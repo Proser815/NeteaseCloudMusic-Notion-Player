@@ -110,7 +110,7 @@ function renderPlaylist() {
   });
 }
 
-// Live NetEase Search (Fixed endpoint query syntax to type=search&id=)
+// Live NetEase Search
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -143,7 +143,7 @@ function renderSearchResults(results) {
       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
         ${song.title} <small style="opacity:0.6;">- ${song.author}</small>
       </span>
-      <button class="btn-add-morph" title="Add Song">＋</button>
+      <button class="btn-add-morph" title="Add Song">+</button>
     `;
 
     const btnAdd = li.querySelector(".btn-add-morph");
@@ -151,7 +151,7 @@ function renderSearchResults(results) {
       if (btnAdd.classList.contains("added")) return;
 
       btnAdd.classList.add("added");
-      btnAdd.innerText = "✓";
+      btnAdd.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
       playlist.push(song);
       renderPlaylist();

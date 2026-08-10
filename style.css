@@ -305,7 +305,6 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   pointer-events: none;
 }
 
-/* Drawer Header */
 .drawer-header {
   display: flex;
   justify-content: space-between;
@@ -404,35 +403,49 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
 
 .search-results li:hover { background: rgba(255, 255, 255, 0.1); }
 
+/* iOS Glassmorphic Add Button */
 .btn-add-morph {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s ease;
+  font-size: 0.85rem;
+  font-weight: 300;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .btn-add-morph:hover {
-  background: rgba(255, 255, 255, 0.4);
-  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  transform: scale(1.08);
 }
 
+.btn-add-morph:active {
+  transform: scale(0.92);
+}
+
+/* Native iOS Glass Added State */
 .btn-add-morph.added {
-  background: #34c759 !important;
-  transform: scale(1.1);
-  animation: popSuccess 0.35s ease-out forwards;
+  background: rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+  animation: iosPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-@keyframes popSuccess {
+@keyframes iosPop {
   0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1.1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1.05); }
 }
 
 /* Playlist Items & Delete Animation */
