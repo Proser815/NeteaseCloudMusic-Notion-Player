@@ -436,11 +436,12 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   justify-content: space-between;
   font-size: 0.78rem;
   border-radius: 6px;
+  transition: background 0.2s ease;
 }
 
-.search-results li:hover { background: rgba(255, 255, 255, 0.1); }
+.search-results li:hover { background: rgba(255, 255, 255, 0.15); }
 
-/* Perfectly Centered iOS Add Button */
+/* Centered Plus/Checkmark Morph Button */
 .btn-add-morph {
   width: 24px;
   height: 24px;

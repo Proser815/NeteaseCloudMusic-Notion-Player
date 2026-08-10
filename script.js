@@ -122,7 +122,7 @@ function renderPlaylist() {
   });
 }
 
-// Live NetEase Search (All Results)
+// Live NetEase Search
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -141,6 +141,7 @@ async function performSearch() {
   }
 }
 
+// Render Search Results with Instant Preview + Add Feature
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -151,6 +152,7 @@ function renderSearchResults(results) {
   searchResultsContainer.classList.remove("hidden");
   results.forEach(song => {
     const li = document.createElement("li");
+    li.style.cursor = "pointer";
     li.innerHTML = `
       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
         ${song.title} <small style="opacity:0.6;">- ${song.author}</small>
@@ -158,8 +160,17 @@ function renderSearchResults(results) {
       <button class="btn-add-morph" title="Add Song">+</button>
     `;
 
+    // 1. Click row to PREVIEW song immediately
+    li.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-add-morph")) return;
+      loadPreviewTrack(song);
+      playTrack();
+    });
+
+    // 2. Click + button to ADD song to main playlist
     const btnAdd = li.querySelector(".btn-add-morph");
-    btnAdd.addEventListener("click", () => {
+    btnAdd.addEventListener("click", (e) => {
+      e.stopPropagation();
       if (btnAdd.classList.contains("added")) return;
 
       btnAdd.classList.add("added");
@@ -167,15 +178,27 @@ function renderSearchResults(results) {
 
       playlist.push(song);
       renderPlaylist();
-
-      setTimeout(() => {
-        searchResultsContainer.classList.add("hidden");
-        searchInput.value = "";
-      }, 800);
     });
 
     searchResultsUl.appendChild(li);
   });
+}
+
+// Loads a searched track directly onto player for previewing
+function loadPreviewTrack(song) {
+  currentIndex = -1; // Unsets active item in current playlist drawer
+  title.innerText = song.title;
+  artist.innerText = song.author;
+  cover.src = song.pic;
+  backdropImg.src = song.pic;
+  audio.src = song.url;
+  
+  setLyricText("");
+
+  Array.from(playlistUl.children).forEach(li => li.classList.remove("active"));
+
+  extractDominantColor(song.pic);
+  fetchLyrics(song.lrc);
 }
 
 async function loadTrack(index) {
@@ -301,12 +324,14 @@ btnPlay.addEventListener("click", () => {
 });
 
 btnNext.addEventListener("click", () => {
+  if (playlist.length === 0) return;
   let next = playMode === 2 ? Math.floor(Math.random() * playlist.length) : (currentIndex + 1) % playlist.length;
   loadTrack(next);
   playTrack();
 });
 
 btnPrev.addEventListener("click", () => {
+  if (playlist.length === 0) return;
   let prev = (currentIndex - 1 + playlist.length) % playlist.length;
   loadTrack(prev);
   playTrack();
