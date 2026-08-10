@@ -1,214 +1,197 @@
-/* ==========================================================================
-   全局重置与变量
-   ========================================================================== */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-  --glass-bg: rgba(255, 255, 255, 0.2);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-shadow: rgba(0, 0, 0, 0.15);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-  font-family: var(--font-family);
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  background-color: #0d0d0d;
   overflow: hidden;
-  background-color: #000;
-  -webkit-font-smoothing: antialiased;
+  color: #ffffff;
 }
 
-/* ==========================================================================
-   Apple Music 动态流体背景
-   ========================================================================== */
-.fluid-background {
+/* 模糊流体背景效果 */
+.blob-container {
   position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
+  filter: blur(80px);
   z-index: 1;
-  filter: blur(60px);
-  overflow: hidden;
-  transform: scale(1.2);
+  opacity: 0.6;
 }
 
-.color-blob {
+.blob {
   position: absolute;
   border-radius: 50%;
-  opacity: 0.8;
-  animation: float 14s infinite ease-in-out alternate;
   transition: background-color 1.5s ease;
 }
 
-.blob-1 {
-  width: 400px;
-  height: 400px;
-  background: #ff2d55;
-  top: -10%;
-  left: -10%;
-  animation-duration: 12s;
+#blob1 {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  left: 15%;
+  background-color: #ff2d55;
 }
 
-.blob-2 {
-  width: 450px;
-  height: 450px;
-  background: #5856d6;
-  bottom: -10%;
-  right: -10%;
-  animation-duration: 16s;
-  animation-delay: -4s;
-}
-
-.blob-3 {
+#blob2 {
   width: 350px;
   height: 350px;
-  background: #ff9500;
+  bottom: 10%;
+  right: 15%;
+  background-color: #5856d6;
+}
+
+#blob3 {
+  width: 250px;
+  height: 250px;
   top: 40%;
-  left: 30%;
-  animation-duration: 10s;
-  animation-delay: -2s;
+  right: 35%;
+  background-color: #ff9500;
 }
 
-@keyframes float {
-  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
-  50% { transform: translate(80px, 50px) scale(1.15) rotate(180deg); }
-  100% { transform: translate(-60px, 80px) scale(0.95) rotate(360deg); }
-}
-
-/* ==========================================================================
-   Apple 锁屏毛玻璃播放卡片
-   ========================================================================== */
+/* 毛玻璃播放器卡片 */
 .player-card {
   position: relative;
   z-index: 2;
   width: 340px;
-  padding: 20px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 24px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 16px 40px var(--glass-shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  color: var(--text-primary);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-.track-info {
+.song-info {
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-bottom: 20px;
 }
 
-.album-cover {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+#albumCover {
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
   object-fit: cover;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   background-color: rgba(255, 255, 255, 0.1);
 }
 
 .details {
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
 
-.song-title {
-  font-size: 1.05rem;
+#songTitle {
+  font-size: 1.1rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.3px;
+  margin-bottom: 4px;
 }
 
-.artist-name {
+#artistName {
   font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.7);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* 进度条 */
 .progress-container {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  margin-bottom: 20px;
 }
 
-.progress-bar, .volume-bar {
+.progress-bar {
   width: 100%;
   height: 5px;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 3px;
-  overflow: hidden;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   cursor: pointer;
+  overflow: hidden;
+  position: relative;
 }
 
-.progress-fill, .volume-fill {
+.progress-fill {
+  width: 0%;
   height: 100%;
   background: #ffffff;
-  border-radius: 3px;
+  border-radius: 10px;
+  transition: width 0.1s linear;
 }
 
-.time-stamps {
+.time-info {
   display: flex;
   justify-content: space-between;
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 6px;
 }
 
+/* 控制按钮 */
 .controls {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin: 4px 0;
-}
-
-.btn {
-  background: none;
-  border: none;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.2s ease;
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
 }
 
-.btn:active {
-  transform: scale(0.88);
-  opacity: 0.7;
+button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, opacity 0.2s ease;
 }
 
-.btn-primary { font-size: 1.8rem; }
-.btn-secondary { font-size: 1.3rem; opacity: 0.85; }
+button:hover {
+  opacity: 0.8;
+}
 
+button:active {
+  transform: scale(0.9);
+}
+
+.play-btn {
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+}
+
+/* 音量控制 */
 .volume-container {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 4px;
+  opacity: 0.8;
 }
 
-.volume-icon {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+.volume-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
 }
 
-.volume-bar { height: 4px; }
+.volume-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 10px;
+}
