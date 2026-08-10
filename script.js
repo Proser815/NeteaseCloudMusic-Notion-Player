@@ -110,7 +110,7 @@ function renderPlaylist() {
   });
 }
 
-// Live NetEase Search
+// Live NetEase Search (Returns all matched results)
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -123,7 +123,7 @@ async function performSearch() {
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const results = await res.json();
-    renderSearchResults(results.slice(0, 4));
+    renderSearchResults(results);
   } catch (err) {
     alert("Search failed.");
   }
@@ -131,7 +131,7 @@ async function performSearch() {
 
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
-  if (results.length === 0) {
+  if (!results || results.length === 0) {
     searchResultsContainer.classList.add("hidden");
     return;
   }

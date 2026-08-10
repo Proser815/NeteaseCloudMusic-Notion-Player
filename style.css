@@ -322,7 +322,7 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
 
 /* Collapsible Search Section */
 .search-section {
-  max-height: 150px;
+  max-height: 200px;
   opacity: 1;
   overflow: hidden;
   transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, margin-bottom 0.3s ease;
@@ -380,7 +380,7 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
 .btn-search-ios:active { transform: scale(0.92); }
 .btn-search-ios svg { width: 15px; height: 15px; fill: #ffffff; }
 
-/* Search Results UI */
+/* Scrollable Full-Length Search Results UI */
 .search-results {
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
@@ -388,7 +388,16 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   border-radius: 10px;
   margin-top: 6px;
   padding: 4px;
+  max-height: 140px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
+
+.search-results::-webkit-scrollbar { width: 4px; }
+.search-results::-webkit-scrollbar-track { background: transparent; }
+.search-results::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+.search-results::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
 
 .search-results ul { list-style: none; }
 
