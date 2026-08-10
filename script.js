@@ -4,7 +4,7 @@ const API_BASE = `https://api.i-meto.com/meting/api?server=netease&type=playlist
 let playlist = [];
 let currentIndex = 0;
 let lyrics = [];
-let playMode = 0; // 0 = Sequential, 1 = Single Loop, 2 = Shuffle
+let playMode = 0;
 
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -28,17 +28,22 @@ const btnNext = document.getElementById("btn-next");
 const btnList = document.getElementById("btn-list");
 const btnMode = document.getElementById("btn-mode");
 
-const modeLoop = document.getElementById("mode-loop");
-const modeOne = document.getElementById("mode-one");
-const modeShuffle = document.getElementById("mode-shuffle");
+const btnVolume = document.getElementById("btn-volume");
+const volumeSlider = document.getElementById("volume-slider");
+const volIcon = document.getElementById("vol-icon");
+const muteIcon = document.getElementById("mute-icon");
 
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
-const addSongInput = document.getElementById("add-song-input");
-const btnAddSong = document.getElementById("btn-add-song");
 
-// Initialize Player & Fetch Default Playlist
+const searchInput = document.getElementById("search-input");
+const btnSearch = document.getElementById("btn-search");
+const searchResultsContainer = document.getElementById("search-results");
+const searchResultsUl = document.getElementById("search-results-ul");
+
+// Init
 async function initPlayer() {
+  audio.volume = 0.8;
   try {
     const res = await fetch(API_BASE);
     playlist = await res.json();
@@ -49,40 +54,117 @@ async function initPlayer() {
   }
 }
 
+// Render Main Playlist with Smooth Delete
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `<span>${index + 1}. ${song.title}</span><span style="opacity:0.6; margin-left:10px;">${song.author}</span>`;
-    li.addEventListener("click", () => {
+    if (index === currentIndex) li.classList.add("active");
+
+    li.innerHTML = `
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
+        ${index + 1}. ${song.title} <small style="opacity:0.6;">- ${song.author}</small>
+      </span>
+      <button class="btn-delete-song" title="Delete Song">
+        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      </button>
+    `;
+
+    // Click item to play
+    li.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-delete-song")) return; // Don't trigger play on delete
       loadTrack(index);
       playTrack();
     });
+
+    // Delete Button Logic with Smooth Slide/Fade
+    const btnDelete = li.querySelector(".btn-delete-song");
+    btnDelete.addEventListener("click", (e) => {
+      e.stopPropagation();
+      li.classList.add("removing");
+      
+      setTimeout(() => {
+        playlist.splice(index, 1);
+        if (playlist.length === 0) {
+          title.innerText = "No Songs";
+          artist.innerText = "";
+          audio.pause();
+        } else if (index === currentIndex) {
+          loadTrack(currentIndex % playlist.length);
+          playTrack();
+        } else if (index < currentIndex) {
+          currentIndex--;
+        }
+        renderPlaylist();
+      }, 300);
+    });
+
     playlistUl.appendChild(li);
   });
 }
 
-// Add Song Feature
-btnAddSong.addEventListener("click", async () => {
-  const songId = addSongInput.value.trim();
-  if (!songId) return;
-
-  try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=song&id=${songId}`);
-    const data = await res.json();
-    if (data && data.length > 0) {
-      playlist.push(data[0]);
-      renderPlaylist();
-      addSongInput.value = "";
-      loadTrack(playlist.length - 1);
-      playTrack();
-    } else {
-      alert("Song not found. Please check the NetEase Song ID.");
-    }
-  } catch (e) {
-    alert("Failed to fetch song info.");
-  }
+// Live NetEase Keyword Search
+btnSearch.addEventListener("click", performSearch);
+searchInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") performSearch();
 });
+
+async function performSearch() {
+  const query = searchInput.value.trim();
+  if (!query) return;
+
+  btnSearch.innerText = "⏳";
+  try {
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
+    const results = await res.json();
+    renderSearchResults(results.slice(0, 4)); // Show top 4 results
+  } catch (err) {
+    alert("Search failed.");
+  } finally {
+    btnSearch.innerText = "🔍";
+  }
+}
+
+// Render Results with Morphing Plus -> Checkmark Button
+function renderSearchResults(results) {
+  searchResultsUl.innerHTML = "";
+  if (results.length === 0) {
+    searchResultsContainer.classList.add("hidden");
+    return;
+  }
+
+  searchResultsContainer.classList.remove("hidden");
+  results.forEach(song => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
+        ${song.title} <small style="opacity:0.6;">- ${song.author}</small>
+      </span>
+      <button class="btn-add-morph" title="Add Song">＋</button>
+    `;
+
+    const btnAdd = li.querySelector(".btn-add-morph");
+    btnAdd.addEventListener("click", () => {
+      if (btnAdd.classList.contains("added")) return;
+
+      // Morph animation to tick mark
+      btnAdd.classList.add("added");
+      btnAdd.innerText = "✓";
+
+      // Append song to playlist
+      playlist.push(song);
+      renderPlaylist();
+
+      // Automatically hide search dropdown after brief delay
+      setTimeout(() => {
+        searchResultsContainer.classList.add("hidden");
+        searchInput.value = "";
+      }, 800);
+    });
+
+    searchResultsUl.appendChild(li);
+  });
+}
 
 async function loadTrack(index) {
   currentIndex = index;
@@ -91,7 +173,7 @@ async function loadTrack(index) {
   title.innerText = song.title;
   artist.innerText = song.author;
   cover.src = song.pic;
-  backdropImg.src = song.pic; // Apply blurred album artwork backdrop
+  backdropImg.src = song.pic;
   audio.src = song.url;
   
   setLyricText("");
@@ -100,13 +182,25 @@ async function loadTrack(index) {
     li.classList.toggle("active", i === index);
   });
 
-  // Extract Dominant Color for iOS-Style Dynamic Backdrop Glow
   extractDominantColor(song.pic);
-
   fetchLyrics(song.lrc);
 }
 
-// Extract Dominant Color using Offscreen Canvas
+// Volume Controls
+volumeSlider.addEventListener("input", (e) => {
+  audio.volume = parseFloat(e.target.value);
+});
+
+btnVolume.addEventListener("click", () => {
+  if (audio.volume > 0) {
+    audio.volume = 0;
+    volumeSlider.value = 0;
+  } else {
+    audio.volume = 0.8;
+    volumeSlider.value = 0.8;
+  }
+});
+
 function extractDominantColor(imageUrl) {
   const img = new Image();
   img.crossOrigin = "Anonymous";
@@ -114,26 +208,18 @@ function extractDominantColor(imageUrl) {
   img.onload = () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    canvas.width = 50;
-    canvas.height = 50;
+    canvas.width = 50; canvas.height = 50;
     ctx.drawImage(img, 0, 0, 50, 50);
 
     const imageData = ctx.getImageData(0, 0, 50, 50).data;
     let r = 0, g = 0, b = 0, count = 0;
 
     for (let i = 0; i < imageData.length; i += 16) {
-      r += imageData[i];
-      g += imageData[i + 1];
-      b += imageData[i + 2];
+      r += imageData[i]; g += imageData[i + 1]; b += imageData[i + 2];
       count++;
     }
 
-    r = Math.floor(r / count);
-    g = Math.floor(g / count);
-    b = Math.floor(b / count);
-
-    // Update dynamic root variables
-    document.documentElement.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
+    r = Math.floor(r / count); g = Math.floor(g / count); b = Math.floor(b / count);
     document.documentElement.style.setProperty("--glow-color", `rgba(${r}, ${g}, ${b}, 0.75)`);
   };
 }
@@ -141,9 +227,7 @@ function extractDominantColor(imageUrl) {
 function setLyricText(text) {
   lyricText.innerText = text;
   marqueeWrapper.classList.remove("marquee-active");
-  if (lyricText.offsetWidth > 200) {
-    marqueeWrapper.classList.add("marquee-active");
-  }
+  if (lyricText.offsetWidth > 200) marqueeWrapper.classList.add("marquee-active");
 }
 
 async function fetchLyrics(lrcUrl) {
@@ -153,9 +237,7 @@ async function fetchLyrics(lrcUrl) {
     const res = await fetch(lrcUrl);
     const text = await res.text();
     parseLRC(text);
-  } catch (e) {
-    lyrics = [];
-  }
+  } catch (e) { lyrics = []; }
 }
 
 function parseLRC(lrcText) {
@@ -168,9 +250,7 @@ function parseLRC(lrcText) {
     if (match) {
       const minutes = parseInt(match[1]);
       const seconds = parseInt(match[2]);
-      const time = minutes * 60 + seconds;
-      const text = line.replace(timeRegex, "").trim();
-      if (text) lyrics.push({ time, text });
+      lyrics.push({ time: minutes * 60 + seconds, text: line.replace(timeRegex, "").trim() });
     }
   });
 }
@@ -204,23 +284,11 @@ btnPrev.addEventListener("click", () => {
   playTrack();
 });
 
-// Mode Toggle
 btnMode.addEventListener("click", () => {
   playMode = (playMode + 1) % 3;
-  modeLoop.classList.add("hidden");
-  modeOne.classList.add("hidden");
-  modeShuffle.classList.add("hidden");
-
-  if (playMode === 0) {
-    modeLoop.classList.remove("hidden");
-    btnMode.title = "Play Mode: Sequential";
-  } else if (playMode === 1) {
-    modeOne.classList.remove("hidden");
-    btnMode.title = "Play Mode: Single Loop";
-  } else if (playMode === 2) {
-    modeShuffle.classList.remove("hidden");
-    btnMode.title = "Play Mode: Shuffle";
-  }
+  document.getElementById("mode-loop").classList.toggle("hidden", playMode !== 0);
+  document.getElementById("mode-one").classList.toggle("hidden", playMode !== 1);
+  document.getElementById("mode-shuffle").classList.toggle("hidden", playMode !== 2);
 });
 
 btnList.addEventListener("click", () => {
@@ -231,7 +299,6 @@ audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   const curTime = audio.currentTime;
   progressBarFill.style.width = `${(curTime / audio.duration) * 100}%`;
-
   currentTimeEl.innerText = formatTime(curTime);
   durationTimeEl.innerText = formatTime(audio.duration);
 
@@ -244,12 +311,8 @@ audio.addEventListener("timeupdate", () => {
 });
 
 audio.addEventListener("ended", () => {
-  if (playMode === 1) {
-    audio.currentTime = 0;
-    playTrack();
-  } else {
-    btnNext.click();
-  }
+  if (playMode === 1) { audio.currentTime = 0; playTrack(); }
+  else { btnNext.click(); }
 });
 
 progressBarBg.addEventListener("click", (e) => {

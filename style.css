@@ -18,7 +18,6 @@ html, body {
   color: #ffffff;
 }
 
-/* Apple Glass Player Card Container */
 .player-card {
   position: relative;
   width: 100%;
@@ -35,7 +34,6 @@ html, body {
   justify-content: center;
 }
 
-/* 1. Large Blurred Album Glass Backdrop */
 .album-backdrop-container {
   position: absolute;
   top: 0;
@@ -67,7 +65,6 @@ html, body {
   background: radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
 }
 
-/* 2. Dynamic Ambient Color Blobs */
 .blob-container {
   position: absolute;
   top: 0;
@@ -86,23 +83,9 @@ html, body {
   transition: background 1.2s ease;
 }
 
-#blob1 {
-  width: 200px;
-  height: 200px;
-  top: -30px;
-  left: -20px;
-  background: var(--glow-color);
-}
+#blob1 { width: 200px; height: 200px; top: -30px; left: -20px; background: var(--glow-color); }
+#blob2 { width: 180px; height: 180px; bottom: -30px; right: -10px; background: var(--glow-color); }
 
-#blob2 {
-  width: 180px;
-  height: 180px;
-  bottom: -30px;
-  right: -10px;
-  background: var(--glow-color);
-}
-
-/* Main Content Wrapper */
 .main-player {
   position: relative;
   z-index: 2;
@@ -118,7 +101,6 @@ html, body {
   object-fit: cover;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   display: block;
-  transition: transform 0.3s ease;
 }
 
 .info-wrapper {
@@ -146,7 +128,6 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* Rolling Marquee Lyrics */
 .lyrics-container {
   height: 18px;
   overflow: hidden;
@@ -178,7 +159,6 @@ html, body {
   animation: marquee 8s linear infinite;
 }
 
-/* 3. Glowing Progress Bar */
 .progress-container {
   display: flex;
   flex-direction: column;
@@ -192,7 +172,6 @@ html, body {
   border-radius: 4px;
   cursor: pointer;
   position: relative;
-  overflow: visible; /* Allows ambient glow to spill smoothly */
 }
 
 .bar-fill {
@@ -200,9 +179,8 @@ html, body {
   width: 0%;
   background: #ffffff;
   border-radius: 4px;
-  /* Active State Glowing Effect */
   box-shadow: 0 0 10px var(--glow-color), 0 0 4px #ffffff;
-  transition: width 0.1s linear, box-shadow 0.5s ease;
+  transition: width 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s ease;
 }
 
 .time-display {
@@ -212,7 +190,6 @@ html, body {
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* 4. Controls & Button Micro-interactions */
 .controls {
   display: flex;
   align-items: center;
@@ -227,21 +204,18 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  outline: none;
 }
 
 .btn-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
   fill: rgba(255, 255, 255, 0.88);
-  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), fill 0.2s ease, filter 0.2s ease;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), fill 0.2s ease;
 }
 
-/* Hover & Active Tactile Scale Feedback */
 .btn-icon:hover svg {
   fill: #ffffff;
   transform: scale(1.12);
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
 }
 
 .btn-icon:active svg {
@@ -254,20 +228,64 @@ html, body {
   fill: #ffffff;
 }
 
-/* 5. Foldable Playlist Drawer & Add Song Bar */
+/* Folding Volume Wrapper */
+.volume-wrapper {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  transition: background 0.3s ease;
+}
+
+.volume-wrapper:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.volume-slider-container {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-left 0.3s ease;
+}
+
+.volume-wrapper:hover .volume-slider-container,
+.volume-wrapper:focus-within .volume-slider-container {
+  max-width: 65px;
+  opacity: 1;
+  margin-left: 4px;
+  margin-right: 6px;
+}
+
+input[type=range]#volume-slider {
+  -webkit-appearance: none;
+  width: 55px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type=range]#volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* Playlist & Search Drawer */
 .playlist-drawer {
   position: relative;
   z-index: 2;
-  max-height: 160px;
+  max-height: 180px;
   opacity: 1;
   margin-top: 10px;
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   overflow-y: auto;
-  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-              opacity 0.25s ease, 
-              margin-top 0.35s ease, 
-              padding-top 0.35s ease;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
 }
 
 .playlist-drawer.collapsed {
@@ -279,13 +297,13 @@ html, body {
   pointer-events: none;
 }
 
-.add-song-bar {
+.search-bar {
   display: flex;
   gap: 6px;
   margin-bottom: 8px;
 }
 
-.add-song-bar input {
+.search-bar input {
   flex: 1;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -296,44 +314,83 @@ html, body {
   outline: none;
 }
 
-.add-song-bar input::placeholder {
+.search-bar input::placeholder {
   color: rgba(255, 255, 255, 0.45);
 }
 
-.add-song-bar button {
-  background: rgba(255, 255, 255, 0.25);
+.search-bar button {
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 8px;
   color: #ffffff;
-  padding: 0 12px;
-  font-size: 1rem;
-  font-weight: bold;
+  padding: 0 10px;
+  font-size: 0.8rem;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.add-song-bar button:hover {
+/* Search Results UI */
+.search-results {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  padding: 4px;
+}
+
+.search-results ul { list-style: none; }
+
+.search-results li {
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+}
+
+/* Morphing Plus to Checkmark Circle Button */
+.btn-add-morph {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s ease;
+}
+
+.btn-add-morph:hover {
   background: rgba(255, 255, 255, 0.4);
-  transform: scale(1.05);
+  transform: scale(1.15);
 }
 
-.add-song-bar button:active {
-  transform: scale(0.92);
+.btn-add-morph.added {
+  background: #34c759 !important; /* Apple Green */
+  transform: scale(1.2);
+  animation: popSuccess 0.35s ease-out forwards;
 }
 
-.playlist-drawer ul {
-  list-style: none;
+@keyframes popSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1.1); }
 }
+
+/* Playlist Items & Delete Animation */
+.playlist-drawer ul { list-style: none; }
 
 .playlist-drawer li {
-  padding: 6px 10px;
+  padding: 6px 8px;
   border-radius: 6px;
   font-size: 0.8rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.75);
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 
 .playlist-drawer li:hover {
@@ -347,7 +404,35 @@ html, body {
   font-weight: 600;
 }
 
-.playlist-drawer::-webkit-scrollbar { width: 4px; }
-.playlist-drawer::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+/* Delete Trash Button */
+.btn-delete-song {
+  background: none;
+  border: none;
+  opacity: 0;
+  cursor: pointer;
+  padding: 2px;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.playlist-drawer li:hover .btn-delete-song {
+  opacity: 0.7;
+}
+
+.btn-delete-song:hover {
+  opacity: 1 !important;
+  transform: scale(1.2);
+}
+
+.btn-delete-song svg {
+  width: 14px;
+  height: 14px;
+  fill: #ff3b30; /* Apple Red */
+}
+
+/* Item Delete Animation */
+.playlist-drawer li.removing {
+  opacity: 0 !important;
+  transform: translateX(30px) !important;
+}
 
 .hidden { display: none !important; }
