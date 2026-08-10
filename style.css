@@ -55,12 +55,12 @@ body {
   background-color: #af52de;
 }
 
-/* Apple-style Frosted Glass Outer Card */
+/* Apple-style Outer Card Container */
 .player-card {
   position: relative;
   z-index: 2;
-  width: 420px; /* Spacious width */
-  padding: 24px;
+  width: 420px;
+  padding: 22px;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(35px) saturate(180%);
   -webkit-backdrop-filter: blur(35px) saturate(180%);
@@ -70,7 +70,7 @@ body {
 }
 
 /* =========================================
-   APlayer Apple Aesthetics & Lyrics Formatting
+   APlayer Styles & Synced Lyrics Setup
    ========================================= */
 
 .aplayer {
@@ -94,20 +94,17 @@ body {
   height: 85px !important;
 }
 
-/* Track Info Container */
+/* Track Info Area */
 .aplayer .aplayer-info {
   margin-left: 105px !important;
-  padding: 2px 0 0 8px !important;
+  padding: 0 0 0 8px !important;
   height: auto !important;
   min-height: 85px !important;
   border-bottom: none !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
 }
 
 .aplayer .aplayer-info .aplayer-music {
-  margin-bottom: 4px !important;
+  margin-bottom: 2px !important;
   height: auto !important;
 }
 
@@ -115,32 +112,31 @@ body {
   color: #ffffff !important;
   font-size: 1.05rem !important;
   font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
 }
 
 .aplayer .aplayer-info .aplayer-music .aplayer-author {
   color: rgba(255, 255, 255, 0.65) !important;
-  font-size: 0.85rem !important;
-  font-weight: 400 !important;
+  font-size: 0.82rem !important;
 }
 
-/* Real-Time Synced Lyrics (Apple Music Style) */
+/* Synced Lyrics Display (Apple Music Style) */
 .aplayer .aplayer-lrc {
   display: block !important;
-  margin: 6px 0 8px 0 !important;
-  height: 32px !important;
+  margin: 4px 0 6px 0 !important;
+  height: 36px !important;
   text-shadow: none !important;
-  mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 75%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 75%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
 }
 
 .aplayer .aplayer-lrc p {
-  color: rgba(255, 255, 255, 0.45) !important;
-  font-size: 0.82rem !important;
-  line-height: 16px !important;
-  height: 16px !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.8rem !important;
+  line-height: 18px !important;
+  height: 18px !important;
   font-weight: 500 !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  margin: 0 !important;
 }
 
 .aplayer .aplayer-lrc p.aplayer-lrc-current {
@@ -173,11 +169,10 @@ body {
   transform: scale(0.7) !important;
 }
 
-/* Controls & Time Display */
+/* Controls & Time */
 .aplayer .aplayer-info .aplayer-controller .aplayer-time {
   color: rgba(255, 255, 255, 0.6) !important;
   font-size: 0.78rem !important;
-  letter-spacing: 0.02em !important;
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
@@ -197,7 +192,7 @@ body {
   background: rgba(0, 0, 0, 0.2) !important;
   backdrop-filter: blur(15px);
   border-radius: 16px;
-  margin-top: 18px !important;
+  margin-top: 16px !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 4px 0;
 }
