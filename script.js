@@ -4,12 +4,15 @@ const API_BASE = `https://api.i-meto.com/meting/api?server=netease&type=playlist
 let playlist = [];
 let currentIndex = 0;
 let lyrics = [];
+let playMode = 0; // 0 = Sequential, 1 = Single Loop, 2 = Shuffle
 
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
+
 const lyricText = document.getElementById("lyric-text");
+const marqueeWrapper = document.querySelector(".marquee-wrapper");
 
 const progressBarBg = document.getElementById("progress-bar-bg");
 const progressBarFill = document.getElementById("progress-bar-fill");
@@ -22,6 +25,11 @@ const pauseIcon = document.getElementById("pause-icon");
 const btnPrev = document.getElementById("btn-prev");
 const btnNext = document.getElementById("btn-next");
 const btnList = document.getElementById("btn-list");
+const btnMode = document.getElementById("btn-mode");
+
+const modeLoop = document.getElementById("mode-loop");
+const modeOne = document.getElementById("mode-one");
+const modeShuffle = document.getElementById("mode-shuffle");
 
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
@@ -42,7 +50,7 @@ function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `<span>${index + 1}. ${song.title}</span><span style="opacity:0.6">${song.author}</span>`;
+    li.innerHTML = `<span>${index + 1}. ${song.title}</span><span style="opacity:0.6; margin-left:10px;">${song.author}</span>`;
     li.addEventListener("click", () => {
       loadTrack(index);
       playTrack();
@@ -59,15 +67,24 @@ async function loadTrack(index) {
   artist.innerText = song.author;
   cover.src = song.pic;
   audio.src = song.url;
-  lyricText.innerText = "";
+  
+  setLyricText("");
 
-  // Highlight playlist item
   Array.from(playlistUl.children).forEach((li, i) => {
     li.classList.toggle("active", i === index);
   });
 
-  // Fetch Synced Lyrics
   fetchLyrics(song.lrc);
+}
+
+function setLyricText(text) {
+  lyricText.innerText = text;
+  
+  // Check if text exceeds container width to apply Apple left-to-right rolling animation
+  marqueeWrapper.classList.remove("marquee-active");
+  if (lyricText.offsetWidth > 240) {
+    marqueeWrapper.classList.add("marquee-active");
+  }
 }
 
 async function fetchLyrics(lrcUrl) {
@@ -117,7 +134,12 @@ btnPlay.addEventListener("click", () => {
 });
 
 btnNext.addEventListener("click", () => {
-  let next = (currentIndex + 1) % playlist.length;
+  let next;
+  if (playMode === 2) { // Shuffle
+    next = Math.floor(Math.random() * playlist.length);
+  } else {
+    next = (currentIndex + 1) % playlist.length;
+  }
   loadTrack(next);
   playTrack();
 });
@@ -128,11 +150,32 @@ btnPrev.addEventListener("click", () => {
   playTrack();
 });
 
-btnList.addEventListener("click", () => {
-  playlistDrawer.classList.toggle("hidden");
+// Mode Toggle (Loop All -> Loop One -> Shuffle)
+btnMode.addEventListener("click", () => {
+  playMode = (playMode + 1) % 3;
+  
+  modeLoop.classList.add("hidden");
+  modeOne.classList.add("hidden");
+  modeShuffle.classList.add("hidden");
+
+  if (playMode === 0) {
+    modeLoop.classList.remove("hidden");
+    btnMode.title = "Play Mode: Sequential";
+  } else if (playMode === 1) {
+    modeOne.classList.remove("hidden");
+    btnMode.title = "Play Mode: Single Loop";
+  } else if (playMode === 2) {
+    modeShuffle.classList.remove("hidden");
+    btnMode.title = "Play Mode: Shuffle";
+  }
 });
 
-// Update progress bar & real-time lyrics
+// Smooth Folder Drawer Toggle
+btnList.addEventListener("click", () => {
+  playlistDrawer.classList.toggle("collapsed");
+});
+
+// Time & Lyrics Update Loop
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   
@@ -146,20 +189,27 @@ audio.addEventListener("timeupdate", () => {
   // Sync lyrics line
   if (lyrics.length > 0) {
     let currentLine = lyrics.filter(l => l.time <= curTime).pop();
-    if (currentLine) lyricText.innerText = currentLine.text;
+    if (currentLine && lyricText.innerText !== currentLine.text) {
+      setLyricText(currentLine.text);
+    }
   }
 });
 
+// Song End Logic depending on active playMode
 audio.addEventListener("ended", () => {
-  btnNext.click();
+  if (playMode === 1) { // Single Loop
+    audio.currentTime = 0;
+    playTrack();
+  } else {
+    btnNext.click();
+  }
 });
 
-// Seek audio on progress bar click
+// Seek Audio
 progressBarBg.addEventListener("click", (e) => {
   const rect = progressBarBg.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
-  const width = rect.width;
-  audio.currentTime = (clickX / width) * audio.duration;
+  audio.currentTime = (clickX / rect.width) * audio.duration;
 });
 
 function formatTime(seconds) {

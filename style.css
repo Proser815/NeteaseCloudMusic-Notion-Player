@@ -35,11 +35,12 @@ body {
 #blob2 { width: 360px; height: 360px; bottom: 12%; right: 18%; background-color: #5856d6; }
 #blob3 { width: 280px; height: 280px; top: 38%; right: 32%; background-color: #af52de; }
 
-/* Apple-style Frosted Glass Outer Card */
+/* Apple-style Outer Card Container */
 .player-card {
   position: relative;
   z-index: 2;
   width: 420px;
+  max-width: 90vw;
   padding: 20px;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(35px) saturate(180%);
@@ -47,7 +48,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 26px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .main-player {
@@ -66,12 +67,13 @@ body {
   display: block;
 }
 
-/* Track Information & Layout */
+/* Track Info Wrapper */
 .info-wrapper {
   flex: 1;
+  min-width: 0; /* Ensures inner flex items truncate/marquee without expanding the parent */
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .title {
@@ -81,7 +83,6 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 260px;
 }
 
 .artist {
@@ -90,25 +91,39 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 260px;
 }
 
-/* Synced Lyric Container (Auto-collapses when empty) */
+/* Real-time Rolling (Marquee) Lyrics */
 .lyrics-container {
   height: 20px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.marquee-wrapper {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
 }
 
 .lyric-text {
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: opacity 0.2s ease;
+  display: inline-block;
+}
+
+/* Smooth Scrolling Keyframe Animation for Long Lyrics */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  15% { transform: translateX(0); }
+  85% { transform: translateX(calc(-100% + 240px)); }
+  100% { transform: translateX(0); }
+}
+
+.marquee-active {
+  animation: marquee 8s linear infinite;
 }
 
 /* Progress Bar */
@@ -133,6 +148,7 @@ body {
   width: 0%;
   background: #ffffff;
   border-radius: 4px;
+  transition: width 0.1s linear;
 }
 
 .time-display {
@@ -148,7 +164,6 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-top: 2px;
-  padding: 0 4px;
 }
 
 .btn-icon {
@@ -179,18 +194,27 @@ body {
   fill: #ffffff;
 }
 
-/* Foldable Playlist Drawer */
+/* Buttery Smooth Sliding Playlist Drawer */
 .playlist-drawer {
-  margin-top: 16px;
-  padding-top: 12px;
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 14px;
+  padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  max-height: 180px;
   overflow-y: auto;
-  transition: all 0.3s ease;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.25s ease, 
+              margin-top 0.35s ease, 
+              padding-top 0.35s ease;
 }
 
-.playlist-drawer.hidden {
-  display: none !important;
+.playlist-drawer.collapsed {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top-color: transparent !important;
+  pointer-events: none;
 }
 
 .playlist-drawer ul {
@@ -205,7 +229,7 @@ body {
   justify-content: space-between;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.7);
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .playlist-drawer li:hover {
@@ -217,6 +241,15 @@ body {
   background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
   font-weight: 600;
+}
+
+/* Custom Scrollbar for Drawer */
+.playlist-drawer::-webkit-scrollbar {
+  width: 4px;
+}
+.playlist-drawer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
 }
 
 .hidden { display: none !important; }
