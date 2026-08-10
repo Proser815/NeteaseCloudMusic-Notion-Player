@@ -35,12 +35,14 @@ const volumeSlider = document.getElementById("volume-slider");
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
 
+const btnToggleSearch = document.getElementById("btn-toggle-search");
+const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
 const btnSearch = document.getElementById("btn-search");
 const searchResultsContainer = document.getElementById("search-results");
 const searchResultsUl = document.getElementById("search-results-ul");
 
-// Init
+// Init Player
 async function initPlayer() {
   audio.volume = 0.8;
   try {
@@ -53,7 +55,15 @@ async function initPlayer() {
   }
 }
 
-// Render Main Playlist with Delete Button
+// Foldable Search Bar Toggle
+btnToggleSearch.addEventListener("click", () => {
+  searchSection.classList.toggle("collapsed");
+  if (!searchSection.classList.contains("collapsed")) {
+    searchInput.focus();
+  }
+});
+
+// Render Main Playlist with Delete
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
@@ -100,7 +110,7 @@ function renderPlaylist() {
   });
 }
 
-// Live Search Logic
+// Live NetEase Search (Fixed endpoint query syntax to type=search&id=)
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -111,7 +121,7 @@ async function performSearch() {
   if (!query) return;
 
   try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const results = await res.json();
     renderSearchResults(results.slice(0, 4));
   } catch (err) {
@@ -285,7 +295,7 @@ btnList.addEventListener("click", () => {
   playlistDrawer.classList.toggle("collapsed");
 });
 
-// Smooth Interactive Timeline Scrubbing / Dragging
+// Timeline Dragging
 function updateProgressFromEvent(e) {
   if (!audio.duration) return;
   const rect = progressBarBg.getBoundingClientRect();

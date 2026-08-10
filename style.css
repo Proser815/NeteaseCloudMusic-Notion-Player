@@ -159,7 +159,6 @@ html, body {
   animation: marquee 8s linear infinite;
 }
 
-/* Smooth Interactive Progress Bar with Drag Support */
 .progress-container {
   display: flex;
   flex-direction: column;
@@ -231,7 +230,6 @@ html, body {
   fill: #ffffff;
 }
 
-/* Folding Volume Wrapper */
 .volume-wrapper {
   display: flex;
   align-items: center;
@@ -278,39 +276,25 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   background: #ffffff;
 }
 
-/* Playlist & Search Drawer */
+/* Playlist Drawer */
 .playlist-drawer {
   position: relative;
   z-index: 2;
-  max-height: 180px;
+  max-height: 220px;
   opacity: 1;
   margin-top: 10px;
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   overflow-y: auto;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
-
-  /* Custom Sleek Glass Scrollbar (Fixes native white bar) */
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.playlist-drawer::-webkit-scrollbar {
-  width: 4px;
-}
-
-.playlist-drawer::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.playlist-drawer::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-.playlist-drawer::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
+.playlist-drawer::-webkit-scrollbar { width: 4px; }
+.playlist-drawer::-webkit-scrollbar-track { background: transparent; }
+.playlist-drawer::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+.playlist-drawer::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
 
 .playlist-drawer.collapsed {
   max-height: 0 !important;
@@ -321,11 +305,41 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   pointer-events: none;
 }
 
-/* Apple Search Input & Icon */
+/* Drawer Header */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px 6px 4px;
+}
+
+.drawer-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Collapsible Search Section */
+.search-section {
+  max-height: 150px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, margin-bottom 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.search-section.collapsed {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  margin-bottom: 0 !important;
+  pointer-events: none;
+}
+
 .search-bar {
   display: flex;
   gap: 6px;
-  margin-bottom: 8px;
   align-items: center;
 }
 
@@ -363,19 +377,9 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.btn-search-ios:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.btn-search-ios:active {
-  transform: scale(0.92);
-}
-
-.btn-search-ios svg {
-  width: 15px;
-  height: 15px;
-  fill: #ffffff;
-}
+.btn-search-ios:hover { background: rgba(255, 255, 255, 0.3); }
+.btn-search-ios:active { transform: scale(0.92); }
+.btn-search-ios svg { width: 15px; height: 15px; fill: #ffffff; }
 
 /* Search Results UI */
 .search-results {
@@ -383,7 +387,7 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  margin-bottom: 8px;
+  margin-top: 6px;
   padding: 4px;
 }
 
@@ -398,11 +402,8 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   border-radius: 6px;
 }
 
-.search-results li:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
+.search-results li:hover { background: rgba(255, 255, 255, 0.1); }
 
-/* Morphing Plus to Checkmark Circle Button */
 .btn-add-morph {
   width: 22px;
   height: 22px;
@@ -423,7 +424,7 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
 }
 
 .btn-add-morph.added {
-  background: #34c759 !important; /* Apple Green */
+  background: #34c759 !important;
   transform: scale(1.1);
   animation: popSuccess 0.35s ease-out forwards;
 }
@@ -460,7 +461,6 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   font-weight: 600;
 }
 
-/* Delete Trash Button */
 .btn-delete-song {
   background: none;
   border: none;
@@ -470,22 +470,15 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
-.playlist-drawer li:hover .btn-delete-song {
-  opacity: 0.7;
-}
+.playlist-drawer li:hover .btn-delete-song { opacity: 0.7; }
 
 .btn-delete-song:hover {
   opacity: 1 !important;
   transform: scale(1.2);
 }
 
-.btn-delete-song svg {
-  width: 14px;
-  height: 14px;
-  fill: #ff3b30; /* Apple Red */
-}
+.btn-delete-song svg { width: 14px; height: 14px; fill: #ff3b30; }
 
-/* Item Delete Animation */
 .playlist-drawer li.removing {
   opacity: 0 !important;
   transform: translateX(30px) !important;
