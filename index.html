@@ -4,11 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Music Player</title>
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
-
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,23 +15,55 @@
   </div>
 
   <div class="player-card">
-    <meting-js
-      server="netease"
-      type="playlist"
-      id="18210633647"
-      api="https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id"
-      fixed="false"
-      mini="false"
-      autoplay="false"
-      theme="#ffffff"
-      loop="all"
-      order="list"
-      preload="auto"
-      list-folded="true"
-      list-max-height="200px"
-      lrc-type="3">
-    </meting-js>
+    <div class="main-player">
+      <div class="cover-wrapper">
+        <img id="cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
+      </div>
+
+      <div class="info-wrapper">
+        <div class="track-details">
+          <div id="title" class="title">Probably Up</div>
+          <div id="artist" class="artist">Lawrence</div>
+        </div>
+
+        <div id="lyrics-container" class="lyrics-container">
+          <p id="lyric-text" class="lyric-text"></p>
+        </div>
+
+        <div class="progress-container">
+          <div class="bar-bg" id="progress-bar-bg">
+            <div class="bar-fill" id="progress-bar-fill"></div>
+          </div>
+          <div class="time-display">
+            <span id="current-time">00:00</span>
+            <span id="duration-time">00:00</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="btn-prev" class="btn-icon" title="Previous">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button id="btn-play" class="btn-icon btn-play" title="Play/Pause">
+            <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <button id="btn-next" class="btn-icon" title="Next">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+          <button id="btn-list" class="btn-icon" title="Playlist">
+            <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="playlist-drawer" class="playlist-drawer hidden">
+      <ul id="playlist-ul"></ul>
+    </div>
   </div>
 
+  <audio id="audio-player" crossorigin="anonymous"></audio>
+  <script src="script.js"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ body {
   color: #ffffff;
 }
 
-/* Ambient Glow Background */
+/* Ambient Background Glow */
 .blob-container {
   position: absolute;
   width: 100%;
@@ -31,229 +31,192 @@ body {
   transition: background-color 1.5s ease;
 }
 
-#blob1 {
-  width: 320px;
-  height: 320px;
-  top: 15%;
-  left: 20%;
-  background-color: #ff2d55;
-}
+#blob1 { width: 320px; height: 320px; top: 15%; left: 20%; background-color: #ff2d55; }
+#blob2 { width: 360px; height: 360px; bottom: 12%; right: 18%; background-color: #5856d6; }
+#blob3 { width: 280px; height: 280px; top: 38%; right: 32%; background-color: #af52de; }
 
-#blob2 {
-  width: 360px;
-  height: 360px;
-  bottom: 12%;
-  right: 18%;
-  background-color: #5856d6;
-}
-
-#blob3 {
-  width: 280px;
-  height: 280px;
-  top: 38%;
-  right: 32%;
-  background-color: #af52de;
-}
-
-/* Frosted Glass Outer Card */
+/* Apple-style Frosted Glass Outer Card */
 .player-card {
   position: relative;
   z-index: 2;
   width: 420px;
-  padding: 22px;
+  padding: 20px;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(35px) saturate(180%);
   -webkit-backdrop-filter: blur(35px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 26px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
-/* =========================================
-   APlayer Layout Overrides
-   ========================================= */
-
-.aplayer {
-  background: transparent !important;
-  box-shadow: none !important;
-  border-radius: 18px !important;
-  margin: 0 !important;
-  font-family: inherit !important;
-}
-
-.aplayer .aplayer-body {
-  background: transparent !important;
-  padding: 0 !important;
+.main-player {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
 /* Album Cover */
-.aplayer .aplayer-pic {
-  border-radius: 16px !important;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35) !important;
-  width: 85px !important;
-  height: 85px !important;
-  float: left !important;
+.cover-wrapper img {
+  width: 90px;
+  height: 90px;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  display: block;
 }
 
-/* Track Info Wrapper */
-.aplayer .aplayer-info {
-  margin-left: 100px !important;
-  padding: 0 !important;
-  height: auto !important;
-  min-height: 85px !important;
-  border-bottom: none !important;
+/* Track Information & Layout */
+.info-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.aplayer .aplayer-info .aplayer-music {
-  margin-bottom: 2px !important;
-  height: auto !important;
+.title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
 }
 
-.aplayer .aplayer-info .aplayer-music .aplayer-title {
-  color: #ffffff !important;
-  font-size: 1.05rem !important;
-  font-weight: 600 !important;
+.artist {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
 }
 
-.aplayer .aplayer-info .aplayer-music .aplayer-author {
-  color: rgba(255, 255, 255, 0.65) !important;
-  font-size: 0.82rem !important;
+/* Synced Lyric Container (Auto-collapses when empty) */
+.lyrics-container {
+  height: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
-/* =========================================
-   FORCE SHOW SYNCED LYRICS
-   ========================================= */
-
-/* Un-hide and format the lyric wrapper */
-.aplayer .aplayer-lrc,
-.aplayer.aplayer-withlrc .aplayer-lrc {
-  display: block !important;
-  position: relative !important;
-  top: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  margin: 6px 0 8px 0 !important;
-  height: 38px !important;
-  overflow: hidden !important;
-  text-shadow: none !important;
-  mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
-}
-
-.aplayer .aplayer-lrc:before,
-.aplayer .aplayer-lrc:after {
-  display: none !important;
-}
-
-.aplayer .aplayer-lrc .aplayer-lrc-contents {
-  width: 100% !important;
-  position: relative !important;
-  transition: all 0.5s ease-out !important;
-}
-
-.aplayer .aplayer-lrc p {
-  color: rgba(255, 255, 255, 0.35) !important;
-  font-size: 0.8rem !important;
-  line-height: 19px !important;
-  height: 19px !important;
-  font-weight: 500 !important;
-  transition: all 0.3s ease !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  opacity: 0.6 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-/* Active Lyric Line Highlighting */
-.aplayer .aplayer-lrc p.aplayer-lrc-current {
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  opacity: 1 !important;
-  transform: scale(1.02);
+.lyric-text {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.2s ease;
 }
 
 /* Progress Bar */
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap {
-  padding: 6px 0 !important;
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
-  background: rgba(255, 255, 255, 0.18) !important;
-  height: 4px !important;
-  border-radius: 10px !important;
+.bar-bg {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
-  background: #ffffff !important;
-  height: 4px !important;
-  border-radius: 10px !important;
+.bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #ffffff;
+  border-radius: 4px;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
-  background: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
-  transform: scale(0.7) !important;
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-/* Player Control Icons & Time */
-.aplayer .aplayer-info .aplayer-controller .aplayer-time {
-  color: rgba(255, 255, 255, 0.6) !important;
-  font-size: 0.78rem !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
+/* Apple Media Controls */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  padding: 0 4px;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-time .aplayer-icon path {
-  fill: rgba(255, 255, 255, 0.85) !important;
-  transition: fill 0.2s ease !important;
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.aplayer .aplayer-info .aplayer-controller .aplayer-time .aplayer-icon:hover path {
-  fill: #ffffff !important;
+.btn-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: rgba(255, 255, 255, 0.85);
+  transition: fill 0.2s ease, transform 0.1s ease;
 }
 
-/* Playlist Drawer */
-.aplayer .aplayer-list {
-  background: rgba(0, 0, 0, 0.2) !important;
-  backdrop-filter: blur(15px);
-  border-radius: 16px;
-  margin-top: 16px !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 4px 0;
+.btn-icon:hover svg {
+  fill: #ffffff;
+  transform: scale(1.1);
 }
 
-.aplayer .aplayer-list ol li {
-  height: 40px !important;
-  line-height: 40px !important;
-  padding: 0 16px !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.04) !important;
-  transition: all 0.2s ease;
+.btn-play svg {
+  width: 26px;
+  height: 26px;
+  fill: #ffffff;
 }
 
-.aplayer .aplayer-list ol li:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
+/* Foldable Playlist Drawer */
+.playlist-drawer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: 180px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
 }
 
-.aplayer .aplayer-list ol li.aplayer-list-light {
-  background: rgba(255, 255, 255, 0.2) !important;
+.playlist-drawer.hidden {
+  display: none !important;
+}
+
+.playlist-drawer ul {
+  list-style: none;
+}
+
+.playlist-drawer li {
+  padding: 8px 12px;
   border-radius: 8px;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background 0.2s ease;
 }
 
-.aplayer .aplayer-list ol li .aplayer-list-title {
-  color: #ffffff !important;
-  font-size: 0.9rem !important;
+.playlist-drawer li:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
-.aplayer .aplayer-list ol li .aplayer-list-author {
-  color: rgba(255, 255, 255, 0.55) !important;
-  font-size: 0.8rem !important;
+.playlist-drawer li.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 600;
 }
 
-.aplayer .aplayer-list ol li .aplayer-list-index {
-  color: rgba(255, 255, 255, 0.4) !important;
-  margin-right: 12px !important;
-}
+.hidden { display: none !important; }
