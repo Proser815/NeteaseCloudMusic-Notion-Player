@@ -2,7 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
@@ -15,14 +15,14 @@ body {
   color: #ffffff;
 }
 
-/* 模糊流体背景 */
+/* 背景流体弥散光影 */
 .blob-container {
   position: absolute;
   width: 100%;
   height: 100%;
   filter: blur(80px);
   z-index: 1;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .blob {
@@ -32,8 +32,8 @@ body {
 }
 
 #blob1 {
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   top: 10%;
   left: 15%;
   background-color: #ff2d55;
@@ -55,49 +55,122 @@ body {
   background-color: #ff9500;
 }
 
-/* 毛玻璃播放器卡片 */
+/* 外层苹果风毛玻璃卡片 */
 .player-card {
   position: relative;
   z-index: 2;
-  width: 340px;
+  width: 360px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
-/* 适配 APlayer 暗色毛玻璃样式 */
+/* =========================================
+   深度重置 APlayer 内部样式 (修复UI错乱)
+   ========================================= */
+
+/* 1. 彻底清除原生白色背景和外边框 */
 .aplayer {
   background: transparent !important;
   box-shadow: none !important;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   margin: 0 !important;
+  font-family: inherit !important;
 }
 
 .aplayer .aplayer-body {
   background: transparent !important;
+  padding: 4px !important;
 }
 
-.aplayer .aplayer-title {
+/* 2. 专辑封面圆角与阴影 */
+.aplayer .aplayer-pic {
+  border-radius: 14px !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+  width: 75px !important;
+  height: 75px !important;
+}
+
+/* 3. 歌曲信息与文字颜色 */
+.aplayer .aplayer-info {
+  margin-left: 85px !important;
+  padding: 6px 10px 0 10px !important;
+  height: 75px !important;
+  border-bottom: none !important;
+}
+
+.aplayer .aplayer-info .aplayer-music {
+  margin-bottom: 8px !important;
+}
+
+.aplayer .aplayer-info .aplayer-music .aplayer-title {
   color: #ffffff !important;
+  font-size: 1rem !important;
   font-weight: 600 !important;
 }
 
-.aplayer .aplayer-author {
+.aplayer .aplayer-info .aplayer-music .aplayer-author {
   color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.8rem !important;
 }
 
+/* 4. 进度条美化 */
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap {
+  padding: 4px 0 !important;
+}
+
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
+  background: rgba(255, 255, 255, 0.2) !important;
+  height: 4px !important;
+  border-radius: 4px !important;
+}
+
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-loaded {
+  background: rgba(255, 255, 255, 0.3) !important;
+  height: 4px !important;
+}
+
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
+  background: #ffffff !important;
+  height: 4px !important;
+  border-radius: 4px !important;
+}
+
+.aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played .aplayer-thumb {
+  background: #ffffff !important;
+  transform: scale(0.8) !important;
+}
+
+/* 5. 时间与按钮控制区 */
+.aplayer .aplayer-info .aplayer-controller .aplayer-time {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.75rem !important;
+}
+
+.aplayer .aplayer-info .aplayer-controller .aplayer-time .aplayer-icon path {
+  fill: rgba(255, 255, 255, 0.85) !important;
+}
+
+.aplayer .aplayer-info .aplayer-controller .aplayer-time .aplayer-icon:hover path {
+  fill: #ffffff !important;
+}
+
+/* 6. 展开的歌单列表美化 */
 .aplayer .aplayer-list {
-  background: rgba(0, 0, 0, 0.2) !important;
-  border-radius: 10px;
-  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  margin-top: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .aplayer .aplayer-list ol li {
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: background 0.2s ease;
 }
 
 .aplayer .aplayer-list ol li:hover {
@@ -105,10 +178,14 @@ body {
 }
 
 .aplayer .aplayer-list ol li.aplayer-list-light {
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
 }
 
 .aplayer .aplayer-list ol li .aplayer-list-title,
 .aplayer .aplayer-list ol li .aplayer-list-author {
   color: #ffffff !important;
+}
+
+.aplayer .aplayer-list ol li .aplayer-list-index {
+  color: rgba(255, 255, 255, 0.5) !important;
 }
