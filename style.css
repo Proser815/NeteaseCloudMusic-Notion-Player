@@ -15,7 +15,7 @@ body {
   color: #ffffff;
 }
 
-/* Background Fluid Blur */
+/* Ambient Glow Background */
 .blob-container {
   position: absolute;
   width: 100%;
@@ -55,7 +55,7 @@ body {
   background-color: #af52de;
 }
 
-/* Apple-style Outer Card Container */
+/* Frosted Glass Outer Card */
 .player-card {
   position: relative;
   z-index: 2;
@@ -70,7 +70,7 @@ body {
 }
 
 /* =========================================
-   APlayer Styles & Synced Lyrics Setup
+   APlayer Layout Overrides
    ========================================= */
 
 .aplayer {
@@ -86,18 +86,19 @@ body {
   padding: 0 !important;
 }
 
-/* Cover Art */
+/* Album Cover */
 .aplayer .aplayer-pic {
   border-radius: 16px !important;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35) !important;
   width: 85px !important;
   height: 85px !important;
+  float: left !important;
 }
 
-/* Track Info Area */
+/* Track Info Wrapper */
 .aplayer .aplayer-info {
-  margin-left: 105px !important;
-  padding: 0 0 0 8px !important;
+  margin-left: 100px !important;
+  padding: 0 !important;
   height: auto !important;
   min-height: 85px !important;
   border-bottom: none !important;
@@ -119,26 +120,54 @@ body {
   font-size: 0.82rem !important;
 }
 
-/* Synced Lyrics Display (Apple Music Style) */
-.aplayer .aplayer-lrc {
+/* =========================================
+   FORCE SHOW SYNCED LYRICS
+   ========================================= */
+
+/* Un-hide and format the lyric wrapper */
+.aplayer .aplayer-lrc,
+.aplayer.aplayer-withlrc .aplayer-lrc {
   display: block !important;
-  margin: 4px 0 6px 0 !important;
-  height: 36px !important;
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  margin: 6px 0 8px 0 !important;
+  height: 38px !important;
+  overflow: hidden !important;
   text-shadow: none !important;
   mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
   -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
 }
 
-.aplayer .aplayer-lrc p {
-  color: rgba(255, 255, 255, 0.4) !important;
-  font-size: 0.8rem !important;
-  line-height: 18px !important;
-  height: 18px !important;
-  font-weight: 500 !important;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
-  margin: 0 !important;
+.aplayer .aplayer-lrc:before,
+.aplayer .aplayer-lrc:after {
+  display: none !important;
 }
 
+.aplayer .aplayer-lrc .aplayer-lrc-contents {
+  width: 100% !important;
+  position: relative !important;
+  transition: all 0.5s ease-out !important;
+}
+
+.aplayer .aplayer-lrc p {
+  color: rgba(255, 255, 255, 0.35) !important;
+  font-size: 0.8rem !important;
+  line-height: 19px !important;
+  height: 19px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0.6 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Active Lyric Line Highlighting */
 .aplayer .aplayer-lrc p.aplayer-lrc-current {
   color: #ffffff !important;
   font-weight: 700 !important;
@@ -169,7 +198,7 @@ body {
   transform: scale(0.7) !important;
 }
 
-/* Controls & Time */
+/* Player Control Icons & Time */
 .aplayer .aplayer-info .aplayer-controller .aplayer-time {
   color: rgba(255, 255, 255, 0.6) !important;
   font-size: 0.78rem !important;
@@ -187,7 +216,7 @@ body {
   fill: #ffffff !important;
 }
 
-/* Foldable Playlist Menu */
+/* Playlist Drawer */
 .aplayer .aplayer-list {
   background: rgba(0, 0, 0, 0.2) !important;
   backdrop-filter: blur(15px);
