@@ -15,7 +15,7 @@ body {
   color: #ffffff;
 }
 
-/* 背景柔和弥散光影 */
+/* Background Fluid Blur */
 .blob-container {
   position: absolute;
   width: 100%;
@@ -55,12 +55,12 @@ body {
   background-color: #af52de;
 }
 
-/* 苹果风外层容器 (加宽并增加留白) */
+/* Apple-style Frosted Glass Outer Card */
 .player-card {
   position: relative;
   z-index: 2;
-  width: 400px; /* 从 340px 调宽到 400px，舒展空间 */
-  padding: 24px; /* 增加留白 */
+  width: 420px; /* Spacious width */
+  padding: 24px;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(35px) saturate(180%);
   -webkit-backdrop-filter: blur(35px) saturate(180%);
@@ -70,7 +70,7 @@ body {
 }
 
 /* =========================================
-   APlayer 苹果美化重置
+   APlayer Apple Aesthetics & Lyrics Formatting
    ========================================= */
 
 .aplayer {
@@ -86,7 +86,7 @@ body {
   padding: 0 !important;
 }
 
-/* 专辑封面 - Apple Music 风格大圆角与阴影 */
+/* Cover Art */
 .aplayer .aplayer-pic {
   border-radius: 16px !important;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35) !important;
@@ -94,20 +94,20 @@ body {
   height: 85px !important;
 }
 
-/* 右侧信息区域布局调整 (拉开间距，解决文字堆叠) */
+/* Track Info Container */
 .aplayer .aplayer-info {
-  margin-left: 105px !important; /* 给更大的封面留出空间 */
+  margin-left: 105px !important;
   padding: 2px 0 0 8px !important;
-  height: 85px !important;
+  height: auto !important;
+  min-height: 85px !important;
   border-bottom: none !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
 }
 
-/* 歌名与歌手拉开垂直距离 */
 .aplayer .aplayer-info .aplayer-music {
-  margin-bottom: 6px !important;
+  margin-bottom: 4px !important;
   height: auto !important;
 }
 
@@ -124,15 +124,35 @@ body {
   font-weight: 400 !important;
 }
 
-/* 隐藏干扰视觉的“作曲”等遮罩行（如果有） */
-.aplayer .aplayer-info .aplayer-lrc {
-  display: none !important;
+/* Real-Time Synced Lyrics (Apple Music Style) */
+.aplayer .aplayer-lrc {
+  display: block !important;
+  margin: 6px 0 8px 0 !important;
+  height: 32px !important;
+  text-shadow: none !important;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 75%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 75%, transparent 100%);
 }
 
-/* 进度条 - iOS 极简细线风格 */
+.aplayer .aplayer-lrc p {
+  color: rgba(255, 255, 255, 0.45) !important;
+  font-size: 0.82rem !important;
+  line-height: 16px !important;
+  height: 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+  transform: scale(1.02);
+}
+
+/* Progress Bar */
 .aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap {
   padding: 6px 0 !important;
-  margin-right: 0 !important;
 }
 
 .aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
@@ -153,14 +173,14 @@ body {
   transform: scale(0.7) !important;
 }
 
-/* 按钮与时间区 (加大图标与间距) */
+/* Controls & Time Display */
 .aplayer .aplayer-info .aplayer-controller .aplayer-time {
   color: rgba(255, 255, 255, 0.6) !important;
   font-size: 0.78rem !important;
   letter-spacing: 0.02em !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important; /* 控制按钮之间更宽松的间隔 */
+  gap: 8px !important;
 }
 
 .aplayer .aplayer-info .aplayer-controller .aplayer-time .aplayer-icon path {
@@ -172,7 +192,7 @@ body {
   fill: #ffffff !important;
 }
 
-/* 折叠菜单列表 - Apple List 风格 */
+/* Foldable Playlist Menu */
 .aplayer .aplayer-list {
   background: rgba(0, 0, 0, 0.2) !important;
   backdrop-filter: blur(15px);
