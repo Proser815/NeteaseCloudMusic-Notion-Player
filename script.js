@@ -5,6 +5,7 @@ let playlist = [];
 let currentIndex = 0;
 let lyrics = [];
 let playMode = 0;
+let isDraggingProgress = false;
 
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -30,8 +31,6 @@ const btnMode = document.getElementById("btn-mode");
 
 const btnVolume = document.getElementById("btn-volume");
 const volumeSlider = document.getElementById("volume-slider");
-const volIcon = document.getElementById("vol-icon");
-const muteIcon = document.getElementById("mute-icon");
 
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
@@ -54,7 +53,7 @@ async function initPlayer() {
   }
 }
 
-// Render Main Playlist with Smooth Delete
+// Render Main Playlist with Delete Button
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
@@ -70,14 +69,12 @@ function renderPlaylist() {
       </button>
     `;
 
-    // Click item to play
     li.addEventListener("click", (e) => {
-      if (e.target.closest(".btn-delete-song")) return; // Don't trigger play on delete
+      if (e.target.closest(".btn-delete-song")) return;
       loadTrack(index);
       playTrack();
     });
 
-    // Delete Button Logic with Smooth Slide/Fade
     const btnDelete = li.querySelector(".btn-delete-song");
     btnDelete.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -103,7 +100,7 @@ function renderPlaylist() {
   });
 }
 
-// Live NetEase Keyword Search
+// Live Search Logic
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -113,19 +110,15 @@ async function performSearch() {
   const query = searchInput.value.trim();
   if (!query) return;
 
-  btnSearch.innerText = "⏳";
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
     const results = await res.json();
-    renderSearchResults(results.slice(0, 4)); // Show top 4 results
+    renderSearchResults(results.slice(0, 4));
   } catch (err) {
     alert("Search failed.");
-  } finally {
-    btnSearch.innerText = "🔍";
   }
 }
 
-// Render Results with Morphing Plus -> Checkmark Button
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (results.length === 0) {
@@ -147,15 +140,12 @@ function renderSearchResults(results) {
     btnAdd.addEventListener("click", () => {
       if (btnAdd.classList.contains("added")) return;
 
-      // Morph animation to tick mark
       btnAdd.classList.add("added");
       btnAdd.innerText = "✓";
 
-      // Append song to playlist
       playlist.push(song);
       renderPlaylist();
 
-      // Automatically hide search dropdown after brief delay
       setTimeout(() => {
         searchResultsContainer.classList.add("hidden");
         searchInput.value = "";
@@ -295,8 +285,40 @@ btnList.addEventListener("click", () => {
   playlistDrawer.classList.toggle("collapsed");
 });
 
-audio.addEventListener("timeupdate", () => {
+// Smooth Interactive Timeline Scrubbing / Dragging
+function updateProgressFromEvent(e) {
   if (!audio.duration) return;
+  const rect = progressBarBg.getBoundingClientRect();
+  let percent = (e.clientX - rect.left) / rect.width;
+  percent = Math.max(0, Math.min(1, percent));
+  
+  progressBarFill.style.width = `${percent * 100}%`;
+  currentTimeEl.innerText = formatTime(percent * audio.duration);
+  return percent;
+}
+
+progressBarBg.addEventListener("mousedown", (e) => {
+  isDraggingProgress = true;
+  const percent = updateProgressFromEvent(e);
+  if (percent !== undefined) audio.currentTime = percent * audio.duration;
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (isDraggingProgress) {
+    updateProgressFromEvent(e);
+  }
+});
+
+window.addEventListener("mouseup", (e) => {
+  if (isDraggingProgress) {
+    isDraggingProgress = false;
+    const percent = updateProgressFromEvent(e);
+    if (percent !== undefined) audio.currentTime = percent * audio.duration;
+  }
+});
+
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration || isDraggingProgress) return;
   const curTime = audio.currentTime;
   progressBarFill.style.width = `${(curTime / audio.duration) * 100}%`;
   currentTimeEl.innerText = formatTime(curTime);
@@ -313,11 +335,6 @@ audio.addEventListener("timeupdate", () => {
 audio.addEventListener("ended", () => {
   if (playMode === 1) { audio.currentTime = 0; playTrack(); }
   else { btnNext.click(); }
-});
-
-progressBarBg.addEventListener("click", (e) => {
-  const rect = progressBarBg.getBoundingClientRect();
-  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
 });
 
 function formatTime(seconds) {
