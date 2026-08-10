@@ -5,7 +5,11 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Page body is transparent so Notion embed frames it directly */
+:root {
+  --accent-rgb: 255, 255, 255;
+  --glow-color: rgba(255, 255, 255, 0.6);
+}
+
 html, body {
   width: 100%;
   height: 100%;
@@ -14,16 +18,16 @@ html, body {
   color: #ffffff;
 }
 
-/* Apple Glass Card - Fills container edge-to-edge */
+/* Apple Glass Player Card Container */
 .player-card {
   position: relative;
   width: 100%;
   height: 100%;
   padding: 16px;
-  background: rgba(30, 30, 35, 0.65);
-  backdrop-filter: blur(35px) saturate(180%);
-  -webkit-backdrop-filter: blur(35px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(20, 20, 25, 0.5);
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
   overflow: hidden;
   display: flex;
@@ -31,28 +35,74 @@ html, body {
   justify-content: center;
 }
 
-/* Ambient Glow Blobs Inside Card */
+/* 1. Large Blurred Album Glass Backdrop */
+.album-backdrop-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#backdrop-img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  filter: blur(45px) brightness(0.65) saturate(140%);
+  transition: src 0.8s ease, filter 0.8s ease;
+}
+
+.backdrop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+/* 2. Dynamic Ambient Color Blobs */
 .blob-container {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  filter: blur(60px);
   z-index: 0;
-  opacity: 0.55;
+  opacity: 0.45;
   pointer-events: none;
+  filter: blur(50px);
 }
 
 .blob {
   position: absolute;
   border-radius: 50%;
+  transition: background 1.2s ease;
 }
 
-#blob1 { width: 180px; height: 180px; top: -20px; left: -20px; background-color: #ff2d55; }
-#blob2 { width: 220px; height: 220px; bottom: -30px; right: -20px; background-color: #5856d6; }
-#blob3 { width: 150px; height: 150px; top: 20%; right: 20%; background-color: #af52de; }
+#blob1 {
+  width: 200px;
+  height: 200px;
+  top: -30px;
+  left: -20px;
+  background: var(--glow-color);
+}
 
+#blob2 {
+  width: 180px;
+  height: 180px;
+  bottom: -30px;
+  right: -10px;
+  background: var(--glow-color);
+}
+
+/* Main Content Wrapper */
 .main-player {
   position: relative;
   z-index: 2;
@@ -61,17 +111,16 @@ html, body {
   align-items: center;
 }
 
-/* Album Cover */
 .cover-wrapper img {
-  width: 82px;
-  height: 82px;
+  width: 84px;
+  height: 84px;
   border-radius: 14px;
   object-fit: cover;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   display: block;
+  transition: transform 0.3s ease;
 }
 
-/* Track Info */
 .info-wrapper {
   flex: 1;
   min-width: 0;
@@ -91,13 +140,13 @@ html, body {
 
 .artist {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.68);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Lyrics Marquee */
+/* Rolling Marquee Lyrics */
 .lyrics-container {
   height: 18px;
   overflow: hidden;
@@ -113,7 +162,7 @@ html, body {
 
 .lyric-text {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.88);
   font-weight: 500;
   display: inline-block;
 }
@@ -129,7 +178,7 @@ html, body {
   animation: marquee 8s linear infinite;
 }
 
-/* Progress Bar */
+/* 3. Glowing Progress Bar */
 .progress-container {
   display: flex;
   flex-direction: column;
@@ -139,11 +188,11 @@ html, body {
 .bar-bg {
   width: 100%;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 4px;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* Allows ambient glow to spill smoothly */
 }
 
 .bar-fill {
@@ -151,16 +200,19 @@ html, body {
   width: 0%;
   background: #ffffff;
   border-radius: 4px;
+  /* Active State Glowing Effect */
+  box-shadow: 0 0 10px var(--glow-color), 0 0 4px #ffffff;
+  transition: width 0.1s linear, box-shadow 0.5s ease;
 }
 
 .time-display {
   display: flex;
   justify-content: space-between;
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.55);
 }
 
-/* Controls */
+/* 4. Controls & Button Micro-interactions */
 .controls {
   display: flex;
   align-items: center;
@@ -171,31 +223,38 @@ html, body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 2px;
+  padding: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
+  outline: none;
 }
 
 .btn-icon svg {
-  width: 19px;
-  height: 19px;
-  fill: rgba(255, 255, 255, 0.85);
-  transition: fill 0.2s ease, transform 0.1s ease;
+  width: 20px;
+  height: 20px;
+  fill: rgba(255, 255, 255, 0.88);
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), fill 0.2s ease, filter 0.2s ease;
 }
 
+/* Hover & Active Tactile Scale Feedback */
 .btn-icon:hover svg {
   fill: #ffffff;
-  transform: scale(1.08);
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+}
+
+.btn-icon:active svg {
+  transform: scale(0.9) !important;
 }
 
 .btn-play svg {
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   fill: #ffffff;
 }
 
-/* Foldable Playlist */
+/* 5. Foldable Playlist Drawer & Add Song Bar */
 .playlist-drawer {
   position: relative;
   z-index: 2;
@@ -203,9 +262,12 @@ html, body {
   opacity: 1;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   overflow-y: auto;
-  transition: max-height 0.3s ease, opacity 0.2s ease, margin-top 0.3s ease;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.25s ease, 
+              margin-top 0.35s ease, 
+              padding-top 0.35s ease;
 }
 
 .playlist-drawer.collapsed {
@@ -215,6 +277,48 @@ html, body {
   padding-top: 0 !important;
   border-top-color: transparent !important;
   pointer-events: none;
+}
+
+.add-song-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.add-song-bar input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  color: #ffffff;
+  outline: none;
+}
+
+.add-song-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.add-song-bar button {
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.add-song-bar button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.add-song-bar button:active {
+  transform: scale(0.92);
 }
 
 .playlist-drawer ul {
@@ -228,7 +332,8 @@ html, body {
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.75);
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .playlist-drawer li:hover {
@@ -237,7 +342,7 @@ html, body {
 }
 
 .playlist-drawer li.active {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
   font-weight: 600;
 }

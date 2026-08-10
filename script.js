@@ -8,6 +8,7 @@ let playMode = 0; // 0 = Sequential, 1 = Single Loop, 2 = Shuffle
 
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
+const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 
@@ -33,8 +34,10 @@ const modeShuffle = document.getElementById("mode-shuffle");
 
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
+const addSongInput = document.getElementById("add-song-input");
+const btnAddSong = document.getElementById("btn-add-song");
 
-// Fetch playlist data
+// Initialize Player & Fetch Default Playlist
 async function initPlayer() {
   try {
     const res = await fetch(API_BASE);
@@ -59,6 +62,28 @@ function renderPlaylist() {
   });
 }
 
+// Add Song Feature
+btnAddSong.addEventListener("click", async () => {
+  const songId = addSongInput.value.trim();
+  if (!songId) return;
+
+  try {
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=song&id=${songId}`);
+    const data = await res.json();
+    if (data && data.length > 0) {
+      playlist.push(data[0]);
+      renderPlaylist();
+      addSongInput.value = "";
+      loadTrack(playlist.length - 1);
+      playTrack();
+    } else {
+      alert("Song not found. Please check the NetEase Song ID.");
+    }
+  } catch (e) {
+    alert("Failed to fetch song info.");
+  }
+});
+
 async function loadTrack(index) {
   currentIndex = index;
   const song = playlist[index];
@@ -66,6 +91,7 @@ async function loadTrack(index) {
   title.innerText = song.title;
   artist.innerText = song.author;
   cover.src = song.pic;
+  backdropImg.src = song.pic; // Apply blurred album artwork backdrop
   audio.src = song.url;
   
   setLyricText("");
@@ -74,15 +100,48 @@ async function loadTrack(index) {
     li.classList.toggle("active", i === index);
   });
 
+  // Extract Dominant Color for iOS-Style Dynamic Backdrop Glow
+  extractDominantColor(song.pic);
+
   fetchLyrics(song.lrc);
+}
+
+// Extract Dominant Color using Offscreen Canvas
+function extractDominantColor(imageUrl) {
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = imageUrl;
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = 50;
+    canvas.height = 50;
+    ctx.drawImage(img, 0, 0, 50, 50);
+
+    const imageData = ctx.getImageData(0, 0, 50, 50).data;
+    let r = 0, g = 0, b = 0, count = 0;
+
+    for (let i = 0; i < imageData.length; i += 16) {
+      r += imageData[i];
+      g += imageData[i + 1];
+      b += imageData[i + 2];
+      count++;
+    }
+
+    r = Math.floor(r / count);
+    g = Math.floor(g / count);
+    b = Math.floor(b / count);
+
+    // Update dynamic root variables
+    document.documentElement.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
+    document.documentElement.style.setProperty("--glow-color", `rgba(${r}, ${g}, ${b}, 0.75)`);
+  };
 }
 
 function setLyricText(text) {
   lyricText.innerText = text;
-  
-  // Check if text exceeds container width to apply Apple left-to-right rolling animation
   marqueeWrapper.classList.remove("marquee-active");
-  if (lyricText.offsetWidth > 240) {
+  if (lyricText.offsetWidth > 200) {
     marqueeWrapper.classList.add("marquee-active");
   }
 }
@@ -134,12 +193,7 @@ btnPlay.addEventListener("click", () => {
 });
 
 btnNext.addEventListener("click", () => {
-  let next;
-  if (playMode === 2) { // Shuffle
-    next = Math.floor(Math.random() * playlist.length);
-  } else {
-    next = (currentIndex + 1) % playlist.length;
-  }
+  let next = playMode === 2 ? Math.floor(Math.random() * playlist.length) : (currentIndex + 1) % playlist.length;
   loadTrack(next);
   playTrack();
 });
@@ -150,10 +204,9 @@ btnPrev.addEventListener("click", () => {
   playTrack();
 });
 
-// Mode Toggle (Loop All -> Loop One -> Shuffle)
+// Mode Toggle
 btnMode.addEventListener("click", () => {
   playMode = (playMode + 1) % 3;
-  
   modeLoop.classList.add("hidden");
   modeOne.classList.add("hidden");
   modeShuffle.classList.add("hidden");
@@ -170,23 +223,18 @@ btnMode.addEventListener("click", () => {
   }
 });
 
-// Smooth Folder Drawer Toggle
 btnList.addEventListener("click", () => {
   playlistDrawer.classList.toggle("collapsed");
 });
 
-// Time & Lyrics Update Loop
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
-  
   const curTime = audio.currentTime;
-  const progressPercent = (curTime / audio.duration) * 100;
-  progressBarFill.style.width = `${progressPercent}%`;
+  progressBarFill.style.width = `${(curTime / audio.duration) * 100}%`;
 
   currentTimeEl.innerText = formatTime(curTime);
   durationTimeEl.innerText = formatTime(audio.duration);
 
-  // Sync lyrics line
   if (lyrics.length > 0) {
     let currentLine = lyrics.filter(l => l.time <= curTime).pop();
     if (currentLine && lyricText.innerText !== currentLine.text) {
@@ -195,9 +243,8 @@ audio.addEventListener("timeupdate", () => {
   }
 });
 
-// Song End Logic depending on active playMode
 audio.addEventListener("ended", () => {
-  if (playMode === 1) { // Single Loop
+  if (playMode === 1) {
     audio.currentTime = 0;
     playTrack();
   } else {
@@ -205,11 +252,9 @@ audio.addEventListener("ended", () => {
   }
 });
 
-// Seek Audio
 progressBarBg.addEventListener("click", (e) => {
   const rect = progressBarBg.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  audio.currentTime = (clickX / rect.width) * audio.duration;
+  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
 });
 
 function formatTime(seconds) {

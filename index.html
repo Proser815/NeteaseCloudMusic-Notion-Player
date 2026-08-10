@@ -9,15 +9,20 @@
 <body>
 
   <div class="player-card">
+    
+    <div class="album-backdrop-container">
+      <img id="backdrop-img" src="" alt="Backdrop">
+      <div class="backdrop-overlay"></div>
+    </div>
+
     <div class="blob-container">
       <div id="blob1" class="blob"></div>
       <div id="blob2" class="blob"></div>
-      <div id="blob3" class="blob"></div>
     </div>
 
     <div class="main-player">
       <div class="cover-wrapper">
-        <img id="cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
+        <img id="cover" crossorigin="anonymous" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
       </div>
 
       <div class="info-wrapper">
@@ -70,6 +75,10 @@
     </div>
 
     <div id="playlist-drawer" class="playlist-drawer collapsed">
+      <div class="add-song-bar">
+        <input type="text" id="add-song-input" placeholder="Paste NetEase Song ID...">
+        <button id="btn-add-song">+</button>
+      </div>
       <ul id="playlist-ul"></ul>
     </div>
   </div>
