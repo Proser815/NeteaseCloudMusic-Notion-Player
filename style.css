@@ -1,0 +1,214 @@
+/* ==========================================================================
+   全局重置与变量
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --glass-bg: rgba(255, 255, 255, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: rgba(0, 0, 0, 0.15);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+body {
+  font-family: var(--font-family);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #000;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   Apple Music 动态流体背景
+   ========================================================================== */
+.fluid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  filter: blur(60px);
+  overflow: hidden;
+  transform: scale(1.2);
+}
+
+.color-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: float 14s infinite ease-in-out alternate;
+  transition: background-color 1.5s ease;
+}
+
+.blob-1 {
+  width: 400px;
+  height: 400px;
+  background: #ff2d55;
+  top: -10%;
+  left: -10%;
+  animation-duration: 12s;
+}
+
+.blob-2 {
+  width: 450px;
+  height: 450px;
+  background: #5856d6;
+  bottom: -10%;
+  right: -10%;
+  animation-duration: 16s;
+  animation-delay: -4s;
+}
+
+.blob-3 {
+  width: 350px;
+  height: 350px;
+  background: #ff9500;
+  top: 40%;
+  left: 30%;
+  animation-duration: 10s;
+  animation-delay: -2s;
+}
+
+@keyframes float {
+  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  50% { transform: translate(80px, 50px) scale(1.15) rotate(180deg); }
+  100% { transform: translate(-60px, 80px) scale(0.95) rotate(360deg); }
+}
+
+/* ==========================================================================
+   Apple 锁屏毛玻璃播放卡片
+   ========================================================================== */
+.player-card {
+  position: relative;
+  z-index: 2;
+  width: 340px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 16px 40px var(--glass-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-primary);
+}
+
+.track-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.album-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.song-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.3px;
+}
+
+.artist-name {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-bar, .volume-bar {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.progress-fill, .volume-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 3px;
+}
+
+.time-stamps {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 4px 0;
+}
+
+.btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn:active {
+  transform: scale(0.88);
+  opacity: 0.7;
+}
+
+.btn-primary { font-size: 1.8rem; }
+.btn-secondary { font-size: 1.3rem; opacity: 0.85; }
+
+.volume-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+}
+
+.volume-icon {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.volume-bar { height: 4px; }
