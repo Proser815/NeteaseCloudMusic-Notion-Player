@@ -41,6 +41,11 @@ const volumeSliderContainer = document.getElementById("volume-slider-container")
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
 
+const btnToggleSettings = document.getElementById("btn-toggle-settings");
+const settingsSection = document.getElementById("settings-section");
+const opacitySlider = document.getElementById("opacity-slider");
+const opacityVal = document.getElementById("opacity-val");
+
 const btnToggleSearch = document.getElementById("btn-toggle-search");
 const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
@@ -61,21 +66,41 @@ async function initPlayer() {
   }
 }
 
-// Smooth Foldable Lyrics Button Toggle
+// Foldable Lyrics Toggle
 btnLyrics.addEventListener("click", () => {
   lyricsContainer.classList.toggle("collapsed");
   btnLyrics.classList.toggle("active");
 });
 
+// Foldable Settings Panel Toggle
+btnToggleSettings.addEventListener("click", () => {
+  settingsSection.classList.toggle("collapsed");
+  btnToggleSettings.classList.toggle("active");
+  if (!searchSection.classList.contains("collapsed")) {
+    searchSection.classList.add("collapsed");
+  }
+});
+
+// Smooth Glass Opacity Slider Listener
+opacitySlider.addEventListener("input", (e) => {
+  const val = parseFloat(e.target.value);
+  document.documentElement.style.setProperty("--glass-bg-opacity", val);
+  opacityVal.innerText = `${Math.round(val * 100)}%`;
+});
+
 // Foldable Search Bar Toggle
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
+  if (!settingsSection.classList.contains("collapsed")) {
+    settingsSection.classList.add("collapsed");
+    btnToggleSettings.classList.remove("active");
+  }
   if (!searchSection.classList.contains("collapsed")) {
     searchInput.focus();
   }
 });
 
-// Render Main Playlist with Delete Animation
+// Render Main Playlist
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
@@ -122,7 +147,7 @@ function renderPlaylist() {
   });
 }
 
-// Live NetEase Search
+// Live Search
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -141,7 +166,7 @@ async function performSearch() {
   }
 }
 
-// Render Search Results with Instant Preview + Add Feature
+// Render Search Results with Instant Row Preview
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -160,14 +185,12 @@ function renderSearchResults(results) {
       <button class="btn-add-morph" title="Add Song">+</button>
     `;
 
-    // 1. Click row to PREVIEW song immediately
     li.addEventListener("click", (e) => {
       if (e.target.closest(".btn-add-morph")) return;
       loadPreviewTrack(song);
       playTrack();
     });
 
-    // 2. Click + button to ADD song to main playlist
     const btnAdd = li.querySelector(".btn-add-morph");
     btnAdd.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -184,9 +207,9 @@ function renderSearchResults(results) {
   });
 }
 
-// Loads a searched track directly onto player for previewing
+// Preview track directly
 function loadPreviewTrack(song) {
-  currentIndex = -1; // Unsets active item in current playlist drawer
+  currentIndex = -1;
   title.innerText = song.title;
   artist.innerText = song.author;
   cover.src = song.pic;
@@ -221,7 +244,7 @@ async function loadTrack(index) {
   fetchLyrics(song.lrc);
 }
 
-// Smart Mute & Auto-Collapsing Volume Controls
+// Volume Controls
 volumeSlider.addEventListener("input", (e) => {
   audio.volume = parseFloat(e.target.value);
   if (audio.volume > 0) {
