@@ -61,9 +61,9 @@ async function initPlayer() {
   }
 }
 
-// Foldable Lyrics Book Button Toggle
+// Smooth Foldable Lyrics Button Toggle
 btnLyrics.addEventListener("click", () => {
-  lyricsContainer.classList.toggle("hidden");
+  lyricsContainer.classList.toggle("collapsed");
   btnLyrics.classList.toggle("active");
 });
 
@@ -75,7 +75,7 @@ btnToggleSearch.addEventListener("click", () => {
   }
 });
 
-// Render Main Playlist with Delete
+// Render Main Playlist with Delete Animation
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
@@ -122,7 +122,7 @@ function renderPlaylist() {
   });
 }
 
-// Live NetEase Search
+// Live NetEase Search (All Results)
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -198,7 +198,7 @@ async function loadTrack(index) {
   fetchLyrics(song.lrc);
 }
 
-// Smart Mute & Auto-Collapsing Volume Slider Controls
+// Smart Mute & Auto-Collapsing Volume Controls
 volumeSlider.addEventListener("input", (e) => {
   audio.volume = parseFloat(e.target.value);
   if (audio.volume > 0) {
@@ -219,14 +219,12 @@ btnVolume.addEventListener("click", () => {
     volumeSlider.value = 0;
     volIcon.classList.add("hidden");
     muteIcon.classList.remove("hidden");
-    // Fold/Hide slider when muted
     volumeSliderContainer.classList.add("force-collapse");
   } else {
     audio.volume = previousVolume || 0.8;
     volumeSlider.value = audio.volume;
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
-    // Expand slider when unmuted
     volumeSliderContainer.classList.remove("force-collapse");
   }
 });
