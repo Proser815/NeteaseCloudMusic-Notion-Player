@@ -1,4 +1,4 @@
-// 静态歌单数据
+// 歌单列表
 const playlist = [
   {
     name: "Probably Up",
@@ -23,18 +23,11 @@ const playlist = [
     artist: "The Rare Occasions",
     id: "1883584812",
     cover: "https://p1.music.126.net/zO8v4vXGvGvGvGvGvGvGvG==/109951166612984123.jpg"
-  },
-  {
-    name: "无果之花",
-    artist: "Youzee Music",
-    id: "1990123841",
-    cover: "https://p2.music.126.net/m98v4vXGvGvGvGvGvGvGvG==/109951167901238412.jpg"
   }
 ];
 
 let currentIndex = 0;
 
-// 获取 DOM 元素
 const audio = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playBtn");
 const prevBtn = document.getElementById("prevBtn");
@@ -51,7 +44,6 @@ const volumeFill = document.getElementById("volumeFill");
 
 const colorThief = new ColorThief();
 
-// 加载指定歌曲
 function loadSong(index) {
   currentIndex = index;
   const song = playlist[currentIndex];
@@ -59,15 +51,14 @@ function loadSong(index) {
   songTitle.textContent = song.name;
   artistName.textContent = song.artist;
   
-  // 使用图片 CORS 代理避免被网易云防盗链拦截
-  const proxiedCover = `https://images.weserv.nl/?url=${encodeURIComponent(song.cover)}&w=300&h=300`;
-  albumCover.src = proxiedCover;
+  // 图片代理
+  albumCover.src = `https://images.weserv.nl/?url=${encodeURIComponent(song.cover)}&w=300&h=300`;
 
-  // 使用高兼容度音频流接口
+  // 音频代理
   audio.src = `https://api.i-meto.com/meting/api?server=netease&type=url&id=${song.id}`;
 }
 
-// 提取颜色并更新背景
+// 提取颜色
 albumCover.addEventListener("load", () => {
   try {
     const palette = colorThief.getPalette(albumCover, 3);
@@ -77,28 +68,23 @@ albumCover.addEventListener("load", () => {
       document.getElementById("blob3").style.backgroundColor = `rgb(${palette[2].join(",")})`;
     }
   } catch (e) {
-    // 降级柔和渐变色
     document.getElementById("blob1").style.backgroundColor = "#ff2d55";
     document.getElementById("blob2").style.backgroundColor = "#5856d6";
     document.getElementById("blob3").style.backgroundColor = "#ff9500";
   }
 });
 
-// 播放 / 暂停 控制
 playBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play().then(() => {
       playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    }).catch(err => {
-      console.error("Autoplay blocked or network error:", err);
-    });
+    }).catch(err => console.error("Play error:", err));
   } else {
     audio.pause();
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
   }
 });
 
-// 切歌
 prevBtn.addEventListener("click", () => {
   currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
   loadSong(currentIndex);
@@ -119,27 +105,21 @@ function playAudioWhenReady() {
   };
 }
 
-// 进度与音量
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
-  const progressPercent = (audio.currentTime / audio.duration) * 100;
-  progressFill.style.width = `${progressPercent}%`;
-
+  progressFill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
   currentTimeEl.textContent = formatTime(audio.currentTime);
   totalTimeEl.textContent = formatTime(audio.duration);
 });
 
 progressBar.addEventListener("click", (e) => {
   if (!audio.duration) return;
-  const width = progressBar.clientWidth;
-  const clickX = e.offsetX;
-  audio.currentTime = (clickX / width) * audio.duration;
+  audio.currentTime = (e.offsetX / progressBar.clientWidth) * audio.duration;
 });
 
 volumeBar.addEventListener("click", (e) => {
-  const width = volumeBar.clientWidth;
-  const clickX = e.offsetX;
-  audio.volume = Math.max(0, Math.min(1, clickX / width));
+  const volume = e.offsetX / volumeBar.clientWidth;
+  audio.volume = Math.max(0, Math.min(1, volume));
   volumeFill.style.width = `${audio.volume * 100}%`;
 });
 
@@ -151,5 +131,5 @@ function formatTime(seconds) {
 
 audio.addEventListener("ended", () => nextBtn.click());
 
-// 初始化加载第一首
+// 默认直接初始化加载
 loadSong(0);

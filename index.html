@@ -3,53 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notion Apple Music Player</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Notion Music Player</title>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="fluid-background">
-    <div class="color-blob blob-1" id="blob1"></div>
-    <div class="color-blob blob-2" id="blob2"></div>
-    <div class="color-blob blob-3" id="blob3"></div>
+  <div class="blob-container">
+    <div id="blob1" class="blob"></div>
+    <div id="blob2" class="blob"></div>
+    <div id="blob3" class="blob"></div>
   </div>
 
   <div class="player-card">
-    
-    <div class="track-info">
-      <img src="" alt="Album Cover" class="album-cover" id="albumCover" crossorigin="anonymous">
+    <div class="song-info">
+      <img id="albumCover" src="" alt="Album Cover" crossorigin="anonymous">
       <div class="details">
-        <h2 class="song-title" id="songTitle">加载中...</h2>
-        <p class="artist-name" id="artistName">请稍候</p>
+        <h2 id="songTitle">正在加载...</h2>
+        <p id="artistName">请稍候</p>
       </div>
     </div>
 
     <div class="progress-container">
       <div class="progress-bar" id="progressBar">
-        <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        <div class="progress-fill" id="progressFill"></div>
       </div>
-      <div class="time-stamps">
-        <span class="current-time" id="currentTime">0:00</span>
-        <span class="total-time" id="totalTime">0:00</span>
+      <div class="time-info">
+        <span id="currentTime">0:00</span>
+        <span id="totalTime">0:00</span>
       </div>
     </div>
 
     <div class="controls">
-      <button class="btn btn-secondary" id="prevBtn" aria-label="Previous"><i class="fas fa-backward-step"></i></button>
-      <button class="btn btn-primary" id="playBtn" aria-label="Play/Pause"><i class="fas fa-play"></i></button>
-      <button class="btn btn-secondary" id="nextBtn" aria-label="Next"><i class="fas fa-forward-step"></i></button>
+      <button id="prevBtn"><i class="fas fa-step-backward"></i></button>
+      <button id="playBtn" class="play-btn"><i class="fas fa-play"></i></button>
+      <button id="nextBtn"><i class="fas fa-step-forward"></i></button>
     </div>
 
     <div class="volume-container">
-      <i class="fas fa-volume-low volume-icon"></i>
+      <i class="fas fa-volume-low"></i>
       <div class="volume-bar" id="volumeBar">
-        <div class="volume-fill" id="volumeFill" style="width: 70%;"></div>
+        <div class="volume-fill" id="volumeFill" style="width: 80%;"></div>
       </div>
-      <i class="fas fa-volume-high volume-icon"></i>
+      <i class="fas fa-volume-high"></i>
     </div>
-
   </div>
 
   <audio id="audioPlayer"></audio>
