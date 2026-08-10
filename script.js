@@ -81,10 +81,10 @@ btnToggleSettings.addEventListener("click", () => {
   }
 });
 
-// Smooth Glass Opacity Slider Listener
+// Live Glass Opacity Slider Listener
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
-  document.documentElement.style.setProperty("--glass-bg-opacity", val);
+  document.documentElement.style.setProperty("--glass-tint-opacity", val);
   opacityVal.innerText = `${Math.round(val * 100)}%`;
 });
 
