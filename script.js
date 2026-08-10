@@ -6,6 +6,7 @@ let currentIndex = 0;
 let lyrics = [];
 let playMode = 0;
 let isDraggingProgress = false;
+let previousVolume = 0.8;
 
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -13,6 +14,7 @@ const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 
+const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
 const marqueeWrapper = document.querySelector(".marquee-wrapper");
 
@@ -26,11 +28,15 @@ const playIcon = document.getElementById("play-icon");
 const pauseIcon = document.getElementById("pause-icon");
 const btnPrev = document.getElementById("btn-prev");
 const btnNext = document.getElementById("btn-next");
+const btnLyrics = document.getElementById("btn-lyrics");
 const btnList = document.getElementById("btn-list");
 const btnMode = document.getElementById("btn-mode");
 
 const btnVolume = document.getElementById("btn-volume");
+const volIcon = document.getElementById("vol-icon");
+const muteIcon = document.getElementById("mute-icon");
 const volumeSlider = document.getElementById("volume-slider");
+const volumeSliderContainer = document.getElementById("volume-slider-container");
 
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
@@ -54,6 +60,12 @@ async function initPlayer() {
     title.innerText = "Error Loading Playlist";
   }
 }
+
+// Foldable Lyrics Book Button Toggle
+btnLyrics.addEventListener("click", () => {
+  lyricsContainer.classList.toggle("hidden");
+  btnLyrics.classList.toggle("active");
+});
 
 // Foldable Search Bar Toggle
 btnToggleSearch.addEventListener("click", () => {
@@ -110,7 +122,7 @@ function renderPlaylist() {
   });
 }
 
-// Live NetEase Search (Returns all matched results)
+// Live NetEase Search
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -186,18 +198,36 @@ async function loadTrack(index) {
   fetchLyrics(song.lrc);
 }
 
-// Volume Controls
+// Smart Mute & Auto-Collapsing Volume Slider Controls
 volumeSlider.addEventListener("input", (e) => {
   audio.volume = parseFloat(e.target.value);
+  if (audio.volume > 0) {
+    previousVolume = audio.volume;
+    volIcon.classList.remove("hidden");
+    muteIcon.classList.add("hidden");
+    volumeSliderContainer.classList.remove("force-collapse");
+  } else {
+    volIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+  }
 });
 
 btnVolume.addEventListener("click", () => {
   if (audio.volume > 0) {
+    previousVolume = audio.volume;
     audio.volume = 0;
     volumeSlider.value = 0;
+    volIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+    // Fold/Hide slider when muted
+    volumeSliderContainer.classList.add("force-collapse");
   } else {
-    audio.volume = 0.8;
-    volumeSlider.value = 0.8;
+    audio.volume = previousVolume || 0.8;
+    volumeSlider.value = audio.volume;
+    volIcon.classList.remove("hidden");
+    muteIcon.classList.add("hidden");
+    // Expand slider when unmuted
+    volumeSliderContainer.classList.remove("force-collapse");
   }
 });
 

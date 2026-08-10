@@ -108,7 +108,13 @@ html, body {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  justify-content: space-between;
+}
+
+.track-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .title {
@@ -128,8 +134,10 @@ html, body {
   text-overflow: ellipsis;
 }
 
+/* Foldable Lyrics - Properly spaced in the vertical center */
 .lyrics-container {
   height: 18px;
+  margin: 6px 0;
   overflow: hidden;
   position: relative;
   width: 100%;
@@ -163,6 +171,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  margin-top: 2px;
 }
 
 .bar-bg {
@@ -196,6 +205,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 4px;
 }
 
 .btn-icon {
@@ -224,6 +234,12 @@ html, body {
   transform: scale(0.9) !important;
 }
 
+/* Active Book Icon state when lyrics are open */
+#btn-lyrics.active svg {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
 .btn-play svg {
   width: 25px;
   height: 25px;
@@ -250,8 +266,9 @@ html, body {
   transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-left 0.3s ease;
 }
 
-.volume-wrapper:hover .volume-slider-container,
-.volume-wrapper:focus-within .volume-slider-container {
+/* Slider expands on hover unless muted/collapsed */
+.volume-wrapper:hover .volume-slider-container:not(.force-collapse),
+.volume-wrapper:focus-within .volume-slider-container:not(.force-collapse) {
   max-width: 65px;
   opacity: 1;
   margin-left: 4px;
@@ -320,7 +337,6 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Collapsible Search Section */
 .search-section {
   max-height: 200px;
   opacity: 1;
@@ -380,7 +396,6 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
 .btn-search-ios:active { transform: scale(0.92); }
 .btn-search-ios svg { width: 15px; height: 15px; fill: #ffffff; }
 
-/* Scrollable Full-Length Search Results UI */
 .search-results {
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
@@ -412,19 +427,25 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
 
 .search-results li:hover { background: rgba(255, 255, 255, 0.1); }
 
-/* iOS Glassmorphic Add Button */
+/* Perfectly Centered iOS Glassmorphic Add Button */
 .btn-add-morph {
   width: 24px;
   height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  margin: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: rgba(255, 255, 255, 0.9);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  line-height: 1;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 300;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -442,7 +463,6 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   transform: scale(0.92);
 }
 
-/* Native iOS Glass Added State */
 .btn-add-morph.added {
   background: rgba(255, 255, 255, 0.35) !important;
   border-color: rgba(255, 255, 255, 0.6) !important;
@@ -451,13 +471,17 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   animation: iosPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
+.btn-add-morph svg {
+  display: block;
+  margin: auto;
+}
+
 @keyframes iosPop {
   0% { transform: scale(1); }
   50% { transform: scale(1.2); }
   100% { transform: scale(1.05); }
 }
 
-/* Playlist Items & Delete Animation */
 .playlist-drawer ul { list-style: none; }
 
 .playlist-drawer li {
