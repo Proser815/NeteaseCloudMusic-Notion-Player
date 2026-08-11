@@ -19,7 +19,7 @@ html, body {
   color: #ffffff;
 }
 
-/* Glass Base Container with Ultra-Clear Contrast */
+/* Glass Base Container with High-Contrast Dark Backdrop */
 .player-card {
   position: relative;
   width: 100%;
@@ -291,8 +291,8 @@ html, body {
   transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-left 0.3s ease;
 }
 
-.volume-wrapper:hover .volume-slider-container:not(.force-collapse),
-.volume-wrapper:focus-within .volume-slider-container:not(.force-collapse) {
+.volume-wrapper:hover .volume-slider-container,
+.volume-wrapper:focus-within .volume-slider-container {
   max-width: 65px;
   opacity: 1;
   margin-left: 4px;
@@ -317,7 +317,7 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   background: #ffffff;
 }
 
-/* Glass Opacity Hover Slider (Volume-Style) */
+/* Glass Opacity Hover Slider */
 .glass-wrapper {
   display: flex;
   align-items: center;
@@ -338,8 +338,8 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-left 0.3s ease;
 }
 
-.glass-wrapper:hover .glass-slider-container:not(.force-collapse),
-.glass-wrapper:focus-within .glass-slider-container:not(.force-collapse) {
+.glass-wrapper:hover .glass-slider-container,
+.glass-wrapper:focus-within .glass-slider-container {
   max-width: 65px;
   opacity: 1;
   margin-left: 4px;

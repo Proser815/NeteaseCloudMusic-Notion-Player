@@ -37,13 +37,11 @@ const btnVolume = document.getElementById("btn-volume");
 const volIcon = document.getElementById("vol-icon");
 const muteIcon = document.getElementById("mute-icon");
 const volumeSlider = document.getElementById("volume-slider");
-const volumeSliderContainer = document.getElementById("volume-slider-container");
 
 const btnGlass = document.getElementById("btn-glass");
 const glassIcon = document.getElementById("glass-icon");
 const glassOffIcon = document.getElementById("glass-off-icon");
 const opacitySlider = document.getElementById("opacity-slider");
-const glassSliderContainer = document.getElementById("glass-slider-container");
 
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
@@ -74,7 +72,7 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Hover Slider Listener for Glass Darkness Overlay
+// Glass Opacity Slider Event (Smooth continuous hover/slide)
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -82,14 +80,13 @@ opacitySlider.addEventListener("input", (e) => {
     previousOpacity = val;
     glassIcon.classList.remove("hidden");
     glassOffIcon.classList.add("hidden");
-    glassSliderContainer.classList.remove("force-collapse");
   } else {
     glassIcon.classList.add("hidden");
     glassOffIcon.classList.remove("hidden");
   }
 });
 
-// Click Glass Icon to Toggle Off / White Line Cross Out
+// Click Glass Icon to Mute/Unmute Tint
 btnGlass.addEventListener("click", () => {
   const currentVal = parseFloat(opacitySlider.value);
   if (currentVal > 0) {
@@ -98,13 +95,11 @@ btnGlass.addEventListener("click", () => {
     document.documentElement.style.setProperty("--glass-tint-opacity", 0);
     glassIcon.classList.add("hidden");
     glassOffIcon.classList.remove("hidden");
-    glassSliderContainer.classList.add("force-collapse");
   } else {
     opacitySlider.value = previousOpacity || 0.5;
     document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
     glassIcon.classList.remove("hidden");
     glassOffIcon.classList.add("hidden");
-    glassSliderContainer.classList.remove("force-collapse");
   }
 });
 
@@ -267,7 +262,6 @@ volumeSlider.addEventListener("input", (e) => {
     previousVolume = audio.volume;
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
-    volumeSliderContainer.classList.remove("force-collapse");
   } else {
     volIcon.classList.add("hidden");
     muteIcon.classList.remove("hidden");
@@ -281,13 +275,11 @@ btnVolume.addEventListener("click", () => {
     volumeSlider.value = 0;
     volIcon.classList.add("hidden");
     muteIcon.classList.remove("hidden");
-    volumeSliderContainer.classList.add("force-collapse");
   } else {
     audio.volume = previousVolume || 0.8;
     volumeSlider.value = audio.volume;
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
-    volumeSliderContainer.classList.remove("force-collapse");
   }
 });
 
