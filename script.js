@@ -7,6 +7,7 @@ let lyrics = [];
 let playMode = 0;
 let isDraggingProgress = false;
 let previousVolume = 0.8;
+let previousOpacity = 0.5;
 
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -38,13 +39,14 @@ const muteIcon = document.getElementById("mute-icon");
 const volumeSlider = document.getElementById("volume-slider");
 const volumeSliderContainer = document.getElementById("volume-slider-container");
 
+const btnGlass = document.getElementById("btn-glass");
+const glassIcon = document.getElementById("glass-icon");
+const glassOffIcon = document.getElementById("glass-off-icon");
+const opacitySlider = document.getElementById("opacity-slider");
+const glassSliderContainer = document.getElementById("glass-slider-container");
+
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
-
-const btnToggleSettings = document.getElementById("btn-toggle-settings");
-const settingsSection = document.getElementById("settings-section");
-const opacitySlider = document.getElementById("opacity-slider");
-const opacityVal = document.getElementById("opacity-val");
 
 const btnToggleSearch = document.getElementById("btn-toggle-search");
 const searchSection = document.getElementById("search-section");
@@ -72,29 +74,43 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Foldable Settings Panel Toggle
-btnToggleSettings.addEventListener("click", () => {
-  settingsSection.classList.toggle("collapsed");
-  btnToggleSettings.classList.toggle("active");
-  if (!searchSection.classList.contains("collapsed")) {
-    searchSection.classList.add("collapsed");
-  }
-});
-
-// Live Glass Opacity Slider Listener
+// Hover Slider Listener for Glass Opacity
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
-  opacityVal.innerText = `${Math.round(val * 100)}%`;
+  if (val > 0) {
+    previousOpacity = val;
+    glassIcon.classList.remove("hidden");
+    glassOffIcon.classList.add("hidden");
+    glassSliderContainer.classList.remove("force-collapse");
+  } else {
+    glassIcon.classList.add("hidden");
+    glassOffIcon.classList.remove("hidden");
+  }
+});
+
+// Click Glass Icon to Mute/Cross Out Glass Tint
+btnGlass.addEventListener("click", () => {
+  const currentVal = parseFloat(opacitySlider.value);
+  if (currentVal > 0) {
+    previousOpacity = currentVal;
+    opacitySlider.value = 0;
+    document.documentElement.style.setProperty("--glass-tint-opacity", 0);
+    glassIcon.classList.add("hidden");
+    glassOffIcon.classList.remove("hidden");
+    glassSliderContainer.classList.add("force-collapse");
+  } else {
+    opacitySlider.value = previousOpacity || 0.5;
+    document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
+    glassIcon.classList.remove("hidden");
+    glassOffIcon.classList.add("hidden");
+    glassSliderContainer.classList.remove("force-collapse");
+  }
 });
 
 // Foldable Search Bar Toggle
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
-  if (!settingsSection.classList.contains("collapsed")) {
-    settingsSection.classList.add("collapsed");
-    btnToggleSettings.classList.remove("active");
-  }
   if (!searchSection.classList.contains("collapsed")) {
     searchInput.focus();
   }
