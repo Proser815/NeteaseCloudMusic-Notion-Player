@@ -9,9 +9,6 @@ let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
 
-// Web Audio API
-let audioCtx, analyser, dataArray, source;
-
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -82,45 +79,6 @@ async function initPlayer() {
     if (playlist.length > 0) loadTrack(0);
   } catch (err) {
     title.innerText = "Error Loading Playlist";
-  }
-}
-
-// Audio Context Setup
-function initAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 32;
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-    updateEqBars();
-  }
-}
-
-// Real Audio Spectrum Equalizer Sync
-function updateEqBars() {
-  requestAnimationFrame(updateEqBars);
-  if (!analyser || audio.paused) return;
-
-  analyser.getByteFrequencyData(dataArray);
-  const spans = eqIndicator.querySelectorAll("span");
-  const islandSpans = islandEq.querySelectorAll("span");
-
-  if (spans.length >= 3) {
-    const b1 = dataArray[1] || 0;
-    const b2 = dataArray[4] || 0;
-    const b3 = dataArray[8] || 0;
-
-    const h1 = `${Math.max(3, (b1 / 255) * 13)}px`;
-    const h2 = `${Math.max(3, (b2 / 255) * 13)}px`;
-    const h3 = `${Math.max(3, (b3 / 255) * 13)}px`;
-
-    spans[0].style.height = h1; spans[1].style.height = h2; spans[2].style.height = h3;
-    if (islandSpans.length >= 3) {
-      islandSpans[0].style.height = h1; islandSpans[1].style.height = h2; islandSpans[2].style.height = h3;
-    }
   }
 }
 
@@ -339,6 +297,7 @@ function loadPreviewTrack(song) {
   Array.from(playlistUl.children).forEach(li => li.classList.remove("active"));
   extractDominantColor(song.pic);
   fetchLyrics(song.lrc);
+  updateMediaSession(song);
 }
 
 async function loadTrack(index) {
@@ -361,6 +320,25 @@ async function loadTrack(index) {
 
   extractDominantColor(song.pic);
   fetchLyrics(song.lrc);
+  updateMediaSession(song);
+}
+
+function updateMediaSession(song) {
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: song.author,
+      album: 'Notion Player',
+      artwork: [
+        { src: song.pic, sizes: '512x512', type: 'image/jpeg' }
+      ]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => playTrack());
+    navigator.mediaSession.setActionHandler('pause', () => pauseTrack());
+    navigator.mediaSession.setActionHandler('previoustrack', () => btnPrev.click());
+    navigator.mediaSession.setActionHandler('nexttrack', () => btnNext.click());
+  }
 }
 
 volumeSlider.addEventListener("input", (e) => {
@@ -445,15 +423,13 @@ function parseLRC(lrcText) {
 }
 
 function playTrack() {
-  initAudioContext();
-  if (audioCtx && audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
   audio.play();
   playIcon.classList.add("hidden");
   pauseIcon.classList.remove("hidden");
+  
   if (eqIndicator) eqIndicator.classList.remove("paused");
   if (islandEq) islandEq.classList.remove("paused");
+  
   renderPlaylist();
 }
 
@@ -461,8 +437,10 @@ function pauseTrack() {
   audio.pause();
   playIcon.classList.remove("hidden");
   pauseIcon.classList.add("hidden");
+  
   if (eqIndicator) eqIndicator.classList.add("paused");
   if (islandEq) islandEq.classList.add("paused");
+  
   renderPlaylist();
 }
 
