@@ -29,7 +29,22 @@ const artist = document.getElementById("artist");
 const dynamicIsland = document.getElementById("dynamic-island");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
+const islandHoverCover = document.getElementById("island-hover-cover");
+const islandHoverTitle = document.getElementById("island-hover-title");
+const islandHoverArtist = document.getElementById("island-hover-artist");
 const btnIsland = document.getElementById("btn-island");
+
+// Dynamic Island Hover Control Buttons
+const islandBtnMode = document.getElementById("island-btn-mode");
+const islandModeLoop = document.getElementById("island-mode-loop");
+const islandModeOne = document.getElementById("island-mode-one");
+const islandModeShuffle = document.getElementById("island-mode-shuffle");
+const islandBtnPrev = document.getElementById("island-btn-prev");
+const islandBtnPlay = document.getElementById("island-btn-play");
+const islandPlayIcon = document.getElementById("island-play-icon");
+const islandPauseIcon = document.getElementById("island-pause-icon");
+const islandBtnNext = document.getElementById("island-btn-next");
+const islandVolumeSlider = document.getElementById("island-volume-slider");
 
 // Track Info Metadata Elements
 const btnInfo = document.getElementById("btn-info");
@@ -151,10 +166,50 @@ btnIsland.addEventListener("click", () => {
   dynamicIsland.classList.remove("hidden");
 });
 
-dynamicIsland.addEventListener("click", () => {
+dynamicIsland.addEventListener("click", (e) => {
+  // Clicking anywhere on island except hover interactive elements restores full player card
+  if (e.target.closest(".island-hover-controls")) return;
   playerCard.classList.remove("morphed-hidden");
   dynamicIsland.classList.add("hidden");
 });
+
+// Island Hover Control Action Bindings
+islandBtnPlay.addEventListener("click", () => {
+  btnPlay.click();
+});
+
+islandBtnPrev.addEventListener("click", () => {
+  btnPrev.click();
+});
+
+islandBtnNext.addEventListener("click", () => {
+  btnNext.click();
+});
+
+islandBtnMode.addEventListener("click", () => {
+  btnMode.click();
+  syncPlayModeUI();
+});
+
+islandVolumeSlider.addEventListener("input", (e) => {
+  const val = parseFloat(e.target.value);
+  audio.volume = val;
+  volumeSlider.value = val;
+  if (val > 0) {
+    previousVolume = val;
+    volIcon.classList.remove("hidden");
+    muteIcon.classList.add("hidden");
+  } else {
+    volIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+  }
+});
+
+function syncPlayModeUI() {
+  islandModeLoop.classList.toggle("hidden", playMode !== 0);
+  islandModeOne.classList.toggle("hidden", playMode !== 1);
+  islandModeShuffle.classList.toggle("hidden", playMode !== 2);
+}
 
 coverWrapper.addEventListener("click", () => {
   playerCard.classList.toggle("standby-mode");
@@ -174,7 +229,7 @@ opacitySlider.addEventListener("input", (e) => {
     glassOffIcon.classList.add("hidden");
   } else {
     glassIcon.classList.add("hidden");
-    glassOffIcon.classList.remove("hidden");
+    glassOffIcon.classList.add("hidden");
   }
 });
 
@@ -185,7 +240,7 @@ btnGlass.addEventListener("click", () => {
     opacitySlider.value = 0;
     document.documentElement.style.setProperty("--glass-tint-opacity", 0);
     glassIcon.classList.add("hidden");
-    glassOffIcon.classList.remove("hidden");
+    glassOffIcon.classList.add("hidden");
   } else {
     opacitySlider.value = previousOpacity || 0.5;
     document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
@@ -264,7 +319,6 @@ searchInput.addEventListener("input", () => {
     return;
   }
 
-  // Debounce API calls slightly while typing incomplete words
   debounceTimer = setTimeout(() => {
     fetchPredictions(query);
   }, 280);
@@ -287,19 +341,15 @@ function renderPredictions(results) {
     return;
   }
 
-  // Display top 5 predictions live, aligned to the left
   const suggestions = results.slice(0, 5);
   suggestions.forEach(song => {
     const li = document.createElement("li");
     li.innerHTML = `
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-        <span class="prediction-title">${song.title}</span> 
-        <small class="prediction-artist">- ${song.author}</small>
-      </span>
+      <span class="prediction-title">${song.title}</span>
+      <span class="prediction-artist">- ${song.author}</span>
     `;
 
-    // Click fills search field & triggers full search
     li.addEventListener("click", () => {
       searchInput.value = `${song.title} - ${song.author}`;
       hidePredictions();
@@ -422,6 +472,9 @@ function applyTrackData(song) {
   cover.src = song.pic;
   islandCover.src = song.pic;
   islandTitle.innerText = song.title;
+  islandHoverCover.src = song.pic;
+  islandHoverTitle.innerText = song.title;
+  islandHoverArtist.innerText = song.author;
   backdropImg.src = song.pic;
   audio.src = song.url;
   
@@ -432,7 +485,6 @@ function applyTrackData(song) {
   updateSongMetadata(song);
 }
 
-// Dynamically generate background context for played track
 function updateSongMetadata(song) {
   metaAlbum.innerText = song.album || "Single / Netease Release";
   
@@ -465,9 +517,11 @@ function updateMediaSession(song) {
 }
 
 volumeSlider.addEventListener("input", (e) => {
-  audio.volume = parseFloat(e.target.value);
-  if (audio.volume > 0) {
-    previousVolume = audio.volume;
+  const val = parseFloat(e.target.value);
+  audio.volume = val;
+  islandVolumeSlider.value = val;
+  if (val > 0) {
+    previousVolume = val;
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
   } else {
@@ -481,11 +535,13 @@ btnVolume.addEventListener("click", () => {
     previousVolume = audio.volume;
     audio.volume = 0;
     volumeSlider.value = 0;
+    islandVolumeSlider.value = 0;
     volIcon.classList.add("hidden");
     muteIcon.classList.remove("hidden");
   } else {
     audio.volume = previousVolume || 0.8;
     volumeSlider.value = audio.volume;
+    islandVolumeSlider.value = audio.volume;
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
   }
@@ -555,6 +611,8 @@ function playTrack() {
   audio.play();
   playIcon.classList.add("hidden");
   pauseIcon.classList.remove("hidden");
+  islandPlayIcon.classList.add("hidden");
+  islandPauseIcon.classList.remove("hidden");
 
   cancelAnimationFrame(animationFrameId);
   animateBars();
@@ -566,6 +624,8 @@ function pauseTrack() {
   audio.pause();
   playIcon.classList.remove("hidden");
   pauseIcon.classList.add("hidden");
+  islandPlayIcon.classList.remove("hidden");
+  islandPauseIcon.classList.add("hidden");
 
   cancelAnimationFrame(animationFrameId);
 
@@ -599,6 +659,7 @@ btnMode.addEventListener("click", () => {
   document.getElementById("mode-loop").classList.toggle("hidden", playMode !== 0);
   document.getElementById("mode-one").classList.toggle("hidden", playMode !== 1);
   document.getElementById("mode-shuffle").classList.toggle("hidden", playMode !== 2);
+  syncPlayModeUI();
 });
 
 btnList.addEventListener("click", () => {
