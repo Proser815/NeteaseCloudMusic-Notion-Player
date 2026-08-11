@@ -7,7 +7,7 @@ let lyrics = [];
 let playMode = 0;
 let isDraggingProgress = false;
 let previousVolume = 0.8;
-let previousOpacity = 0.5;
+let previousOpacity = 0.6;
 let debounceTimer = null;
 
 // Web Audio API Real-Time Analyzer State
@@ -102,11 +102,9 @@ const btnSearch = document.getElementById("btn-search");
 const searchResultsContainer = document.getElementById("search-results");
 const searchResultsUl = document.getElementById("search-results-ul");
 
-// Predictions Elements
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
-// Initialize Web Audio API Context safely
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -126,7 +124,6 @@ function initAudioContext() {
   }
 }
 
-// Drive Bar Heights from Real Frequency Data
 function animateBars() {
   if (!analyser || audio.paused) return;
 
@@ -153,7 +150,6 @@ function animateBars() {
   animationFrameId = requestAnimationFrame(animateBars);
 }
 
-// Init Player
 async function initPlayer() {
   audio.volume = 0.8;
   try {
@@ -166,7 +162,6 @@ async function initPlayer() {
   }
 }
 
-// Exit / Close Event Handlers for Drawers & Overlays
 btnCloseInfo.addEventListener("click", () => {
   infoDrawer.classList.add("collapsed");
   btnInfo.classList.remove("active");
@@ -187,13 +182,11 @@ islandBtnExit.addEventListener("click", (e) => {
   dynamicIsland.classList.add("hidden");
 });
 
-// Toggle Song Context / Background Info Drawer
 btnInfo.addEventListener("click", () => {
   infoDrawer.classList.toggle("collapsed");
   btnInfo.classList.toggle("active");
 });
 
-// Dynamic Island Morph Toggle
 btnIsland.addEventListener("click", () => {
   playerCard.classList.add("morphed-hidden");
   dynamicIsland.classList.remove("hidden");
@@ -284,29 +277,29 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
+// Transparency & Natural Light Bulb Logic
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
-  if (val > 0) {
-    previousOpacity = val;
-    glassIcon.classList.remove("hidden");
-    glassOffIcon.classList.add("hidden");
-  } else {
+  if (val < 0.15) {
     glassIcon.classList.add("hidden");
+    glassOffIcon.classList.remove("hidden");
+  } else {
+    glassIcon.classList.remove("hidden");
     glassOffIcon.classList.add("hidden");
   }
 });
 
 btnGlass.addEventListener("click", () => {
   const currentVal = parseFloat(opacitySlider.value);
-  if (currentVal > 0) {
+  if (currentVal >= 0.15) {
     previousOpacity = currentVal;
     opacitySlider.value = 0;
     document.documentElement.style.setProperty("--glass-tint-opacity", 0);
     glassIcon.classList.add("hidden");
-    glassOffIcon.classList.add("hidden");
+    glassOffIcon.classList.remove("hidden");
   } else {
-    opacitySlider.value = previousOpacity || 0.5;
+    opacitySlider.value = previousOpacity || 0.6;
     document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
     glassIcon.classList.remove("hidden");
     glassOffIcon.classList.add("hidden");
@@ -373,7 +366,6 @@ function renderPlaylist() {
   });
 }
 
-// Live Autocomplete Predictions with id= parameter
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
   const query = searchInput.value.trim();
@@ -541,7 +533,6 @@ function applyTrackData(song) {
   islandHoverArtist.innerText = song.author;
   backdropImg.src = song.pic;
   
-  // Ensure robust source stream assignment
   audio.src = song.url;
   audio.load();
 
@@ -583,6 +574,7 @@ function updateMediaSession(song) {
   }
 }
 
+// Volume & Mute Icon Bug-Free Toggle Logic
 volumeSlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   audio.volume = val;
@@ -616,7 +608,7 @@ btnVolume.addEventListener("click", () => {
     volumeSlider.value = audio.volume;
     islandVolumeSlider.value = audio.volume;
     volIcon.classList.remove("hidden");
-    muteIcon.classList.remove("hidden");
+    muteIcon.classList.add("hidden");
     islandVolIcon.classList.remove("hidden");
     islandMuteIcon.classList.add("hidden");
   }
@@ -676,7 +668,9 @@ function parseLRC(lrcText) {
     if (match) {
       const minutes = parseInt(match[1]);
       const seconds = parseInt(match[2]);
-      lyrics.push({ time: minutes * 60 + seconds, text: line.replace(timeRegex, "").trim() });
+      // Added a slight 0.5s offset buffer so scrolling syncs more naturally and calmly
+      let totalSec = minutes * 60 + seconds - 0.5;
+      lyrics.push({ time: Math.max(0, totalSec), text: line.replace(timeRegex, "").trim() });
     }
   });
 }
