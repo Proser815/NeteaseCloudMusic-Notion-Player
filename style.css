@@ -624,7 +624,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 .btn-search-ios:hover { background: rgba(255, 255, 255, 0.38); }
 .btn-search-ios svg { width: 15px; height: 15px; fill: #ffffff; }
 
-/* Real-time Predictions Dropdown Menu */
+/* Real-time iOS Predictions Dropdown Menu */
 .search-predictions {
   position: absolute;
   top: 100%;
@@ -632,15 +632,14 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   right: 0;
   z-index: 10;
   margin-top: 4px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(18, 18, 18, 0.88);
   backdrop-filter: blur(25px) saturate(200%);
   -webkit-backdrop-filter: blur(25px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
   max-height: 150px;
   overflow-y: auto;
-  padding: 4px;
   transition: opacity 0.25s ease, transform 0.25s var(--ios-spring);
 }
 
@@ -650,43 +649,46 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 
 .search-predictions ul {
   list-style: none;
-  padding: 0;
+  padding: 4px 0;
   margin: 0;
 }
 
 .search-predictions li {
-  padding: 6px 8px;
-  font-size: 0.78rem;
+  padding: 6px 12px;
+  font-size: 0.76rem;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 8px;
   cursor: pointer;
-  color: #ffffff;
-  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
   transition: background 0.2s ease;
 }
 
 .search-predictions li:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
 }
 
 .search-predictions li svg {
-  width: 13px;
-  height: 13px;
-  fill: rgba(255, 255, 255, 0.7);
+  width: 12px;
+  height: 12px;
+  fill: rgba(255, 255, 255, 0.6);
   flex-shrink: 0;
 }
 
 .prediction-title {
   font-weight: 600;
-  color: #ffffff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .prediction-artist {
-  opacity: 0.75;
-  font-size: 0.72rem;
-  font-weight: 400;
+  opacity: 0.65;
+  font-size: 0.7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .search-results {
