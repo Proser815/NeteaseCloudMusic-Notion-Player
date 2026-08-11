@@ -9,6 +9,9 @@ let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
 
+// Web Audio API for Audio-Synced Spectrum Equalizer
+let audioCtx, analyser, dataArray, source;
+
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -69,7 +72,40 @@ async function initPlayer() {
   }
 }
 
-// iOS StandBy Dynamic Morph Toggle
+// Audio Context Initialization (Runs on first user gesture)
+function initAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 32;
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    updateEqBars();
+  }
+}
+
+// Real-Time Frequency Equalizer Sync
+function updateEqBars() {
+  requestAnimationFrame(updateEqBars);
+  if (!analyser || audio.paused) return;
+
+  analyser.getByteFrequencyData(dataArray);
+  const spans = eqIndicator.querySelectorAll("span");
+
+  if (spans.length >= 3) {
+    const b1 = dataArray[1] || 0;
+    const b2 = dataArray[4] || 0;
+    const b3 = dataArray[8] || 0;
+
+    spans[0].style.height = `${Math.max(3, (b1 / 255) * 13)}px`;
+    spans[1].style.height = `${Math.max(3, (b2 / 255) * 13)}px`;
+    spans[2].style.height = `${Math.max(3, (b3 / 255) * 13)}px`;
+  }
+}
+
+// StandBy Morph Toggle
 coverWrapper.addEventListener("click", () => {
   playerCard.classList.toggle("standby-mode");
 });
@@ -80,7 +116,7 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Glass Opacity Slider Event
+// Glass Darkness Slider
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -94,7 +130,6 @@ opacitySlider.addEventListener("input", (e) => {
   }
 });
 
-// Click Glass Icon to Mute/Unmute Tint
 btnGlass.addEventListener("click", () => {
   const currentVal = parseFloat(opacitySlider.value);
   if (currentVal > 0) {
@@ -111,7 +146,6 @@ btnGlass.addEventListener("click", () => {
   }
 });
 
-// Foldable Search Bar Toggle
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
   if (!searchSection.classList.contains("collapsed")) {
@@ -119,7 +153,6 @@ btnToggleSearch.addEventListener("click", () => {
   }
 });
 
-// Render Main Playlist with Equalizer Indicators
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
@@ -176,7 +209,6 @@ function renderPlaylist() {
   });
 }
 
-// Live Search
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") performSearch();
@@ -195,7 +227,7 @@ async function performSearch() {
   }
 }
 
-// Render Search Results
+// Search Results with Play Next Sequence Feature
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -208,18 +240,37 @@ function renderSearchResults(results) {
     const li = document.createElement("li");
     li.style.cursor = "pointer";
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 55%;">
         ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
       </span>
-      <button class="btn-add-morph" title="Add Song">+</button>
+      <div class="search-action-group">
+        <button class="btn-play-next" title="Play Next in Sequence">+ Next</button>
+        <button class="btn-add-morph" title="Add to End of Queue">+</button>
+      </div>
     `;
 
     li.addEventListener("click", (e) => {
-      if (e.target.closest(".btn-add-morph")) return;
+      if (e.target.closest(".search-action-group")) return;
       loadPreviewTrack(song);
       playTrack();
     });
 
+    // Add to Sequence (Play Next)
+    const btnNextSeq = li.querySelector(".btn-play-next");
+    btnNextSeq.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (btnNextSeq.classList.contains("added")) return;
+
+      btnNextSeq.classList.add("added");
+      btnNextSeq.innerText = "Queued";
+
+      // Insert immediately after the current song index
+      const insertAt = currentIndex < 0 ? 0 : currentIndex + 1;
+      playlist.splice(insertAt, 0, song);
+      renderPlaylist();
+    });
+
+    // Add to End of Playlist
     const btnAdd = li.querySelector(".btn-add-morph");
     btnAdd.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -236,7 +287,6 @@ function renderSearchResults(results) {
   });
 }
 
-// Preview Track Directly
 function loadPreviewTrack(song) {
   currentIndex = -1;
   title.innerText = song.title;
@@ -246,9 +296,7 @@ function loadPreviewTrack(song) {
   audio.src = song.url;
   
   setLyricText("");
-
   Array.from(playlistUl.children).forEach(li => li.classList.remove("active"));
-
   extractDominantColor(song.pic);
   fetchLyrics(song.lrc);
 }
@@ -273,7 +321,6 @@ async function loadTrack(index) {
   fetchLyrics(song.lrc);
 }
 
-// Volume Controls
 volumeSlider.addEventListener("input", (e) => {
   audio.volume = parseFloat(e.target.value);
   if (audio.volume > 0) {
@@ -356,6 +403,10 @@ function parseLRC(lrcText) {
 }
 
 function playTrack() {
+  initAudioContext();
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
   audio.play();
   playIcon.classList.add("hidden");
   pauseIcon.classList.remove("hidden");
@@ -401,7 +452,6 @@ btnList.addEventListener("click", () => {
   playlistDrawer.classList.toggle("collapsed");
 });
 
-// Timeline Dragging
 function updateProgressFromEvent(e) {
   if (!audio.duration) return;
   const rect = progressBarBg.getBoundingClientRect();
@@ -420,9 +470,7 @@ progressBarBg.addEventListener("mousedown", (e) => {
 });
 
 window.addEventListener("mousemove", (e) => {
-  if (isDraggingProgress) {
-    updateProgressFromEvent(e);
-  }
+  if (isDraggingProgress) updateProgressFromEvent(e);
 });
 
 window.addEventListener("mouseup", (e) => {
