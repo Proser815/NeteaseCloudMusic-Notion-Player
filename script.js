@@ -16,6 +16,7 @@ const coverWrapper = document.getElementById("cover-wrapper");
 const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
+const eqIndicator = document.getElementById("eq-indicator");
 
 const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
@@ -118,17 +119,27 @@ btnToggleSearch.addEventListener("click", () => {
   }
 });
 
-// Render Main Playlist
+// Render Main Playlist with Equalizer Indicators
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
     const li = document.createElement("li");
-    if (index === currentIndex) li.classList.add("active");
+    const isActive = index === currentIndex;
+    if (isActive) li.classList.add("active");
+
+    const isPlaying = isActive && !audio.paused;
 
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        ${index + 1}. ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
-      </span>
+      <div style="display:flex; align-items:center; gap:6px; overflow:hidden; max-width:80%;">
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          ${index + 1}. ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
+        </span>
+        ${isActive ? `
+          <div class="eq-bars ${isPlaying ? '' : 'paused'}" style="height:10px;">
+            <span></span><span></span><span></span>
+          </div>
+        ` : ''}
+      </div>
       <button class="btn-delete-song" title="Delete Song">
         <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
       </button>
@@ -225,7 +236,7 @@ function renderSearchResults(results) {
   });
 }
 
-// Preview track directly
+// Preview Track Directly
 function loadPreviewTrack(song) {
   currentIndex = -1;
   title.innerText = song.title;
@@ -348,12 +359,16 @@ function playTrack() {
   audio.play();
   playIcon.classList.add("hidden");
   pauseIcon.classList.remove("hidden");
+  if (eqIndicator) eqIndicator.classList.remove("paused");
+  renderPlaylist();
 }
 
 function pauseTrack() {
   audio.pause();
   playIcon.classList.remove("hidden");
   pauseIcon.classList.add("hidden");
+  if (eqIndicator) eqIndicator.classList.add("paused");
+  renderPlaylist();
 }
 
 btnPlay.addEventListener("click", () => {
