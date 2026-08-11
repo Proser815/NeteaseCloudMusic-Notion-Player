@@ -8,6 +8,7 @@ let playMode = 0;
 let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
+let debounceTimer = null;
 
 // Web Audio API Real-Time Analyzer State
 let audioCtx;
@@ -76,6 +77,10 @@ const searchInput = document.getElementById("search-input");
 const btnSearch = document.getElementById("btn-search");
 const searchResultsContainer = document.getElementById("search-results");
 const searchResultsUl = document.getElementById("search-results-ul");
+
+// Predictions Elements
+const searchPredictionsContainer = document.getElementById("search-predictions");
+const predictionsUl = document.getElementById("predictions-ul");
 
 // Initialize Web Audio API Context
 function initAudioContext() {
@@ -192,6 +197,7 @@ btnGlass.addEventListener("click", () => {
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
   if (!searchSection.classList.contains("collapsed")) searchInput.focus();
+  else hidePredictions();
 });
 
 function renderPlaylist() {
@@ -248,14 +254,84 @@ function renderPlaylist() {
   });
 }
 
+// Live Autocomplete / Search Predictions Handling
+searchInput.addEventListener("input", () => {
+  clearTimeout(debounceTimer);
+  const query = searchInput.value.trim();
+
+  if (!query) {
+    hidePredictions();
+    return;
+  }
+
+  // Debounce API calls slightly while typing incomplete words
+  debounceTimer = setTimeout(() => {
+    fetchPredictions(query);
+  }, 280);
+});
+
+async function fetchPredictions(query) {
+  try {
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
+    const results = await res.json();
+    renderPredictions(results);
+  } catch (err) {
+    hidePredictions();
+  }
+}
+
+function renderPredictions(results) {
+  predictionsUl.innerHTML = "";
+  if (!results || results.length === 0) {
+    hidePredictions();
+    return;
+  }
+
+  // Display top 5 predictions live
+  const suggestions = results.slice(0, 5);
+  suggestions.forEach(song => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <span class="prediction-title">${song.title}</span>
+      <span class="prediction-artist">- ${song.author}</span>
+    `;
+
+    li.addEventListener("click", () => {
+      hidePredictions();
+      loadPreviewTrack(song);
+      playTrack();
+    });
+
+    predictionsUl.appendChild(li);
+  });
+
+  searchPredictionsContainer.classList.remove("hidden");
+}
+
+function hidePredictions() {
+  searchPredictionsContainer.classList.add("hidden");
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-bar-wrapper")) {
+    hidePredictions();
+  }
+});
+
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") performSearch();
+  if (e.key === "Enter") {
+    hidePredictions();
+    performSearch();
+  }
 });
 
 async function performSearch() {
   const query = searchInput.value.trim();
   if (!query) return;
+
+  hidePredictions();
 
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
