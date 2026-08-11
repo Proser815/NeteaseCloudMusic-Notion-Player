@@ -9,6 +9,8 @@
   --accent-rgb: 255, 255, 255;
   --glow-color: rgba(255, 255, 255, 0.6);
   --glass-tint-opacity: 0.5;
+  /* Native Apple Spring Physics Bezier Curve */
+  --ios-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 html, body {
@@ -17,8 +19,60 @@ html, body {
   background: transparent !important;
   overflow: hidden;
   color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Dynamic Island Floating Pill Mode */
+.dynamic-island {
+  position: absolute;
+  top: 12px;
+  z-index: 10;
+  height: 36px;
+  padding: 0 12px;
+  background: #000000;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition: transform 0.5s var(--ios-spring), width 0.5s var(--ios-spring), opacity 0.3s ease;
+  will-change: transform, width;
+}
+
+.dynamic-island:hover {
+  transform: scale(1.08);
+}
+
+.dynamic-island img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dynamic-island span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* iOS Spring Physics Buttons */
+.spring-btn {
+  transition: transform 0.4s var(--ios-spring), fill 0.2s ease, opacity 0.2s ease !important;
+}
+
+.spring-btn:active {
+  transform: scale(0.72) !important;
+}
+
+/* Main Player Card Container */
 .player-card {
   position: relative;
   width: 100%;
@@ -33,7 +87,13 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 0.6s var(--ios-spring), opacity 0.4s ease, border-radius 0.5s ease;
+}
+
+.player-card.morphed-hidden {
+  transform: scale(0.1) translateY(-100px);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .album-backdrop-container {
@@ -95,17 +155,17 @@ html, body {
   display: flex;
   gap: 14px;
   align-items: center;
-  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: all 0.5s var(--ios-spring);
 }
 
 .cover-wrapper {
   cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform, width, height;
+  transition: transform 0.5s var(--ios-spring);
+  will-change: transform;
 }
 
 .cover-wrapper:hover { transform: scale(1.05); }
-.cover-wrapper:active { transform: scale(0.95); }
+.cover-wrapper:active { transform: scale(0.92); }
 
 .cover-wrapper img {
   width: 84px;
@@ -114,7 +174,7 @@ html, body {
   object-fit: cover;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
   display: block;
-  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: all 0.5s var(--ios-spring);
 }
 
 .player-card.standby-mode { padding: 20px; }
@@ -163,7 +223,6 @@ html, body {
   transition: font-size 0.3s ease;
 }
 
-/* Audio-Synced Real Spectrum Equalizer */
 .eq-bars {
   display: inline-flex;
   align-items: flex-end;
@@ -205,10 +264,9 @@ html, body {
   overflow: hidden;
   position: relative;
   width: 100%;
-  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-              opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-              margin 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: max-height 0.4s var(--ios-spring), 
+              opacity 0.25s ease, 
+              transform 0.4s var(--ios-spring);
 }
 
 .lyrics-container.collapsed {
@@ -258,7 +316,10 @@ html, body {
   cursor: pointer;
   position: relative;
   user-select: none;
+  transition: transform 0.2s var(--ios-spring);
 }
+
+.bar-bg:hover { transform: scaleY(1.3); }
 
 .bar-fill {
   height: 100%;
@@ -296,22 +357,18 @@ html, body {
 }
 
 .btn-icon svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   fill: #ffffff;
-  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), fill 0.2s ease;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
-
-.btn-icon:hover svg { fill: #ffffff; transform: scale(1.12); }
-.btn-icon:active svg { transform: scale(0.82) !important; opacity: 0.7; }
 
 #btn-lyrics.active svg {
   fill: #ffffff;
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
 }
 
-.btn-play svg { width: 25px; height: 25px; fill: #ffffff; }
+.btn-play svg { width: 24px; height: 24px; fill: #ffffff; }
 
 /* Volume Hover Slider */
 .volume-wrapper {
@@ -329,7 +386,7 @@ html, body {
   overflow: hidden;
   display: flex;
   align-items: center;
-  transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-left 0.3s ease;
+  transition: max-width 0.4s var(--ios-spring), opacity 0.25s ease;
 }
 
 .volume-wrapper:hover .volume-slider-container,
@@ -374,7 +431,7 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   overflow: hidden;
   display: flex;
   align-items: center;
-  transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-left 0.3s ease;
+  transition: max-width 0.4s var(--ios-spring), opacity 0.25s ease;
 }
 
 .glass-wrapper:hover .glass-slider-container,
@@ -403,6 +460,56 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   background: #ffffff;
 }
 
+/* AirPlay Audio Route Sheet */
+.airplay-sheet {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 8;
+  background: rgba(25, 25, 25, 0.85);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  transition: transform 0.5s var(--ios-spring), opacity 0.3s ease;
+}
+
+.airplay-sheet.collapsed {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.airplay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 8px;
+}
+
+.airplay-routes { list-style: none; }
+
+.route-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.route-item:hover { background: rgba(255, 255, 255, 0.15); }
+.route-item.active { background: rgba(255, 255, 255, 0.28); font-weight: 600; }
+.route-item svg { width: 16px; height: 16px; fill: #ffffff; }
+
 /* Playlist Drawer & Controls */
 .playlist-drawer {
   position: relative;
@@ -413,7 +520,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.25);
   overflow-y: auto;
-  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+  transition: max-height 0.4s var(--ios-spring), opacity 0.25s ease;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
@@ -453,7 +560,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   max-height: 200px;
   opacity: 1;
   overflow: hidden;
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, margin-bottom 0.3s ease;
+  transition: max-height 0.4s var(--ios-spring), opacity 0.2s ease, margin-bottom 0.3s ease;
   margin-bottom: 8px;
 }
 
@@ -495,11 +602,10 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition: background 0.2s ease;
 }
 
 .btn-search-ios:hover { background: rgba(255, 255, 255, 0.38); }
-.btn-search-ios:active { transform: scale(0.92); }
 .btn-search-ios svg { width: 15px; height: 15px; fill: #ffffff; }
 
 .search-results {
@@ -533,7 +639,6 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   align-items: center;
 }
 
-/* Play Next & Add Buttons */
 .btn-play-next {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -543,7 +648,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   padding: 3px 8px;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s var(--ios-spring);
 }
 
 .btn-play-next:hover {
@@ -574,12 +679,12 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   cursor: pointer;
   font-size: 1rem;
   font-weight: 300;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.3s var(--ios-spring);
 }
 
 .btn-add-morph:hover {
   background: rgba(255, 255, 255, 0.4);
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .btn-add-morph.added {
@@ -598,7 +703,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   align-items: center;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.9);
-  transition: background 0.2s ease, opacity 0.3s ease, transform 0.3s ease;
+  transition: background 0.2s ease, opacity 0.3s ease, transform 0.4s var(--ios-spring);
 }
 
 .playlist-drawer li:hover { background: rgba(255, 255, 255, 0.25); color: #ffffff; }
@@ -610,11 +715,11 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   opacity: 0;
   cursor: pointer;
   padding: 2px;
-  transition: opacity 0.2s ease, transform 0.1s ease;
+  transition: opacity 0.2s ease, transform 0.2s var(--ios-spring);
 }
 
 .playlist-drawer li:hover .btn-delete-song { opacity: 0.9; }
-.btn-delete-song:hover { opacity: 1 !important; transform: scale(1.2); }
+.btn-delete-song:hover { opacity: 1 !important; transform: scale(1.25); }
 .btn-delete-song svg { width: 14px; height: 14px; fill: #ff3b30; }
 
 .playlist-drawer li.removing {

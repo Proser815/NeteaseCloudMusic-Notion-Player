@@ -9,7 +9,7 @@ let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
 
-// Web Audio API for Audio-Synced Spectrum Equalizer
+// Web Audio API
 let audioCtx, analyser, dataArray, source;
 
 const playerCard = document.getElementById("player-card");
@@ -20,6 +20,19 @@ const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 const eqIndicator = document.getElementById("eq-indicator");
+
+// Dynamic Island Elements
+const dynamicIsland = document.getElementById("dynamic-island");
+const islandCover = document.getElementById("island-cover");
+const islandTitle = document.getElementById("island-title");
+const islandEq = document.getElementById("island-eq");
+const btnIsland = document.getElementById("btn-island");
+
+// AirPlay Sheet Elements
+const btnAirplay = document.getElementById("btn-airplay");
+const airplaySheet = document.getElementById("airplay-sheet");
+const btnCloseAirplay = document.getElementById("btn-close-airplay");
+const routeItems = document.querySelectorAll(".route-item");
 
 const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
@@ -72,7 +85,7 @@ async function initPlayer() {
   }
 }
 
-// Audio Context Initialization (Runs on first user gesture)
+// Audio Context Setup
 function initAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -86,37 +99,68 @@ function initAudioContext() {
   }
 }
 
-// Real-Time Frequency Equalizer Sync
+// Real Audio Spectrum Equalizer Sync
 function updateEqBars() {
   requestAnimationFrame(updateEqBars);
   if (!analyser || audio.paused) return;
 
   analyser.getByteFrequencyData(dataArray);
   const spans = eqIndicator.querySelectorAll("span");
+  const islandSpans = islandEq.querySelectorAll("span");
 
   if (spans.length >= 3) {
     const b1 = dataArray[1] || 0;
     const b2 = dataArray[4] || 0;
     const b3 = dataArray[8] || 0;
 
-    spans[0].style.height = `${Math.max(3, (b1 / 255) * 13)}px`;
-    spans[1].style.height = `${Math.max(3, (b2 / 255) * 13)}px`;
-    spans[2].style.height = `${Math.max(3, (b3 / 255) * 13)}px`;
+    const h1 = `${Math.max(3, (b1 / 255) * 13)}px`;
+    const h2 = `${Math.max(3, (b2 / 255) * 13)}px`;
+    const h3 = `${Math.max(3, (b3 / 255) * 13)}px`;
+
+    spans[0].style.height = h1; spans[1].style.height = h2; spans[2].style.height = h3;
+    if (islandSpans.length >= 3) {
+      islandSpans[0].style.height = h1; islandSpans[1].style.height = h2; islandSpans[2].style.height = h3;
+    }
   }
 }
 
-// StandBy Morph Toggle
+// Dynamic Island Morph Toggle
+btnIsland.addEventListener("click", () => {
+  playerCard.classList.add("morphed-hidden");
+  dynamicIsland.classList.remove("hidden");
+});
+
+dynamicIsland.addEventListener("click", () => {
+  playerCard.classList.remove("morphed-hidden");
+  dynamicIsland.classList.add("hidden");
+});
+
+// AirPlay Audio Route Sheet
+btnAirplay.addEventListener("click", () => {
+  airplaySheet.classList.toggle("collapsed");
+});
+
+btnCloseAirplay.addEventListener("click", () => {
+  airplaySheet.classList.add("collapsed");
+});
+
+routeItems.forEach(item => {
+  item.addEventListener("click", () => {
+    routeItems.forEach(r => r.classList.remove("active"));
+    item.classList.add("active");
+    setTimeout(() => airplaySheet.classList.add("collapsed"), 200);
+  });
+});
+
 coverWrapper.addEventListener("click", () => {
   playerCard.classList.toggle("standby-mode");
 });
 
-// Foldable Lyrics Toggle
 btnLyrics.addEventListener("click", () => {
   lyricsContainer.classList.toggle("collapsed");
   btnLyrics.classList.toggle("active");
 });
 
-// Glass Darkness Slider
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -148,9 +192,7 @@ btnGlass.addEventListener("click", () => {
 
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
-  if (!searchSection.classList.contains("collapsed")) {
-    searchInput.focus();
-  }
+  if (!searchSection.classList.contains("collapsed")) searchInput.focus();
 });
 
 function renderPlaylist() {
@@ -173,7 +215,7 @@ function renderPlaylist() {
           </div>
         ` : ''}
       </div>
-      <button class="btn-delete-song" title="Delete Song">
+      <button class="btn-delete-song spring-btn" title="Delete Song">
         <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
       </button>
     `;
@@ -227,7 +269,6 @@ async function performSearch() {
   }
 }
 
-// Search Results with Play Next Sequence Feature
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -255,7 +296,6 @@ function renderSearchResults(results) {
       playTrack();
     });
 
-    // Add to Sequence (Play Next)
     const btnNextSeq = li.querySelector(".btn-play-next");
     btnNextSeq.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -264,13 +304,11 @@ function renderSearchResults(results) {
       btnNextSeq.classList.add("added");
       btnNextSeq.innerText = "Queued";
 
-      // Insert immediately after the current song index
       const insertAt = currentIndex < 0 ? 0 : currentIndex + 1;
       playlist.splice(insertAt, 0, song);
       renderPlaylist();
     });
 
-    // Add to End of Playlist
     const btnAdd = li.querySelector(".btn-add-morph");
     btnAdd.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -292,6 +330,8 @@ function loadPreviewTrack(song) {
   title.innerText = song.title;
   artist.innerText = song.author;
   cover.src = song.pic;
+  islandCover.src = song.pic;
+  islandTitle.innerText = song.title;
   backdropImg.src = song.pic;
   audio.src = song.url;
   
@@ -308,6 +348,8 @@ async function loadTrack(index) {
   title.innerText = song.title;
   artist.innerText = song.author;
   cover.src = song.pic;
+  islandCover.src = song.pic;
+  islandTitle.innerText = song.title;
   backdropImg.src = song.pic;
   audio.src = song.url;
   
@@ -411,6 +453,7 @@ function playTrack() {
   playIcon.classList.add("hidden");
   pauseIcon.classList.remove("hidden");
   if (eqIndicator) eqIndicator.classList.remove("paused");
+  if (islandEq) islandEq.classList.remove("paused");
   renderPlaylist();
 }
 
@@ -419,6 +462,7 @@ function pauseTrack() {
   playIcon.classList.remove("hidden");
   pauseIcon.classList.add("hidden");
   if (eqIndicator) eqIndicator.classList.add("paused");
+  if (islandEq) islandEq.classList.add("paused");
   renderPlaylist();
 }
 
