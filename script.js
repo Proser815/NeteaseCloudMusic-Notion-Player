@@ -11,9 +11,13 @@ let previousOpacity = 0.5;
 
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
+const coverWrapper = document.getElementById("cover-wrapper");
 const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
+
+const coverModal = document.getElementById("cover-modal");
+const zoomCoverImg = document.getElementById("zoom-cover-img");
 
 const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
@@ -66,13 +70,23 @@ async function initPlayer() {
   }
 }
 
+// Apple Music Style Album Art Zoom Modal Controls
+coverWrapper.addEventListener("click", () => {
+  zoomCoverImg.src = cover.src;
+  coverModal.classList.remove("hidden");
+});
+
+coverModal.addEventListener("click", () => {
+  coverModal.classList.add("hidden");
+});
+
 // Foldable Lyrics Toggle
 btnLyrics.addEventListener("click", () => {
   lyricsContainer.classList.toggle("collapsed");
   btnLyrics.classList.toggle("active");
 });
 
-// Glass Opacity Slider Event (Smooth continuous hover/slide)
+// Glass Opacity Slider Event
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -177,7 +191,7 @@ async function performSearch() {
   }
 }
 
-// Render Search Results with Instant Row Preview
+// Render Search Results
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {

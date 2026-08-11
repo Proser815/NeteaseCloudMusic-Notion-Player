@@ -21,7 +21,7 @@
     </div>
 
     <div class="main-player">
-      <div class="cover-wrapper">
+      <div class="cover-wrapper" id="cover-wrapper" title="Click to zoom cover">
         <img id="cover" crossorigin="anonymous" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
       </div>
 
@@ -123,6 +123,13 @@
       </div>
 
       <ul id="playlist-ul"></ul>
+    </div>
+  </div>
+
+  <div id="cover-modal" class="cover-modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <img id="zoom-cover-img" src="" alt="Zoomed Cover">
     </div>
   </div>
 
