@@ -9,15 +9,13 @@ let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
 
+const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
 const coverWrapper = document.getElementById("cover-wrapper");
 const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
-
-const coverModal = document.getElementById("cover-modal");
-const zoomCoverImg = document.getElementById("zoom-cover-img");
 
 const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
@@ -70,14 +68,9 @@ async function initPlayer() {
   }
 }
 
-// Apple Music Style Album Art Zoom Modal Controls
+// iOS StandBy Dynamic Morph Toggle
 coverWrapper.addEventListener("click", () => {
-  zoomCoverImg.src = cover.src;
-  coverModal.classList.remove("hidden");
-});
-
-coverModal.addEventListener("click", () => {
-  coverModal.classList.add("hidden");
+  playerCard.classList.toggle("standby-mode");
 });
 
 // Foldable Lyrics Toggle

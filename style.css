@@ -34,6 +34,7 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  transition: all 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
 .album-backdrop-container {
@@ -96,11 +97,13 @@ html, body {
   display: flex;
   gap: 14px;
   align-items: center;
+  transition: all 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
 .cover-wrapper {
   cursor: pointer;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+  will-change: transform, width, height;
 }
 
 .cover-wrapper:hover {
@@ -118,6 +121,35 @@ html, body {
   object-fit: cover;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
   display: block;
+  transition: all 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+/* --- iOS 17 StandBy Morph Mode --- */
+.player-card.standby-mode {
+  padding: 20px;
+}
+
+.player-card.standby-mode .main-player {
+  gap: 20px;
+}
+
+.player-card.standby-mode .cover-wrapper {
+  transform: scale(1);
+}
+
+.player-card.standby-mode .cover-wrapper img {
+  width: 130px;
+  height: 130px;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.player-card.standby-mode .title {
+  font-size: 1.15rem;
+}
+
+.player-card.standby-mode .artist {
+  font-size: 0.9rem;
 }
 
 .info-wrapper {
@@ -143,6 +175,7 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  transition: font-size 0.3s ease;
 }
 
 .artist {
@@ -153,6 +186,7 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  transition: font-size 0.3s ease;
 }
 
 .lyrics-container {
@@ -619,62 +653,6 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 .playlist-drawer li.removing {
   opacity: 0 !important;
   transform: translateX(30px) !important;
-}
-
-/* Apple Music Zoom Modal Overlay */
-.cover-modal {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 99;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.cover-modal.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.modal-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  cursor: pointer;
-}
-
-.modal-content {
-  position: relative;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: scale(0.65);
-  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.cover-modal:not(.hidden) .modal-content {
-  transform: scale(1);
-}
-
-#zoom-cover-img {
-  width: 180px;
-  height: 180px;
-  max-width: 80vw;
-  max-height: 80vh;
-  border-radius: 18px;
-  object-fit: cover;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
-  cursor: pointer;
 }
 
 .hidden { display: none !important; }
