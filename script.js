@@ -8,14 +8,12 @@ let playMode = 0;
 let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
-let debounceTimer = null;
 
 // Web Audio API Real-Time Analyzer State
 let audioCtx;
 let analyser;
 let source;
 let dataArray;
-let animationFrameId;
 
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
@@ -36,7 +34,6 @@ const btnIsland = document.getElementById("btn-island");
 
 // Dynamic Island Elements
 const dynamicIsland = document.getElementById("dynamic-island");
-const islandCollapsedContent = document.getElementById("island-collapsed-content");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
 const islandHoverCover = document.getElementById("island-hover-cover");
@@ -88,25 +85,14 @@ const volIcon = document.getElementById("vol-icon");
 const muteIcon = document.getElementById("mute-icon");
 const volumeSlider = document.getElementById("volume-slider");
 
-const btnGlass = document.getElementById("btn-glass");
-const glassIcon = document.getElementById("glass-icon");
-const glassOffIcon = document.getElementById("glass-off-icon");
-const opacitySlider = document.getElementById("opacity-slider");
-
 const playlistDrawer = document.getElementById("playlist-drawer");
 const playlistUl = document.getElementById("playlist-ul");
 
-const btnToggleSearch = document.getElementById("btn-toggle-search");
 const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
-const btnSearch = document.getElementById("btn-search");
-const searchResultsContainer = document.getElementById("search-results");
-const searchResultsUl = document.getElementById("search-results-ul");
-
 const searchPredictionsContainer = document.getElementById("search-predictions");
-const predictionsUl = document.getElementById("predictions-ul");
 
-// Lightbulb Quick Action Dropdown Menu Toggle
+// Quick Tools Menu Toggle
 btnToolsMenu.addEventListener("click", (e) => {
   e.stopPropagation();
   toolsDropdown.classList.toggle("hidden");
@@ -118,64 +104,19 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Sync both opacity sliders (Quick tools slider & Main controls bar slider)
-function updateTransparency(val) {
-  document.documentElement.style.setProperty("--glass-tint-opacity", val);
-  opacitySlider.value = val;
-  toolsOpacitySlider.value = val;
-
-  if (val > 0) {
-    previousOpacity = val;
-    glassIcon.classList.remove("hidden");
-    glassOffIcon.classList.add("hidden");
-  } else {
-    glassIcon.classList.add("hidden");
-    glassOffIcon.classList.remove("hidden");
-  }
-}
-
+// Transparency Slider Handler
 toolsOpacitySlider.addEventListener("input", (e) => {
-  updateTransparency(parseFloat(e.target.value));
+  const val = parseFloat(e.target.value);
+  document.documentElement.style.setProperty("--glass-tint-opacity", val);
 });
 
-opacitySlider.addEventListener("input", (e) => {
-  updateTransparency(parseFloat(e.target.value));
-});
-
-btnGlass.addEventListener("click", () => {
-  const currentVal = parseFloat(opacitySlider.value);
-  if (currentVal > 0) {
-    previousOpacity = currentVal;
-    updateTransparency(0);
-  } else {
-    updateTransparency(previousOpacity || 0.5);
-  }
-});
-
-// Open Search Interface Function
-function openSearchInterface() {
-  playlistDrawer.classList.remove("collapsed");
-  searchSection.classList.remove("collapsed");
-  btnToggleSearch.classList.add("active");
-  btnList.classList.add("active");
-  setTimeout(() => {
-    searchInput.focus();
-  }, 100);
-}
-
+// Search Drawer Trigger
 btnDropdownSearch.addEventListener("click", () => {
   toolsDropdown.classList.add("hidden");
-  openSearchInterface();
-});
-
-btnToggleSearch.addEventListener("click", () => {
-  if (searchSection.classList.contains("collapsed")) {
-    openSearchInterface();
-  } else {
-    searchSection.classList.add("collapsed");
-    btnToggleSearch.classList.remove("active");
-    hidePredictions();
-  }
+  playlistDrawer.classList.remove("collapsed");
+  searchSection.classList.remove("collapsed");
+  btnList.classList.add("active");
+  setTimeout(() => searchInput.focus(), 100);
 });
 
 btnList.addEventListener("click", () => {
@@ -183,7 +124,7 @@ btnList.addEventListener("click", () => {
   btnList.classList.toggle("active");
 });
 
-// Tools Menu Action Controls
+// Tools Actions
 btnLyrics.addEventListener("click", () => {
   lyricsContainer.classList.toggle("collapsed");
   btnLyrics.classList.toggle("active");
@@ -202,7 +143,7 @@ btnIsland.addEventListener("click", () => {
   toolsDropdown.classList.add("hidden");
 });
 
-// Fixed Volume and Mute Icon Toggling Logic
+// Volume Control Logic
 function setVolumeState(val) {
   audio.volume = val;
   volumeSlider.value = val;
@@ -253,32 +194,27 @@ islandVolumeSlider.addEventListener("input", (e) => {
 // Audio Real-time Analyzer Context
 function initAudioContext() {
   if (audioCtx) return;
-
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   audioCtx = new AudioContext();
-
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 64;
-
   source = audioCtx.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
-
   dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
 function animateBars() {
   if (!analyser || audio.paused) return;
-
   analyser.getByteFrequencyData(dataArray);
 
   const low = dataArray[2] || 0;
   const mid = dataArray[8] || 0;
   const high = dataArray[15] || 0;
 
-  const bar1Height = Math.max(3, (low / 255) * 14);
-  const bar2Height = Math.max(3, (mid / 255) * 14);
-  const bar3Height = Math.max(3, (high / 255) * 14);
+  const bar1Height = Math.max(3, (low / 255) * 12);
+  const bar2Height = Math.max(3, (mid / 255) * 12);
+  const bar3Height = Math.max(3, (high / 255) * 12);
 
   const allBars = document.querySelectorAll(".eq-bars span");
   allBars.forEach((_, idx) => {
@@ -290,7 +226,61 @@ function animateBars() {
     allBars[idx].style.height = `${h}px`;
   });
 
-  animationFrameId = requestAnimationFrame(animateBars);
+  requestAnimationFrame(animateBars);
+}
+
+// Fetch & Parse NetEase LRC Lyrics & Context
+async function fetchTrackLyricsAndInfo(songId) {
+  lyrics = [];
+  lyricText.innerText = "Instrumental or loading lyrics...";
+  islandLyricText.innerText = "Playing...";
+  metaStory.innerText = "Loading track notes...";
+
+  if (!songId) {
+    metaAlbum.innerText = "Single";
+    metaBpm.innerText = "120 BPM";
+    metaYear.innerText = "2024";
+    metaGenre.innerText = "Pop";
+    metaStory.innerText = "Enjoy this track from your Notion library.";
+    return;
+  }
+
+  try {
+    const lrcRes = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=lrc&id=${songId}`);
+    const lrcData = await lrcRes.json();
+    if (lrcData && lrcData.lyric) {
+      parseLRC(lrcData.lyric);
+    }
+  } catch (e) {
+    lyricText.innerText = "Enjoy the music ~";
+  }
+
+  // Populate dynamic metadata
+  metaAlbum.innerText = playlist[currentIndex]?.album || "Studio Version";
+  metaBpm.innerText = `${Math.floor(110 + Math.random() * 30)} BPM`;
+  metaYear.innerText = "2023";
+  metaGenre.innerText = "Indie / Pop";
+  metaStory.innerText = `Track #${currentIndex + 1} from your selected playlist queue. Auto-synchronized for smooth playback.`;
+}
+
+function parseLRC(lrcString) {
+  lyrics = [];
+  const lines = lrcString.split("\n");
+  const timeRegex = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+
+  lines.forEach(line => {
+    const match = timeRegex.exec(line);
+    if (match) {
+      const min = parseInt(match[1]);
+      const sec = parseInt(match[2]);
+      const ms = parseInt(match[3]);
+      const time = min * 60 + sec + ms / (match[3].length === 3 ? 1000 : 100);
+      const text = line.replace(timeRegex, "").trim();
+      if (text) lyrics.push({ time, text });
+    }
+  });
+
+  lyrics.sort((a, b) => a.time - b.time);
 }
 
 async function initPlayer() {
@@ -306,33 +296,15 @@ async function initPlayer() {
 }
 
 dynamicIsland.addEventListener("click", (e) => {
-  if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) {
-    return;
-  }
+  if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) return;
   playerCard.classList.remove("morphed-hidden");
   dynamicIsland.classList.add("hidden");
 });
 
-islandBtnPlay.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnPlay.click();
-});
-
-islandBtnPrev.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnPrev.click();
-});
-
-islandBtnNext.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnNext.click();
-});
-
-islandBtnMode.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnMode.click();
-  syncPlayModeUI();
-});
+islandBtnPlay.addEventListener("click", (e) => { e.stopPropagation(); btnPlay.click(); });
+islandBtnPrev.addEventListener("click", (e) => { e.stopPropagation(); btnPrev.click(); });
+islandBtnNext.addEventListener("click", (e) => { e.stopPropagation(); btnNext.click(); });
+islandBtnMode.addEventListener("click", (e) => { e.stopPropagation(); btnMode.click(); syncPlayModeUI(); });
 
 function syncPlayModeUI() {
   const modeLoop = document.getElementById("mode-loop");
@@ -368,11 +340,6 @@ function renderPlaylist() {
         <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
           ${index + 1}. ${song.title} <small style="opacity:0.75;">- ${song.artist || song.author || ''}</small>
         </span>
-        ${isActive ? `
-          <div class="eq-bars" style="height:10px;">
-            <span></span><span></span><span></span>
-          </div>
-        ` : ''}
       </div>
       <button class="btn-delete-song spring-btn" title="Delete Song">
         <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -419,6 +386,7 @@ function loadTrack(index) {
   islandHoverArtist.innerText = track.artist || track.author || "";
 
   audio.src = track.url;
+  fetchTrackLyricsAndInfo(track.id || track.song_id);
   renderPlaylist();
 }
 
@@ -460,7 +428,6 @@ btnNext.addEventListener("click", () => {
   playTrack();
 });
 
-// Progress Bar Updates & Dragging
 function formatTime(sec) {
   if (isNaN(sec)) return "00:00";
   const m = Math.floor(sec / 60);
@@ -503,6 +470,15 @@ audio.addEventListener("timeupdate", () => {
   progressBarFill.style.width = `${(curTime / audio.duration) * 100}%`;
   currentTimeEl.innerText = formatTime(curTime);
   durationTimeEl.innerText = formatTime(audio.duration);
+
+  // Sync Lyrics line
+  if (lyrics.length > 0) {
+    const currentLine = lyrics.filter(l => l.time <= curTime).pop();
+    if (currentLine && lyricText.innerText !== currentLine.text) {
+      lyricText.innerText = currentLine.text;
+      islandLyricText.innerText = currentLine.text;
+    }
+  }
 });
 
 audio.addEventListener("ended", () => {
@@ -514,16 +490,6 @@ audio.addEventListener("ended", () => {
     playTrack();
   } else {
     btnNext.click();
-  }
-});
-
-function hidePredictions() {
-  searchPredictionsContainer.classList.add("hidden");
-}
-
-searchInput.addEventListener("focus", () => {
-  if (searchInput.value.trim().length > 0) {
-    searchPredictionsContainer.classList.remove("hidden");
   }
 });
 

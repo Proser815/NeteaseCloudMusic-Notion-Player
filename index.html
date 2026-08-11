@@ -88,7 +88,7 @@
 
             <div class="dropdown-slider-item">
               <div class="dropdown-slider-label">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/></svg>
                 <span>Transparency</span>
               </div>
               <input type="range" id="tools-opacity-slider" min="0" max="1" step="0.01" value="0.5">
@@ -130,11 +130,13 @@
         <div class="track-details">
           <div class="title-row">
             <span id="title" class="title">Probably Up</span>
+          </div>
+          <div class="artist-row">
+            <span id="artist" class="artist">Lawrence</span>
             <div id="eq-bars" class="eq-bars">
               <span></span><span></span><span></span>
             </div>
           </div>
-          <span id="artist" class="artist">Lawrence</span>
         </div>
 
         <div id="lyrics-container" class="lyrics-container">
@@ -180,20 +182,6 @@
               <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
             </div>
           </div>
-
-          <div class="opacity-wrapper">
-            <button id="btn-glass" class="btn-icon spring-btn" title="Adjust Transparency">
-              <svg id="glass-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-              <svg id="glass-off-icon" class="hidden" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/></svg>
-            </button>
-            <div class="opacity-slider-container">
-              <input type="range" id="opacity-slider" min="0" max="1" step="0.01" value="0.5">
-            </div>
-          </div>
-
-          <button id="btn-toggle-search" class="btn-icon spring-btn" title="Toggle Search">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          </button>
 
           <button id="btn-list" class="btn-icon spring-btn" title="Playlist Queue">
             <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
