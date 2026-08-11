@@ -27,7 +27,6 @@ const artist = document.getElementById("artist");
 
 // Dynamic Island Elements
 const dynamicIsland = document.getElementById("dynamic-island");
-const islandCollapsedContent = document.getElementById("island-collapsed-content");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
 const islandHoverCover = document.getElementById("island-hover-cover");
@@ -172,7 +171,6 @@ btnIsland.addEventListener("click", () => {
   dynamicIsland.classList.remove("hidden");
 });
 
-// Click anywhere on Dynamic Island background restores full player card
 dynamicIsland.addEventListener("click", (e) => {
   if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) {
     return;
@@ -181,7 +179,6 @@ dynamicIsland.addEventListener("click", (e) => {
   dynamicIsland.classList.add("hidden");
 });
 
-// Island Hover Control Action Bindings
 islandBtnPlay.addEventListener("click", (e) => {
   e.stopPropagation();
   btnPlay.click();
@@ -240,7 +237,7 @@ islandBtnVolume.addEventListener("click", (e) => {
     islandVolIcon.classList.remove("hidden");
     islandMuteIcon.classList.add("hidden");
     volIcon.classList.remove("hidden");
-    muteIcon.classList.remove("hidden");
+    muteIcon.classList.add("hidden");
   }
 });
 
@@ -348,7 +345,7 @@ function renderPlaylist() {
   });
 }
 
-// Live Autocomplete / Search Predictions Handling
+// Live Autocomplete Predictions with id= parameter
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
   const query = searchInput.value.trim();
@@ -365,8 +362,7 @@ searchInput.addEventListener("input", () => {
 
 async function fetchPredictions(query) {
   try {
-    // FIXED: Using &name= instead of &id= to successfully query custom strings
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&name=${encodeURIComponent(query)}`);
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const results = await res.json();
     renderPredictions(results);
   } catch (err) {
@@ -427,8 +423,7 @@ async function performSearch() {
   hidePredictions();
 
   try {
-    // FIXED: Using &name= instead of &id= to successfully query custom strings
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&name=${encodeURIComponent(query)}`);
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const results = await res.json();
     renderSearchResults(results);
   } catch (err) {

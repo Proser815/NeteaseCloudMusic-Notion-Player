@@ -3,144 +3,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iOS Glass Music Player</title>
+  <title>Notion Music Player</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="dynamic-island" class="dynamic-island hidden" title="Tap to expand">
-    <div class="island-content">
-      <img id="island-cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
-      <span id="island-title">Playing...</span>
-      <div class="island-eq">
+  <div id="dynamic-island" class="dynamic-island hidden" title="Click anywhere on background to return to player mode">
+    <div id="island-collapsed-content" class="island-collapsed-content">
+      <img id="island-cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Island Cover">
+      <span id="island-title">Probably Up</span>
+      <div id="island-eq" class="eq-bars">
         <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="island-hover-controls">
+      <div class="island-track-meta">
+        <img id="island-hover-cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
+        <div class="island-track-text">
+          <span id="island-hover-title">Probably Up</span>
+          <span id="island-hover-artist">Artist Name</span>
+        </div>
+      </div>
+      <div class="island-marquee-container">
+        <div class="island-marquee-wrapper">
+          <span id="island-lyric-text">Lyrics sync here...</span>
+        </div>
+      </div>
+      <div class="island-action-buttons">
+        <button id="island-btn-mode" class="island-ctrl-btn spring-btn" title="Toggle Mode">
+          <svg id="island-mode-loop" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+          <svg id="island-mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          <svg id="island-mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+        </button>
+        <button id="island-btn-prev" class="island-ctrl-btn spring-btn" title="Previous">
+          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+        <button id="island-btn-play" class="island-ctrl-btn spring-btn" title="Play/Pause">
+          <svg id="island-play-icon" class="hidden" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="island-pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <button id="island-btn-next" class="island-ctrl-btn spring-btn" title="Next">
+          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+        <div class="island-volume-container">
+          <button id="island-btn-volume" class="island-ctrl-btn spring-btn">
+            <svg id="island-vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            <svg id="island-mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+          </button>
+          <input type="range" id="island-volume-slider" min="0" max="1" step="0.01" value="0.8">
+        </div>
       </div>
     </div>
   </div>
 
   <div id="player-card" class="player-card">
-    <div class="glass-backdrop">
-      <img id="backdrop-img" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Backdrop">
+    <div id="backdrop" class="backdrop">
+      <img id="backdrop-img" src="" alt="Backdrop">
+      <div class="backdrop-tint"></div>
     </div>
-    <div class="glass-overlay"></div>
-
-    <canvas id="eq-canvas" class="eq-canvas"></canvas>
 
     <div class="player-content">
-      <div class="top-nav">
-        <button id="btn-drawer-toggle" class="ios-icon-btn" title="Library & Search">
-          <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+      <div class="top-bar">
+        <button id="btn-island" class="btn-top spring-btn" title="Dynamic Island Mode">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
         </button>
-        <span class="top-nav-title">Now Playing</span>
-        <button id="btn-toggle-island" class="ios-icon-btn" title="Dynamic Island Mode">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-        </button>
+        <div class="top-actions-right">
+          <button id="btn-info" class="btn-top spring-btn" title="Settings & Metadata">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          </button>
+          <button id="btn-toggle-search" class="btn-top spring-btn" title="Toggle Search">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+          </button>
+        </div>
       </div>
 
-      <div id="cover-wrapper" class="cover-wrapper">
-        <img id="cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Album Art">
+      <div id="search-section" class="search-section collapsed">
+        <div class="search-bar-wrapper">
+          <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search any song worldwide..." autocomplete="off">
+            <button id="btn-search" class="btn-search-ios spring-btn" title="Search">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+            </button>
+          </div>
+          <div id="search-predictions" class="search-predictions hidden">
+            <ul id="predictions-ul"></ul>
+          </div>
+        </div>
+        <div id="search-results" class="search-results hidden">
+          <ul id="search-results-ul"></ul>
+        </div>
+      </div>
+
+      <div id="cover-wrapper" class="cover-wrapper spring-btn" title="Click to toggle standby card">
+        <img id="cover" src="" alt="Album Art">
+        <div class="standby-overlay">
+          <span id="standby-title">Notion Player</span>
+          <span id="standby-sub">Ambient Audio Engine</span>
+        </div>
       </div>
 
       <div class="track-info">
-        <h2 id="title" class="title">Loading...</h2>
-        <p id="artist" class="artist">Please wait</p>
+        <div class="title-row">
+          <h2 id="title">Loading...</h2>
+          <div class="eq-bars">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <p id="artist">Artist Name</p>
       </div>
 
-      <div class="lyric-container">
-        <p id="lyric-text" class="lyric-text">♪ Apple Music Experience</p>
+      <div id="lyrics-container" class="lyrics-container collapsed">
+        <div class="marquee-wrapper">
+          <span id="lyric-text">Lyrics sync here...</span>
+        </div>
       </div>
 
-      <div class="progress-section">
+      <div class="progress-container">
+        <span id="current-time" class="time-label">0:00</span>
         <div id="progress-bar-bg" class="progress-bar-bg">
           <div id="progress-bar-fill" class="progress-bar-fill"></div>
         </div>
-        <div class="time-display">
-          <span id="current-time">0:00</span>
-          <span id="duration-time">0:00</span>
-        </div>
+        <span id="duration-time" class="time-label">0:00</span>
       </div>
 
-      <div class="controls">
-        <button id="btn-mode" class="control-btn" title="Play Mode">
-          <svg id="mode-icon" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+      <div class="controls-row">
+        <button id="btn-mode" class="btn-ctrl spring-btn" title="Playback Mode">
+          <svg id="mode-loop" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+          <svg id="mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          <svg id="mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
         </button>
-
-        <button id="btn-prev" class="control-btn" title="Previous">
+        <button id="btn-prev" class="btn-ctrl spring-btn" title="Previous Track">
           <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
         </button>
-
-        <button id="btn-play" class="control-btn btn-play" title="Play/Pause">
-          <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <button id="btn-play" class="btn-ctrl btn-play-main spring-btn" title="Play/Pause">
+          <svg id="play-icon" class="hidden" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
-
-        <button id="btn-next" class="control-btn" title="Next">
+        <button id="btn-next" class="btn-ctrl spring-btn" title="Next Track">
           <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </button>
-
-        <button id="btn-settings-drawer" class="control-btn" title="Settings">
-          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <button id="btn-lyrics" class="btn-ctrl spring-btn" title="Toggle Lyrics">
+          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
         </button>
       </div>
 
-      <div class="volume-container">
-        <svg class="vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
+      <div class="bottom-action-bar">
+        <div class="volume-box">
+          <button id="btn-volume" class="spring-btn">
+            <svg id="vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            <svg id="mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+          </button>
+          <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
+        </div>
+
+        <div class="glass-box">
+          <button id="btn-glass" class="spring-btn" title="Toggle Glass Opacity">
+            <svg id="glass-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+            <svg id="glass-off-icon" class="hidden" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5 0 .65.13 1.26.36 1.83l2.92-2.92c-.08-.28-.28-.53-.28-.91 0-1.1.9-2 2-2 .38 0 .63.2.91.28l2.92-2.92C13.26 7.13 12.65 7 12 7zm8.57 12.42L4.58 3.43 3.16 4.85l3.9 3.9C6.38 9.58 6 10.74 6 12c0 3.31 2.69 6 6 6 1.26 0 2.42-.38 3.25-1.06l3.9 3.9 1.42-1.42z"/></svg>
+          </button>
+          <input type="range" id="opacity-slider" min="0" max="0.9" step="0.05" value="0.5">
+        </div>
+
+        <button id="btn-list" class="spring-btn" title="Playlist Queue">
+          <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        </button>
       </div>
     </div>
 
-    <div id="utility-drawer" class="utility-drawer collapsed">
-      <div class="sheet-handle"></div>
-      <div class="drawer-header">
-        <div class="drawer-tabs">
-          <button id="tab-btn-search" class="drawer-tab active">Search</button>
-          <button id="tab-btn-playlist" class="drawer-tab">Queue</button>
-          <button id="tab-btn-settings" class="drawer-tab">Glass</button>
+    <div id="playlist-drawer" class="playlist-drawer collapsed">
+      <h3>Up Next Queue</h3>
+      <ul id="playlist-ul"></ul>
+    </div>
+
+    <div id="info-drawer" class="info-drawer collapsed">
+      <div class="ios-settings-header">
+        <h3>Settings &amp; Track Info</h3>
+      </div>
+      
+      <div class="ios-settings-group">
+        <div class="ios-settings-title">Track Metadata</div>
+        <div class="ios-settings-card">
+          <div class="ios-row">
+            <span class="ios-row-label">Album</span>
+            <span id="meta-album" class="ios-row-value">Single</span>
+          </div>
+          <div class="ios-row">
+            <span class="ios-row-label">Tempo</span>
+            <span id="meta-bpm" class="ios-row-value">~120 BPM</span>
+          </div>
+          <div class="ios-row">
+            <span class="ios-row-label">Release Year</span>
+            <span id="meta-year" class="ios-row-value">2026</span>
+          </div>
+          <div class="ios-row">
+            <span class="ios-row-label">Genre</span>
+            <span id="meta-genre" class="ios-row-value">Pop / Acoustic</span>
+          </div>
         </div>
-        <button id="btn-close-drawer" class="drawer-close-btn">&times;</button>
       </div>
 
-      <div class="drawer-body">
-        <div id="drawer-section-search" class="drawer-section active">
-          <div class="search-bar-container">
-            <div class="search-bar">
-              <input type="text" id="search-input" placeholder="Artists, Songs, Lyrics..." autocomplete="off">
-              <button id="btn-search" class="btn-search-ios" title="Search">
-                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
-              </button>
-            </div>
-            <div id="search-suggestions" class="search-suggestions hidden"></div>
-          </div>
-          <div id="search-results" class="search-results"></div>
-        </div>
-
-        <div id="drawer-section-playlist" class="drawer-section">
-          <ul id="playlist-list" class="playlist-list"></ul>
-        </div>
-
-        <div id="drawer-section-settings" class="drawer-section">
-          <div class="setting-item">
-            <label for="glass-opacity">Glass Opacity <span id="glass-opacity-val">50%</span></label>
-            <input type="range" id="glass-opacity" min="0.05" max="0.95" step="0.01" value="0.5">
-          </div>
-          <div class="setting-item">
-            <label for="blur-slider">Glass Blur <span id="blur-slider-val">25px</span></label>
-            <input type="range" id="blur-slider" min="5" max="60" step="1" value="25">
-          </div>
-          <div class="setting-item">
-            <label for="tint-picker">Accent Tint</label>
-            <input type="color" id="tint-picker" value="#ffffff">
-          </div>
-          <div class="setting-item">
-            <label for="eq-toggle">Equalizer Visualizer</label>
-            <input type="checkbox" id="eq-toggle" checked>
-          </div>
+      <div class="ios-settings-group">
+        <div class="ios-settings-title">Playback Story &amp; Details</div>
+        <div class="ios-settings-card">
+          <p id="meta-story" class="ios-story-text">Streamed globally using Netease CDN. High fidelity audio analyzer active.</p>
         </div>
       </div>
     </div>
   </div>
 
   <audio id="audio-player" crossorigin="anonymous"></audio>
-
   <script src="script.js"></script>
 </body>
 </html>
