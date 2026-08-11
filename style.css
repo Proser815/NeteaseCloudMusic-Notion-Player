@@ -23,6 +23,86 @@ html, body {
   justify-content: center;
 }
 
+/* Header & Lightbulb Tools Menu */
+.player-header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 8px 4px;
+}
+
+.player-header-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tools-wrapper {
+  position: relative;
+}
+
+.tools-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background: rgba(18, 18, 18, 0.88);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 20;
+  min-width: 170px;
+  transition: opacity 0.25s ease, transform 0.25s var(--ios-spring);
+}
+
+.dropdown-item {
+  background: none;
+  border: none;
+  color: #ffffff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dropdown-item.active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dropdown-item svg {
+  width: 16px;
+  height: 16px;
+  fill: #ffffff;
+}
+
 /* Dynamic Island Adapting Mini Pill Mode */
 .dynamic-island {
   position: absolute;
@@ -89,7 +169,6 @@ html, body {
   max-width: 180px;
 }
 
-/* Equalizer Bars Protection - Never Get Squished */
 .eq-bars {
   display: inline-flex;
   align-items: flex-end;
@@ -109,7 +188,6 @@ html, body {
   flex-shrink: 0;
 }
 
-/* Island Expanded Hover Controls Layout */
 .island-hover-controls {
   opacity: 0;
   pointer-events: none;
@@ -176,7 +254,6 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* Island Lyrics Sub-Component on Hover */
 .island-lyrics-container {
   width: 100%;
   height: 18px;
@@ -233,7 +310,6 @@ html, body {
   height: 20px;
 }
 
-/* Island Volume Control Wrapper */
 .island-volume-wrapper {
   display: flex;
   align-items: center;
@@ -280,7 +356,6 @@ input[type=range]#island-volume-slider::-webkit-slider-thumb {
   background: #ffffff;
 }
 
-/* iOS Spring Physics Buttons */
 .spring-btn {
   transition: transform 0.4s var(--ios-spring), fill 0.2s ease, opacity 0.2s ease !important;
 }
@@ -289,7 +364,6 @@ input[type=range]#island-volume-slider::-webkit-slider-thumb {
   transform: scale(0.72) !important;
 }
 
-/* Main Player Card Container */
 .player-card {
   position: relative;
   width: 100%;
@@ -557,15 +631,8 @@ input[type=range]#island-volume-slider::-webkit-slider-thumb {
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
-#btn-lyrics.active svg,
-#btn-info.active svg {
-  fill: #ffffff;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
-}
-
 .btn-play svg { width: 24px; height: 24px; fill: #ffffff; }
 
-/* Song Context & Background Metadata Drawer */
 .info-drawer {
   position: relative;
   z-index: 2;
@@ -630,7 +697,6 @@ input[type=range]#island-volume-slider::-webkit-slider-thumb {
   color: rgba(255, 255, 255, 0.88);
 }
 
-/* Volume Hover Slider */
 .volume-wrapper {
   display: flex;
   align-items: center;
@@ -675,7 +741,6 @@ input[type=range]#volume-slider::-webkit-slider-thumb {
   background: #ffffff;
 }
 
-/* Glass Opacity Hover Slider */
 .glass-wrapper {
   display: flex;
   align-items: center;
@@ -720,7 +785,6 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   background: #ffffff;
 }
 
-/* Playlist Drawer & Controls */
 .playlist-drawer {
   position: relative;
   z-index: 2;
@@ -747,24 +811,6 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   border-top-color: transparent !important;
   pointer-events: none;
 }
-
-.drawer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 4px 6px 4px;
-}
-
-.drawer-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-}
-
-.drawer-actions { display: flex; gap: 6px; align-items: center; }
 
 .search-section {
   position: relative;
@@ -824,7 +870,6 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 .btn-search-ios:hover { background: rgba(255, 255, 255, 0.38); }
 .btn-search-ios svg { width: 15px; height: 15px; fill: #ffffff; }
 
-/* Real-time iOS Predictions Dropdown Menu */
 .search-predictions {
   position: absolute;
   top: 100%;
@@ -916,7 +961,6 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 
 .search-results li:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* Aligned Action Container & Buttons */
 .search-action-group {
   display: flex;
   gap: 6px;

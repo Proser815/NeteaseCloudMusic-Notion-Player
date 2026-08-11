@@ -25,6 +25,13 @@ const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 
+// Tools Dropdown Controls
+const btnToolsMenu = document.getElementById("btn-tools-menu");
+const toolsDropdown = document.getElementById("tools-dropdown");
+const btnLyrics = document.getElementById("btn-lyrics");
+const btnInfo = document.getElementById("btn-info");
+const btnIsland = document.getElementById("btn-island");
+
 // Dynamic Island Elements
 const dynamicIsland = document.getElementById("dynamic-island");
 const islandCollapsedContent = document.getElementById("island-collapsed-content");
@@ -34,9 +41,8 @@ const islandHoverCover = document.getElementById("island-hover-cover");
 const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
 const islandLyricText = document.getElementById("island-lyric-text");
-const btnIsland = document.getElementById("btn-island");
 
-// Dynamic Island Hover Control Buttons
+// Dynamic Island Controls
 const islandBtnMode = document.getElementById("island-btn-mode");
 const islandModeLoop = document.getElementById("island-mode-loop");
 const islandModeOne = document.getElementById("island-mode-one");
@@ -51,8 +57,7 @@ const islandVolIcon = document.getElementById("island-vol-icon");
 const islandMuteIcon = document.getElementById("island-mute-icon");
 const islandVolumeSlider = document.getElementById("island-volume-slider");
 
-// Track Info Metadata Elements
-const btnInfo = document.getElementById("btn-info");
+// Metadata Drawer
 const infoDrawer = document.getElementById("info-drawer");
 const metaAlbum = document.getElementById("meta-album");
 const metaBpm = document.getElementById("meta-bpm");
@@ -75,7 +80,6 @@ const playIcon = document.getElementById("play-icon");
 const pauseIcon = document.getElementById("pause-icon");
 const btnPrev = document.getElementById("btn-prev");
 const btnNext = document.getElementById("btn-next");
-const btnLyrics = document.getElementById("btn-lyrics");
 const btnList = document.getElementById("btn-list");
 const btnMode = document.getElementById("btn-mode");
 
@@ -99,11 +103,41 @@ const btnSearch = document.getElementById("btn-search");
 const searchResultsContainer = document.getElementById("search-results");
 const searchResultsUl = document.getElementById("search-results-ul");
 
-// Predictions Elements
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
-// Initialize Web Audio API Context
+// Lightbulb Quick Action Dropdown Menu Toggle
+btnToolsMenu.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toolsDropdown.classList.toggle("hidden");
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".tools-wrapper")) {
+    toolsDropdown.classList.add("hidden");
+  }
+});
+
+// Tools Menu Action Controls
+btnLyrics.addEventListener("click", () => {
+  lyricsContainer.classList.toggle("collapsed");
+  btnLyrics.classList.toggle("active");
+  toolsDropdown.classList.add("hidden");
+});
+
+btnInfo.addEventListener("click", () => {
+  infoDrawer.classList.toggle("collapsed");
+  btnInfo.classList.toggle("active");
+  toolsDropdown.classList.add("hidden");
+});
+
+btnIsland.addEventListener("click", () => {
+  playerCard.classList.add("morphed-hidden");
+  dynamicIsland.classList.remove("hidden");
+  toolsDropdown.classList.add("hidden");
+});
+
+// Audio Real-time Analyzer Context
 function initAudioContext() {
   if (audioCtx) return;
 
@@ -120,7 +154,6 @@ function initAudioContext() {
   dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
-// Drive Bar Heights from Real Frequency Data
 function animateBars() {
   if (!analyser || audio.paused) return;
 
@@ -147,7 +180,6 @@ function animateBars() {
   animationFrameId = requestAnimationFrame(animateBars);
 }
 
-// Init Player
 async function initPlayer() {
   audio.volume = 0.8;
   try {
@@ -160,19 +192,6 @@ async function initPlayer() {
   }
 }
 
-// Toggle Song Context / Background Info Drawer
-btnInfo.addEventListener("click", () => {
-  infoDrawer.classList.toggle("collapsed");
-  btnInfo.classList.toggle("active");
-});
-
-// Dynamic Island Morph Toggle
-btnIsland.addEventListener("click", () => {
-  playerCard.classList.add("morphed-hidden");
-  dynamicIsland.classList.remove("hidden");
-});
-
-// Click anywhere on Dynamic Island background restores full player card
 dynamicIsland.addEventListener("click", (e) => {
   if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) {
     return;
@@ -181,7 +200,6 @@ dynamicIsland.addEventListener("click", (e) => {
   dynamicIsland.classList.add("hidden");
 });
 
-// Island Hover Control Action Bindings
 islandBtnPlay.addEventListener("click", (e) => {
   e.stopPropagation();
   btnPlay.click();
@@ -252,11 +270,6 @@ function syncPlayModeUI() {
 
 coverWrapper.addEventListener("click", () => {
   playerCard.classList.toggle("standby-mode");
-});
-
-btnLyrics.addEventListener("click", () => {
-  lyricsContainer.classList.toggle("collapsed");
-  btnLyrics.classList.toggle("active");
 });
 
 opacitySlider.addEventListener("input", (e) => {
@@ -348,7 +361,6 @@ function renderPlaylist() {
   });
 }
 
-// Live Autocomplete / Search Predictions Handling
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
   const query = searchInput.value.trim();
