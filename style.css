@@ -39,6 +39,31 @@ html, body {
   background: rgba(255, 255, 255, 0.5);
 }
 
+/* Universal Exit / Close Button Style for Drawers & Sections */
+.btn-exit-drawer {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.3s var(--ios-spring);
+}
+
+.btn-exit-drawer:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.btn-exit-drawer svg {
+  width: 14px;
+  height: 14px;
+  fill: #fff;
+}
+
 /* Dynamic Island Adapting Mini Pill Mode */
 .dynamic-island {
   position: absolute;
@@ -46,7 +71,7 @@ html, body {
   z-index: 10;
   height: 36px;
   min-width: 160px;
-  max-width: 380px;
+  max-width: 420px;
   width: auto;
   padding: 0 12px;
   background: #000000;
@@ -92,12 +117,12 @@ html, body {
 .island-hover-controls {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.88);
   backdrop-filter: blur(20px);
-  padding: 0 16px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -111,12 +136,12 @@ html, body {
 .island-track-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 #island-hover-cover {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 6px;
   object-fit: cover;
 }
@@ -127,18 +152,18 @@ html, body {
 }
 
 #island-hover-title {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  max-width: 90px;
+  max-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 #island-hover-artist {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   opacity: 0.7;
-  max-width: 90px;
+  max-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -146,8 +171,8 @@ html, body {
 
 .island-marquee-container {
   flex: 1;
-  margin: 0 12px;
   overflow: hidden;
+  margin: 0 4px;
 }
 
 .island-marquee-wrapper {
@@ -155,14 +180,14 @@ html, body {
 }
 
 #island-lyric-text {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: rgba(255,255,255,0.85);
 }
 
 .island-action-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .island-ctrl-btn {
@@ -190,7 +215,7 @@ html, body {
 }
 
 #island-volume-slider {
-  width: 50px;
+  width: 45px;
   accent-color: #fff;
   height: 3px;
 }
@@ -308,6 +333,20 @@ html, body {
   pointer-events: none;
 }
 
+.search-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.section-heading {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .search-bar-wrapper {
   position: relative;
   width: 100%;
@@ -315,7 +354,7 @@ html, body {
 
 .search-bar {
   display: flex;
-  background: rgba(30, 30, 30, 0.85);
+  background: rgba(30, 30, 30, 0.88);
   backdrop-filter: blur(20px);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -422,7 +461,7 @@ html, body {
 /* Search Results Drawer */
 .search-results {
   margin-top: 8px;
-  background: rgba(20, 20, 20, 0.9);
+  background: rgba(20, 20, 20, 0.92);
   backdrop-filter: blur(25px);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -748,9 +787,15 @@ html, body {
   transform: translateY(100%);
 }
 
+.drawer-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
 .playlist-drawer h3 {
   font-size: 1rem;
-  margin-bottom: 14px;
   font-weight: 600;
 }
 
@@ -816,11 +861,19 @@ html, body {
   transform: translateX(100%);
 }
 
+.ios-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
 .ios-settings-header h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  margin-bottom: 18px;
+  flex: 1;
   text-align: center;
+  margin-right: 28px; /* Balance out close button */
 }
 
 .ios-settings-group {

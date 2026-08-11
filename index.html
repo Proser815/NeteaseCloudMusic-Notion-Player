@@ -18,6 +18,9 @@
     </div>
 
     <div class="island-hover-controls">
+      <button id="island-btn-exit" class="island-ctrl-btn spring-btn" title="Exit Island Mode">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
       <div class="island-track-meta">
         <img id="island-hover-cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
         <div class="island-track-text">
@@ -79,6 +82,12 @@
       </div>
 
       <div id="search-section" class="search-section collapsed">
+        <div class="search-header-row">
+          <span class="section-heading">Search Global Tracks</span>
+          <button id="btn-close-search" class="btn-exit-drawer spring-btn" title="Close Search">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
         <div class="search-bar-wrapper">
           <div class="search-bar">
             <input type="text" id="search-input" placeholder="Search any song worldwide..." autocomplete="off">
@@ -172,12 +181,20 @@
     </div>
 
     <div id="playlist-drawer" class="playlist-drawer collapsed">
-      <h3>Up Next Queue</h3>
+      <div class="drawer-header-row">
+        <h3>Up Next Queue</h3>
+        <button id="btn-close-playlist" class="btn-exit-drawer spring-btn" title="Close Queue">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
       <ul id="playlist-ul"></ul>
     </div>
 
     <div id="info-drawer" class="info-drawer collapsed">
       <div class="ios-settings-header">
+        <button id="btn-close-info" class="btn-exit-drawer spring-btn" title="Close Settings">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
         <h3>Settings &amp; Track Info</h3>
       </div>
       

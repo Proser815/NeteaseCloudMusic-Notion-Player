@@ -34,6 +34,7 @@ const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
 const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
+const islandBtnExit = document.getElementById("island-btn-exit");
 
 // Dynamic Island Hover Control Buttons
 const islandBtnMode = document.getElementById("island-btn-mode");
@@ -53,6 +54,7 @@ const islandVolumeSlider = document.getElementById("island-volume-slider");
 // Track Info Metadata Elements
 const btnInfo = document.getElementById("btn-info");
 const infoDrawer = document.getElementById("info-drawer");
+const btnCloseInfo = document.getElementById("btn-close-info");
 const metaAlbum = document.getElementById("meta-album");
 const metaBpm = document.getElementById("meta-bpm");
 const metaYear = document.getElementById("meta-year");
@@ -89,9 +91,11 @@ const glassOffIcon = document.getElementById("glass-off-icon");
 const opacitySlider = document.getElementById("opacity-slider");
 
 const playlistDrawer = document.getElementById("playlist-drawer");
+const btnClosePlaylist = document.getElementById("btn-close-playlist");
 const playlistUl = document.getElementById("playlist-ul");
 
 const btnToggleSearch = document.getElementById("btn-toggle-search");
+const btnCloseSearch = document.getElementById("btn-close-search");
 const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
 const btnSearch = document.getElementById("btn-search");
@@ -102,21 +106,24 @@ const searchResultsUl = document.getElementById("search-results-ul");
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
-// Initialize Web Audio API Context
+// Initialize Web Audio API Context safely
 function initAudioContext() {
   if (audioCtx) return;
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
 
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioCtx = new AudioContext();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
 
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 64;
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
 
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+  } catch (e) {
+    console.warn("Web Audio API hook note:", e);
+  }
 }
 
 // Drive Bar Heights from Real Frequency Data
@@ -158,6 +165,27 @@ async function initPlayer() {
     title.innerText = "Error Loading Playlist";
   }
 }
+
+// Exit / Close Event Handlers for Drawers & Overlays
+btnCloseInfo.addEventListener("click", () => {
+  infoDrawer.classList.add("collapsed");
+  btnInfo.classList.remove("active");
+});
+
+btnClosePlaylist.addEventListener("click", () => {
+  playlistDrawer.classList.add("collapsed");
+});
+
+btnCloseSearch.addEventListener("click", () => {
+  searchSection.classList.add("collapsed");
+  hidePredictions();
+});
+
+islandBtnExit.addEventListener("click", (e) => {
+  e.stopPropagation();
+  playerCard.classList.remove("morphed-hidden");
+  dynamicIsland.classList.add("hidden");
+});
 
 // Toggle Song Context / Background Info Drawer
 btnInfo.addEventListener("click", () => {
@@ -512,8 +540,11 @@ function applyTrackData(song) {
   islandHoverTitle.innerText = song.title;
   islandHoverArtist.innerText = song.author;
   backdropImg.src = song.pic;
-  audio.src = song.url;
   
+  // Ensure robust source stream assignment
+  audio.src = song.url;
+  audio.load();
+
   setLyricText("");
   extractDominantColor(song.pic);
   fetchLyrics(song.lrc);
@@ -657,16 +688,18 @@ function playTrack() {
     audioCtx.resume();
   }
 
-  audio.play();
-  playIcon.classList.add("hidden");
-  pauseIcon.classList.remove("hidden");
-  islandPlayIcon.classList.add("hidden");
-  islandPauseIcon.classList.remove("hidden");
+  audio.play().then(() => {
+    playIcon.classList.add("hidden");
+    pauseIcon.classList.remove("hidden");
+    islandPlayIcon.classList.add("hidden");
+    islandPauseIcon.classList.remove("hidden");
 
-  cancelAnimationFrame(animationFrameId);
-  animateBars();
-
-  renderPlaylist();
+    cancelAnimationFrame(animationFrameId);
+    animateBars();
+    renderPlaylist();
+  }).catch((err) => {
+    console.warn("Playback interrupted or stream CORS blocked:", err);
+  });
 }
 
 function pauseTrack() {
