@@ -365,7 +365,8 @@ searchInput.addEventListener("input", () => {
 
 async function fetchPredictions(query) {
   try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
+    // FIXED: Using &name= instead of &id= to successfully query custom strings
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&name=${encodeURIComponent(query)}`);
     const results = await res.json();
     renderPredictions(results);
   } catch (err) {
@@ -426,7 +427,8 @@ async function performSearch() {
   hidePredictions();
 
   try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
+    // FIXED: Using &name= instead of &id= to successfully query custom strings
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&name=${encodeURIComponent(query)}`);
     const results = await res.json();
     renderSearchResults(results);
   } catch (err) {
