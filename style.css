@@ -171,28 +171,49 @@ html, body {
   height: 20px;
 }
 
-/* Island Volume Group */
-.island-volume-group {
+/* Island Volume Wrapper Matching Main Player Style */
+.island-volume-wrapper {
   display: flex;
   align-items: center;
-  position: relative;
+  border-radius: 20px;
+  transition: background 0.3s ease;
 }
 
-#island-volume-slider {
+.island-volume-wrapper:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.island-volume-slider-container {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  transition: max-width 0.4s var(--ios-spring), opacity 0.25s ease;
+}
+
+.island-volume-wrapper:hover .island-volume-slider-container,
+.island-volume-wrapper:focus-within .island-volume-slider-container {
+  max-width: 65px;
+  opacity: 1;
+  margin-left: 4px;
+  margin-right: 6px;
+}
+
+input[type=range]#island-volume-slider {
   -webkit-appearance: none;
   width: 55px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.45);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
-  margin-left: 2px;
 }
 
-#island-volume-slider::-webkit-slider-thumb {
+input[type=range]#island-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #ffffff;
 }

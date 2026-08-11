@@ -27,6 +27,7 @@ const artist = document.getElementById("artist");
 
 // Dynamic Island Elements
 const dynamicIsland = document.getElementById("dynamic-island");
+const islandCollapsedContent = document.getElementById("island-collapsed-content");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
 const islandHoverCover = document.getElementById("island-hover-cover");
@@ -44,6 +45,9 @@ const islandBtnPlay = document.getElementById("island-btn-play");
 const islandPlayIcon = document.getElementById("island-play-icon");
 const islandPauseIcon = document.getElementById("island-pause-icon");
 const islandBtnNext = document.getElementById("island-btn-next");
+const islandBtnVolume = document.getElementById("island-btn-volume");
+const islandVolIcon = document.getElementById("island-vol-icon");
+const islandMuteIcon = document.getElementById("island-mute-icon");
 const islandVolumeSlider = document.getElementById("island-volume-slider");
 
 // Track Info Metadata Elements
@@ -166,27 +170,31 @@ btnIsland.addEventListener("click", () => {
   dynamicIsland.classList.remove("hidden");
 });
 
-dynamicIsland.addEventListener("click", (e) => {
-  // Clicking anywhere on island except hover interactive elements restores full player card
-  if (e.target.closest(".island-hover-controls")) return;
+// Clicking strictly the collapsed pill part (or anywhere outside hover controls) restores the full player card
+islandCollapsedContent.addEventListener("click", (e) => {
+  e.stopPropagation();
   playerCard.classList.remove("morphed-hidden");
   dynamicIsland.classList.add("hidden");
 });
 
 // Island Hover Control Action Bindings
-islandBtnPlay.addEventListener("click", () => {
+islandBtnPlay.addEventListener("click", (e) => {
+  e.stopPropagation();
   btnPlay.click();
 });
 
-islandBtnPrev.addEventListener("click", () => {
+islandBtnPrev.addEventListener("click", (e) => {
+  e.stopPropagation();
   btnPrev.click();
 });
 
-islandBtnNext.addEventListener("click", () => {
+islandBtnNext.addEventListener("click", (e) => {
+  e.stopPropagation();
   btnNext.click();
 });
 
-islandBtnMode.addEventListener("click", () => {
+islandBtnMode.addEventListener("click", (e) => {
+  e.stopPropagation();
   btnMode.click();
   syncPlayModeUI();
 });
@@ -197,10 +205,36 @@ islandVolumeSlider.addEventListener("input", (e) => {
   volumeSlider.value = val;
   if (val > 0) {
     previousVolume = val;
+    islandVolIcon.classList.remove("hidden");
+    islandMuteIcon.classList.add("hidden");
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
   } else {
+    islandVolIcon.classList.add("hidden");
+    islandMuteIcon.classList.remove("hidden");
     volIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+  }
+});
+
+islandBtnVolume.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (audio.volume > 0) {
+    previousVolume = audio.volume;
+    audio.volume = 0;
+    volumeSlider.value = 0;
+    islandVolumeSlider.value = 0;
+    islandVolIcon.classList.add("hidden");
+    islandMuteIcon.classList.remove("hidden");
+    volIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+  } else {
+    audio.volume = previousVolume || 0.8;
+    volumeSlider.value = audio.volume;
+    islandVolumeSlider.value = audio.volume;
+    islandVolIcon.classList.remove("hidden");
+    islandMuteIcon.classList.add("hidden");
+    volIcon.classList.remove("hidden");
     muteIcon.classList.remove("hidden");
   }
 });
@@ -524,9 +558,13 @@ volumeSlider.addEventListener("input", (e) => {
     previousVolume = val;
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
+    islandVolIcon.classList.remove("hidden");
+    islandMuteIcon.classList.add("hidden");
   } else {
     volIcon.classList.add("hidden");
     muteIcon.classList.remove("hidden");
+    islandVolIcon.classList.add("hidden");
+    islandMuteIcon.classList.remove("hidden");
   }
 });
 
@@ -538,12 +576,16 @@ btnVolume.addEventListener("click", () => {
     islandVolumeSlider.value = 0;
     volIcon.classList.add("hidden");
     muteIcon.classList.remove("hidden");
+    islandVolIcon.classList.add("hidden");
+    islandMuteIcon.classList.remove("hidden");
   } else {
     audio.volume = previousVolume || 0.8;
     volumeSlider.value = audio.volume;
     islandVolumeSlider.value = audio.volume;
     volIcon.classList.remove("hidden");
-    muteIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+    islandVolIcon.classList.remove("hidden");
+    islandMuteIcon.classList.add("hidden");
   }
 });
 
