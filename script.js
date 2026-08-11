@@ -170,9 +170,11 @@ btnIsland.addEventListener("click", () => {
   dynamicIsland.classList.remove("hidden");
 });
 
-// Clicking strictly the collapsed pill part (or anywhere outside hover controls) restores the full player card
-islandCollapsedContent.addEventListener("click", (e) => {
-  e.stopPropagation();
+// FIXED: Click anywhere on the Dynamic Island (except interactive controls/sliders) restores the main player
+dynamicIsland.addEventListener("click", (e) => {
+  if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) {
+    return; // Don't trigger restore if user interacted with control buttons or volume slider
+  }
   playerCard.classList.remove("morphed-hidden");
   dynamicIsland.classList.add("hidden");
 });
@@ -200,6 +202,7 @@ islandBtnMode.addEventListener("click", (e) => {
 });
 
 islandVolumeSlider.addEventListener("input", (e) => {
+  e.stopPropagation();
   const val = parseFloat(e.target.value);
   audio.volume = val;
   volumeSlider.value = val;
