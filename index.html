@@ -72,118 +72,93 @@
 
   <div class="player-card" id="player-card">
     
-    <div class="player-header">
-      <span class="player-header-title">PLAYLIST QUEUE</span>
-      <div class="header-actions">
-        <div class="tools-wrapper">
-          <button id="btn-tools-menu" class="btn-icon spring-btn" title="Quick Tools & Modes">
-            <svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 017 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
-          </button>
-          
-          <div id="tools-dropdown" class="tools-dropdown hidden">
-            <button id="btn-dropdown-search" class="dropdown-item spring-btn" title="Search Interface">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              <span>Search Songs</span>
-            </button>
-
-            <div class="dropdown-slider-item">
-              <div class="dropdown-slider-label">
-                <svg viewBox="0 0 24 24"><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/></svg>
-                <span>Transparency</span>
-              </div>
-              <input type="range" id="tools-opacity-slider" min="0" max="1" step="0.01" value="0.5">
-            </div>
-
-            <button id="btn-lyrics" class="dropdown-item spring-btn" title="Toggle Lyrics">
-              <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-              <span>Lyrics Display</span>
-            </button>
-
-            <button id="btn-info" class="dropdown-item spring-btn" title="Song Info & Story">
-              <svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>
-              <span>Track Context</span>
-            </button>
-
-            <button id="btn-island" class="dropdown-item spring-btn" title="Dynamic Island Mode">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
-              <span>Dynamic Island</span>
-            </button>
-          </div>
-        </div>
-      </div>
+    <div class="album-backdrop-container">
+      <img id="backdrop-img" src="" alt="Backdrop">
+      <div id="glass-overlay" class="backdrop-overlay"></div>
     </div>
 
-    <div class="album-backdrop-container">
-      <img id="backdrop-img" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Backdrop">
-      <div class="backdrop-overlay"></div>
-      <div class="blob-container">
-        <div class="blob" id="blob1"></div>
-        <div class="blob" id="blob2"></div>
-      </div>
+    <div class="blob-container">
+      <div id="blob1" class="blob"></div>
+      <div id="blob2" class="blob"></div>
     </div>
 
     <div class="main-player">
-      <div id="cover-wrapper" class="cover-wrapper" title="Click to toggle Standby Mode">
-        <img id="cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Album Cover">
+      <div class="cover-wrapper" id="cover-wrapper" title="Tap to toggle StandBy mode">
+        <img id="cover" crossorigin="anonymous" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
       </div>
+
       <div class="info-wrapper">
         <div class="track-details">
           <div class="title-row">
-            <span id="title" class="title">Probably Up</span>
-          </div>
-          <div class="artist-row">
-            <span id="artist" class="artist">Lawrence</span>
-            <div id="eq-bars" class="eq-bars">
-              <span></span><span></span><span></span>
+            <div id="title" class="title">Probably Up</div>
+            <div id="eq-indicator" class="eq-bars">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
           </div>
+          <div id="artist" class="artist">Lawrence</div>
         </div>
 
-        <div id="lyrics-container" class="lyrics-container">
+        <div id="lyrics-container" class="lyrics-container collapsed">
           <div class="marquee-wrapper">
-            <span id="lyric-text" class="lyric-text">Loading track lyrics...</span>
+            <span id="lyric-text" class="lyric-text"></span>
           </div>
         </div>
 
         <div class="progress-container">
-          <span id="current-time" class="time">00:00</span>
-          <div id="progress-bar-bg" class="progress-bar-wrapper">
-            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+          <div class="bar-bg" id="progress-bar-bg">
+            <div class="bar-fill" id="progress-bar-fill"></div>
           </div>
-          <span id="duration-time" class="time">00:00</span>
+          <div class="time-display">
+            <span id="current-time">00:00</span>
+            <span id="duration-time">00:00</span>
+          </div>
         </div>
 
-        <div class="controls-container">
-          <button id="btn-mode" class="btn-icon spring-btn" title="Loop Mode">
+        <div class="controls">
+          <button id="btn-prev" class="btn-icon spring-btn" title="Previous">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          
+          <button id="btn-play" class="btn-icon btn-play spring-btn" title="Play/Pause">
+            <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+
+          <button id="btn-next" class="btn-icon spring-btn" title="Next">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+
+          <button id="btn-lyrics" class="btn-icon spring-btn" title="Toggle Lyrics">
+            <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+          </button>
+
+          <button id="btn-info" class="btn-icon spring-btn" title="Song Info & Story">
+            <svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>
+          </button>
+
+          <div class="volume-wrapper" id="volume-wrapper">
+            <button id="btn-volume" class="btn-icon spring-btn" title="Volume">
+              <svg id="vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              <svg id="mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            </button>
+            <div class="volume-slider-container" id="volume-slider-container">
+              <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
+            </div>
+          </div>
+
+          <button id="btn-island" class="btn-icon spring-btn" title="Dynamic Island Mode">
+            <svg viewBox="0 0 24 24"><path d="M7 10h10c1.1 0 2 .9 2 2s-.9 2-2 2H7c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg>
+          </button>
+
+          <button id="btn-mode" class="btn-icon spring-btn" title="Play Mode">
             <svg id="mode-loop" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
             <svg id="mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-4V9h-1l-2 1v1h1.5v3H13z"/></svg>
             <svg id="mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
           </button>
 
-          <button id="btn-prev" class="btn-icon spring-btn" title="Previous Song">
-            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-          </button>
-
-          <button id="btn-play" class="btn-icon play-main spring-btn" title="Play / Pause">
-            <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-
-          <button id="btn-next" class="btn-icon spring-btn" title="Next Song">
-            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-          </button>
-
-          <div class="volume-wrapper">
-            <button id="btn-volume" class="btn-icon spring-btn" title="Mute / Unmute">
-              <svg id="vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-              <svg id="mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-            </button>
-            <div class="volume-slider-container">
-              <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
-            </div>
-          </div>
-
-          <button id="btn-list" class="btn-icon spring-btn" title="Playlist Queue">
+          <button id="btn-list" class="btn-icon spring-btn" title="Playlist">
             <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
           </button>
         </div>
@@ -197,11 +172,11 @@
           <span id="meta-album" class="info-value">--</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Tempo</span>
-          <span id="meta-bpm" class="info-value">-- BPM</span>
+          <span class="info-label">Tempo / BPM</span>
+          <span id="meta-bpm" class="info-value">--</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Release</span>
+          <span class="info-label">Release Year</span>
           <span id="meta-year" class="info-value">--</span>
         </div>
         <div class="info-item">
@@ -216,18 +191,40 @@
     </div>
 
     <div id="playlist-drawer" class="playlist-drawer collapsed">
+      <div class="drawer-header">
+        <span class="drawer-title">Playlist Queue</span>
+        <div class="drawer-actions">
+          
+          <div class="glass-wrapper" id="glass-wrapper">
+            <button id="btn-glass" class="btn-icon spring-btn" title="Glass Darkness">
+              <svg id="glass-icon" viewBox="0 0 24 24"><path d="M11 2v3h2V2h-2zm-5.5 3.5l2.12 2.12 1.42-1.41L6.92 4.09 5.5 5.5zM18.5 5.5l-1.42-1.41-2.12 2.12 1.41 1.42 2.13-2.13zM12 6c-3.31 0-6 2.69-6 6 0 2.22 1.21 4.15 3 5.19V20c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2.81c1.79-1.04 3-2.97 3-5.19 0-3.31-2.69-6-6-6zm-1 12h2v1h-2v-1zm2.85-3.3l-.85.49V16h-2v-.81l-.85-.49C8.8 14.02 8 12.8 8 11.5 8 9.57 9.57 8 11.5 8s3.5 1.57 3.5 3.5c0 1.3-.8 2.52-2.15 3.2z"/></svg>
+              <svg id="glass-off-icon" class="hidden" viewBox="0 0 24 24"><path d="M12 6c-3.31 0-6 2.69-6 6 0 2.22 1.21 4.15 3 5.19V20c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2.81c1.79-1.04 3-2.97 3-5.19 0-3.31-2.69-6-6-6zm-1 12h2v1h-2v-1zm2.85-3.3l-.85.49V16h-2v-.81l-.85-.49C8.8 14.02 8 12.8 8 11.5 8 9.57 9.57 8 11.5 8s3.5 1.57 3.5 3.5c0 1.3-.8 2.52-2.15 3.2z"/><line x1="3.5" y1="3.5" x2="20.5" y2="20.5" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="glass-slider-container" id="glass-slider-container">
+              <input type="range" id="opacity-slider" min="0" max="0.85" step="0.01" value="0.5">
+            </div>
+          </div>
+
+          <button id="btn-toggle-search" class="btn-icon spring-btn" title="Toggle Search">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+          </button>
+        </div>
+      </div>
+
       <div id="search-section" class="search-section collapsed">
         <div class="search-bar-wrapper">
           <div class="search-bar">
             <input type="text" id="search-input" placeholder="Search song or artist..." autocomplete="off">
             <button id="btn-search" class="btn-search-ios spring-btn" title="Search">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
             </button>
           </div>
+
           <div id="search-predictions" class="search-predictions hidden">
             <ul id="predictions-ul"></ul>
           </div>
         </div>
+
         <div id="search-results" class="search-results hidden">
           <ul id="search-results-ul"></ul>
         </div>
@@ -235,11 +232,9 @@
 
       <ul id="playlist-ul"></ul>
     </div>
-
   </div>
 
   <audio id="audio-player" crossorigin="anonymous"></audio>
-
   <script src="script.js"></script>
 </body>
 </html>
