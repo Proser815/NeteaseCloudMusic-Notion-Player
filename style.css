@@ -222,54 +222,23 @@ html, body {
   transition: font-size 0.3s ease;
 }
 
-/* Dynamic Equalizer Bars Keyframe System */
+/* Real-Time Audio Frequency Responsive Equalizer Bars */
 .eq-bars {
   display: inline-flex;
   align-items: flex-end;
   gap: 2.5px;
-  height: 13px;
+  height: 14px;
   flex-shrink: 0;
 }
 
 .eq-bars span {
   width: 2.5px;
-  height: 12px;
+  height: 3px;
   background: #ffffff;
   border-radius: 3px;
   transform-origin: bottom;
   box-shadow: 0 0 6px var(--glow-color);
-  transition: opacity 0.3s ease;
-}
-
-.eq-bars:not(.paused) span:nth-child(1) {
-  animation: bounceBar1 0.65s ease-in-out infinite alternate;
-}
-.eq-bars:not(.paused) span:nth-child(2) {
-  animation: bounceBar2 0.45s ease-in-out infinite alternate;
-}
-.eq-bars:not(.paused) span:nth-child(3) {
-  animation: bounceBar3 0.8s ease-in-out infinite alternate;
-}
-
-.eq-bars.paused span {
-  height: 3px !important;
-  opacity: 0.65;
-  animation: none !important;
-}
-
-@keyframes bounceBar1 {
-  0% { height: 3px; }
-  100% { height: 13px; }
-}
-
-@keyframes bounceBar2 {
-  0% { height: 12px; }
-  100% { height: 4px; }
-}
-
-@keyframes bounceBar3 {
-  0% { height: 5px; }
-  100% { height: 14px; }
+  transition: height 0.05s ease;
 }
 
 .artist {

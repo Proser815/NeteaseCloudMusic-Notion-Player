@@ -9,6 +9,13 @@ let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
 
+// Web Audio API Real-Time Analyzer State
+let audioCtx;
+let analyser;
+let source;
+let dataArray;
+let animationFrameId;
+
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -16,13 +23,11 @@ const coverWrapper = document.getElementById("cover-wrapper");
 const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
-const eqIndicator = document.getElementById("eq-indicator");
 
 // Dynamic Island Elements
 const dynamicIsland = document.getElementById("dynamic-island");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
-const islandEq = document.getElementById("island-eq");
 const btnIsland = document.getElementById("btn-island");
 
 // AirPlay Sheet Elements
@@ -68,6 +73,50 @@ const searchInput = document.getElementById("search-input");
 const btnSearch = document.getElementById("btn-search");
 const searchResultsContainer = document.getElementById("search-results");
 const searchResultsUl = document.getElementById("search-results-ul");
+
+// Initialize Web Audio API Context
+function initAudioContext() {
+  if (audioCtx) return;
+
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  audioCtx = new AudioContext();
+
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 64; // Fast FFT resolution for crisp equalizer bars
+
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+}
+
+// Drive Bar Heights from Real Frequency Data
+function animateBars() {
+  if (!analyser || audio.paused) return;
+
+  analyser.getByteFrequencyData(dataArray);
+
+  const low = dataArray[2] || 0;
+  const mid = dataArray[8] || 0;
+  const high = dataArray[15] || 0;
+
+  const bar1Height = Math.max(3, (low / 255) * 14);
+  const bar2Height = Math.max(3, (mid / 255) * 14);
+  const bar3Height = Math.max(3, (high / 255) * 14);
+
+  const allBars = document.querySelectorAll(".eq-bars span");
+  allBars.forEach((_, idx) => {
+    const mod = idx % 3;
+    let h = 3;
+    if (mod === 0) h = bar1Height;
+    if (mod === 1) h = bar2Height;
+    if (mod === 2) h = bar3Height;
+    allBars[idx].style.height = `${h}px`;
+  });
+
+  animationFrameId = requestAnimationFrame(animateBars);
+}
 
 // Init Player
 async function initPlayer() {
@@ -160,15 +209,13 @@ function renderPlaylist() {
     const isActive = index === currentIndex;
     if (isActive) li.classList.add("active");
 
-    const isPlaying = isActive && !audio.paused;
-
     li.innerHTML = `
       <div style="display:flex; align-items:center; gap:6px; overflow:hidden; max-width:80%;">
         <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
           ${index + 1}. ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
         </span>
         ${isActive ? `
-          <div class="eq-bars ${isPlaying ? '' : 'paused'}" style="height:10px;">
+          <div class="eq-bars" style="height:10px;">
             <span></span><span></span><span></span>
           </div>
         ` : ''}
@@ -423,13 +470,19 @@ function parseLRC(lrcText) {
 }
 
 function playTrack() {
+  if (!audioCtx) {
+    initAudioContext();
+  } else if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
   audio.play();
   playIcon.classList.add("hidden");
   pauseIcon.classList.remove("hidden");
-  
-  if (eqIndicator) eqIndicator.classList.remove("paused");
-  if (islandEq) islandEq.classList.remove("paused");
-  
+
+  cancelAnimationFrame(animationFrameId);
+  animateBars();
+
   renderPlaylist();
 }
 
@@ -437,10 +490,12 @@ function pauseTrack() {
   audio.pause();
   playIcon.classList.remove("hidden");
   pauseIcon.classList.add("hidden");
-  
-  if (eqIndicator) eqIndicator.classList.add("paused");
-  if (islandEq) islandEq.classList.add("paused");
-  
+
+  cancelAnimationFrame(animationFrameId);
+
+  const bars = document.querySelectorAll(".eq-bars span");
+  bars.forEach(bar => (bar.style.height = "3px"));
+
   renderPlaylist();
 }
 
