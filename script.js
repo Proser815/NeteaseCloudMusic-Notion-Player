@@ -297,10 +297,11 @@ function renderPredictions(results) {
       <span class="prediction-artist">- ${song.author}</span>
     `;
 
+    // Click fills search field & executes search immediately
     li.addEventListener("click", () => {
+      searchInput.value = `${song.title} - ${song.author}`;
       hidePredictions();
-      loadPreviewTrack(song);
-      playTrack();
+      performSearch();
     });
 
     predictionsUl.appendChild(li);
@@ -433,7 +434,6 @@ function applyTrackData(song) {
 function updateSongMetadata(song) {
   metaAlbum.innerText = song.album || "Single / Netease Release";
   
-  // Calculate simulated or actual BPM & year estimation
   const pseudoBpm = 90 + (song.title.length * 7) % 50;
   metaBpm.innerText = `~${pseudoBpm} BPM`;
   

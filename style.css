@@ -716,10 +716,13 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 
 .search-results li:hover { background: rgba(255, 255, 255, 0.25); }
 
+/* Aligned Action Container & Buttons */
 .search-action-group {
   display: flex;
   gap: 6px;
   align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .btn-play-next {
@@ -728,9 +731,13 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   color: #ffffff;
   font-size: 0.68rem;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 12px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 13px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s var(--ios-spring);
 }
 
@@ -745,10 +752,10 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 }
 
 .btn-add-morph {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  min-height: 26px;
   padding: 0;
   margin: 0;
   border-radius: 50%;
@@ -758,16 +765,17 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
+  line-height: 1;
+  box-sizing: border-box;
   transition: all 0.3s var(--ios-spring);
 }
 
 .btn-add-morph:hover {
   background: rgba(255, 255, 255, 0.4);
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .btn-add-morph.added {
