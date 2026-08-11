@@ -4,18 +4,17 @@ const API_BASE = `https://api.i-meto.com/meting/api?server=netease&type=playlist
 let playlist = [];
 let currentIndex = 0;
 let lyrics = [];
-let playMode = 0; // 0: Loop, 1: Single Loop, 2: Shuffle
+let playMode = 0; // 0: Loop, 1: Repeat, 2: Shuffle
 let isDraggingProgress = false;
 let searchDebounceTimer = null;
 
-// Web Audio API State
+// Web Audio Visualizer API State
 let audioCtx;
 let analyser;
 let source;
 let dataArray;
-let animationFrameId;
 
-// DOM Element Selections
+// DOM Selectors
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
@@ -40,17 +39,12 @@ const volumeSlider = document.getElementById("volume-slider");
 const dynamicIsland = document.getElementById("dynamic-island");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
-const islandHoverCover = document.getElementById("island-hover-cover");
-const islandHoverTitle = document.getElementById("island-hover-title");
-const islandHoverArtist = document.getElementById("island-hover-artist");
-const islandBtnPlay = document.getElementById("island-btn-play");
-const islandPlayIcon = document.getElementById("island-play-icon");
-const islandBtnPrev = document.getElementById("island-btn-prev");
-const islandBtnNext = document.getElementById("island-btn-next");
+const btnToggleIsland = document.getElementById("btn-toggle-island");
 
-// Consolidated Utility Drawer Elements
+// Utility Sheet Drawer Elements
 const utilityDrawer = document.getElementById("utility-drawer");
 const btnDrawerToggle = document.getElementById("btn-drawer-toggle");
+const btnSettingsDrawer = document.getElementById("btn-settings-drawer");
 const btnCloseDrawer = document.getElementById("btn-close-drawer");
 
 const tabBtnSearch = document.getElementById("tab-btn-search");
@@ -69,16 +63,17 @@ const playlistList = document.getElementById("playlist-list");
 
 const glassOpacitySlider = document.getElementById("glass-opacity");
 const glassOpacityVal = document.getElementById("glass-opacity-val");
+const blurSlider = document.getElementById("blur-slider");
+const blurSliderVal = document.getElementById("blur-slider-val");
 const tintPicker = document.getElementById("tint-picker");
 const eqToggle = document.getElementById("eq-toggle");
-const btnToggleIsland = document.getElementById("btn-toggle-island");
 const canvas = document.getElementById("eq-canvas");
 const canvasCtx = canvas.getContext("2d");
 
-// Helper to Safely Get Track Attributes
+// Safe Property Extractors to completely eliminate "undefined" errors
 function getTrackTitle(track) {
-  if (!track) return "Unknown Track";
-  return track.name || track.title || "Unknown Track";
+  if (!track) return "Unknown Song";
+  return track.name || track.title || "Unknown Song";
 }
 
 function getTrackArtist(track) {
@@ -91,7 +86,6 @@ function getTrackPic(track) {
   return track.pic || track.cover || track.url_pic || "https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg";
 }
 
-// Time Formatter
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds < 0) return "0:00";
   const mins = Math.floor(seconds / 60);
@@ -99,13 +93,12 @@ function formatTime(seconds) {
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-// Synchronized LRC Lyric Parser
+// LRC Lyric Parser
 function parseLrc(lrcText) {
   if (!lrcText) return [];
   const lines = lrcText.split("\n");
   const result = [];
   const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
-
   for (let line of lines) {
     const match = timeExp.exec(line);
     if (match) {
@@ -114,9 +107,7 @@ function parseLrc(lrcText) {
       const milliseconds = parseInt(match[3], 10);
       const time = minutes * 60 + seconds + (milliseconds > 99 ? milliseconds / 1000 : milliseconds / 100);
       const text = line.replace(timeExp, "").trim();
-      if (text) {
-        result.push({ time, text });
-      }
+      if (text) result.push({ time, text });
     }
   }
   return result.sort((a, b) => a.time - b.time);
@@ -130,51 +121,41 @@ function setLyricText(text) {
   }, 150);
 }
 
-// Active Lyrics API Fetching
 async function fetchLyrics(lrcUrl) {
   lyrics = [];
   setLyricText("♪ Loading lyrics...");
   if (!lrcUrl) {
-    setLyricText("♪ Instrumental / No lyrics");
+    setLyricText("♪ Instrumental");
     return;
   }
   try {
     const res = await fetch(lrcUrl);
     const data = await res.text();
     lyrics = parseLrc(data);
-    if (lyrics.length === 0) {
-      setLyricText("♪ Instrumental / No lyrics");
-    } else {
-      setLyricText("♪");
-    }
+    setLyricText(lyrics.length === 0 ? "♪ Instrumental" : "♪");
   } catch (e) {
-    console.error("Lyrics fetch error:", e);
     setLyricText("♪ Lyrics unavailable");
   }
 }
 
-// Track Loading
+// Load Track State
 function loadTrack(index) {
   if (!playlist || playlist.length === 0) return;
   currentIndex = (index + playlist.length) % playlist.length;
   const track = playlist[currentIndex];
 
-  const trackTitle = getTrackTitle(track);
-  const trackArtist = getTrackArtist(track);
-  const trackPic = getTrackPic(track);
+  const tTitle = getTrackTitle(track);
+  const tArtist = getTrackArtist(track);
+  const tPic = getTrackPic(track);
 
   audio.src = track.url;
-  cover.src = trackPic;
-  backdropImg.src = trackPic;
-  title.innerText = trackTitle;
-  artist.innerText = trackArtist;
+  cover.src = tPic;
+  backdropImg.src = tPic;
+  title.innerText = tTitle;
+  artist.innerText = tArtist;
 
-  // Island Sync
-  islandCover.src = trackPic;
-  islandTitle.innerText = trackTitle;
-  islandHoverCover.src = trackPic;
-  islandHoverTitle.innerText = trackTitle;
-  islandHoverArtist.innerText = trackArtist;
+  islandCover.src = tPic;
+  islandTitle.innerText = tTitle;
 
   fetchLyrics(track.lrc);
   renderPlaylist();
@@ -183,15 +164,13 @@ function loadTrack(index) {
 function playTrack() {
   audio.play().then(() => {
     playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
-    islandPlayIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
     if (!audioCtx && eqToggle.checked) initAudioContext();
-  }).catch(err => console.log("Playback error:", err));
+  }).catch(err => console.log("Playback blocked:", err));
 }
 
 function pauseTrack() {
   audio.pause();
   playIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
-  islandPlayIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
 }
 
 function togglePlay() {
@@ -201,8 +180,7 @@ function togglePlay() {
 
 function playNext() {
   if (playMode === 2) {
-    let nextIndex = Math.floor(Math.random() * playlist.length);
-    loadTrack(nextIndex);
+    loadTrack(Math.floor(Math.random() * playlist.length));
   } else {
     loadTrack(currentIndex + 1);
   }
@@ -214,22 +192,7 @@ function playPrev() {
   playTrack();
 }
 
-// Mode Cycle
-btnMode.addEventListener("click", () => {
-  playMode = (playMode + 1) % 3;
-  if (playMode === 0) {
-    btnMode.title = "Loop Playlist";
-    btnMode.style.opacity = "1";
-  } else if (playMode === 1) {
-    btnMode.title = "Repeat Track";
-    btnMode.style.opacity = "0.6";
-  } else {
-    btnMode.title = "Shuffle";
-    btnMode.style.opacity = "0.3";
-  }
-});
-
-// Auto-Suggest & Full NetEase Search API
+// Accurate NetEase Search & Suggestion Engine
 async function fetchSuggestions(query) {
   if (!query.trim()) {
     searchSuggestions.classList.add("hidden");
@@ -255,47 +218,46 @@ function renderSuggestions(data) {
     const sArtist = getTrackArtist(song);
     const div = document.createElement("div");
     div.className = "suggestion-item";
-    div.innerText = `${sTitle} - ${sArtist}`;
+    div.innerText = `${sTitle} — ${sArtist}`;
     div.addEventListener("click", () => {
-      searchInput.value = `${sTitle} ${sArtist}`;
+      searchInput.value = sTitle;
       searchSuggestions.classList.add("hidden");
-      searchSongs(searchInput.value);
+      executeSearch(sTitle);
     });
     searchSuggestions.appendChild(div);
   });
   searchSuggestions.classList.remove("hidden");
 }
 
-async function searchSongs(query) {
+async function executeSearch(query) {
   if (!query.trim()) return;
   searchSuggestions.classList.add("hidden");
-  searchResults.innerHTML = "<div style='font-size:0.75rem; padding:8px;'>Searching...</div>";
+  searchResults.innerHTML = "<div style='font-size:0.75rem; padding:10px; color:rgba(255,255,255,0.6);'>Searching Apple Music / NetEase...</div>";
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
     const data = await res.json();
     renderSearchResults(data);
   } catch (e) {
-    console.error("Search error:", e);
-    searchResults.innerHTML = "<div style='font-size:0.75rem; padding:8px;'>Search failed.</div>";
+    searchResults.innerHTML = "<div style='font-size:0.75rem; padding:10px; color:rgba(255,255,255,0.6);'>Search failed. Please try again.</div>";
   }
 }
 
 function renderSearchResults(results) {
   searchResults.innerHTML = "";
   if (!results || results.length === 0) {
-    searchResults.innerHTML = "<div style='font-size:0.75rem; padding:8px;'>No songs found.</div>";
+    searchResults.innerHTML = "<div style='font-size:0.75rem; padding:10px; color:rgba(255,255,255,0.6);'>No matching songs found.</div>";
     return;
   }
-  results.slice(0, 10).forEach(song => {
+  results.slice(0, 15).forEach(song => {
     const sTitle = getTrackTitle(song);
     const sArtist = getTrackArtist(song);
     const item = document.createElement("div");
     item.className = "search-item";
     item.innerHTML = `
-      <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        <strong>${sTitle}</strong> - ${sArtist}
+      <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:82%;">
+        <strong>${sTitle}</strong><br><span style="color:rgba(255,255,255,0.6); font-size:0.7rem;">${sArtist}</span>
       </div>
-      <button class="btn-add-morph" title="Add to playlist">+</button>
+      <button class="btn-add-morph" title="Add song">+</button>
     `;
     item.querySelector(".btn-add-morph").addEventListener("click", (e) => {
       e.stopPropagation();
@@ -308,6 +270,7 @@ function renderSearchResults(results) {
       currentIndex = playlist.length - 1;
       loadTrack(currentIndex);
       playTrack();
+      utilityDrawer.classList.add("collapsed");
     });
     searchResults.appendChild(item);
   });
@@ -320,31 +283,38 @@ function renderPlaylist() {
     const sArtist = getTrackArtist(song);
     const li = document.createElement("li");
     if (idx === currentIndex) li.className = "active";
-    li.innerHTML = `<span>${idx + 1}. ${sTitle}</span> <small>${sArtist}</small>`;
+    li.innerHTML = `
+      <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:85%;">
+        <strong>${sTitle}</strong><br><span style="color:rgba(255,255,255,0.6); font-size:0.68rem;">${sArtist}</span>
+      </div>
+    `;
     li.addEventListener("click", () => {
       loadTrack(idx);
       playTrack();
+      utilityDrawer.classList.add("collapsed");
     });
     playlistList.appendChild(li);
   });
 }
 
-// Debounced Input Event Listener for Auto-Suggest
+// Search Inputs & Debounce Event Listeners
 searchInput.addEventListener("input", (e) => {
   clearTimeout(searchDebounceTimer);
   searchDebounceTimer = setTimeout(() => {
     fetchSuggestions(e.target.value);
-  }, 250);
+  }, 200);
 });
 
-// Close suggestions on outside click
+btnSearch.addEventListener("click", () => executeSearch(searchInput.value));
+searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") executeSearch(searchInput.value); });
+
 document.addEventListener("click", (e) => {
   if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
     searchSuggestions.classList.add("hidden");
   }
 });
 
-// Progress Bar Scrubbing Callbacks
+// Progress Bar Scrubbing
 function updateProgressFromEvent(e) {
   const rect = progressBarBg.getBoundingClientRect();
   let percent = (e.clientX - rect.left) / rect.width;
@@ -372,7 +342,6 @@ window.addEventListener("mouseup", (e) => {
   }
 });
 
-// Synchronized Time Update & Lyric Line Event
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration || isDraggingProgress) return;
   const curTime = audio.currentTime;
@@ -397,44 +366,58 @@ audio.addEventListener("ended", () => {
   }
 });
 
-// Controls Listeners
+// Primary Controls
 btnPlay.addEventListener("click", togglePlay);
 btnNext.addEventListener("click", playNext);
 btnPrev.addEventListener("click", playPrev);
 
-islandBtnPlay.addEventListener("click", (e) => { e.stopPropagation(); togglePlay(); });
-islandBtnNext.addEventListener("click", (e) => { e.stopPropagation(); playNext(); });
-islandBtnPrev.addEventListener("click", (e) => { e.stopPropagation(); playPrev(); });
+btnMode.addEventListener("click", () => {
+  playMode = (playMode + 1) % 3;
+  btnMode.style.opacity = playMode === 0 ? "1" : (playMode === 1 ? "0.7" : "0.4");
+});
 
 // Drawer Navigation Tabs
-btnDrawerToggle.addEventListener("click", () => utilityDrawer.classList.remove("collapsed"));
+btnDrawerToggle.addEventListener("click", () => {
+  utilityDrawer.classList.remove("collapsed");
+  switchTab(tabBtnSearch, drawerSectionSearch);
+});
+
+btnSettingsDrawer.addEventListener("click", () => {
+  utilityDrawer.classList.remove("collapsed");
+  switchTab(tabBtnSettings, drawerSectionSettings);
+});
+
 btnCloseDrawer.addEventListener("click", () => utilityDrawer.classList.add("collapsed"));
 
 function switchTab(activeTab, activeSection) {
   [tabBtnSearch, tabBtnPlaylist, tabBtnSettings].forEach(b => b.classList.remove("active"));
   [drawerSectionSearch, drawerSectionPlaylist, drawerSectionSettings].forEach(s => s.classList.remove("active"));
-  
   activeTab.classList.add("active");
   activeSection.classList.add("active");
 }
 
 tabBtnSearch.addEventListener("click", () => switchTab(tabBtnSearch, drawerSectionSearch));
-tabBtnPlaylist.addEventListener("click", () => switchTab(tabBtnPlaylist, drawerSectionPlaylist));
+tabBtnPlaylist.addEventListener("click", () => {
+  switchTab(tabBtnPlaylist, drawerSectionPlaylist);
+  renderPlaylist();
+});
 tabBtnSettings.addEventListener("click", () => switchTab(tabBtnSettings, drawerSectionSettings));
 
-btnSearch.addEventListener("click", () => searchSongs(searchInput.value));
-searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") searchSongs(searchInput.value); });
-
-// Real-Time Instant Glass Opacity Updates While Dragging
+// Live Sliders & Settings
 glassOpacitySlider.addEventListener("input", (e) => {
   const val = e.target.value;
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
   glassOpacityVal.innerText = `${Math.round(val * 100)}%`;
 });
 
+blurSlider.addEventListener("input", (e) => {
+  const val = e.target.value;
+  document.documentElement.style.setProperty("--glass-blur", `${val}px`);
+  blurSliderVal.innerText = `${val}px`;
+});
+
 tintPicker.addEventListener("input", (e) => {
-  const color = e.target.value;
-  playerCard.style.borderColor = color;
+  playerCard.style.boxShadow = `0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px ${e.target.value}44`;
 });
 
 volumeSlider.addEventListener("input", (e) => {
@@ -442,8 +425,8 @@ volumeSlider.addEventListener("input", (e) => {
 });
 
 btnToggleIsland.addEventListener("click", () => {
-  playerCard.classList.toggle("hidden");
-  dynamicIsland.classList.toggle("hidden");
+  playerCard.classList.add("hidden");
+  dynamicIsland.classList.remove("hidden");
 });
 
 dynamicIsland.addEventListener("click", () => {
@@ -451,7 +434,7 @@ dynamicIsland.addEventListener("click", () => {
   dynamicIsland.classList.add("hidden");
 });
 
-// Web Audio API iOS Vertical Rounded Bar Visualizer
+// Web Audio API Equalizer Visualizer Bars
 function initAudioContext() {
   if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -465,7 +448,7 @@ function initAudioContext() {
 }
 
 function drawEQ() {
-  animationFrameId = requestAnimationFrame(drawEQ);
+  requestAnimationFrame(drawEQ);
   if (!eqToggle.checked) {
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
     return;
@@ -473,24 +456,24 @@ function drawEQ() {
   analyser.getByteFrequencyData(dataArray);
   canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const barWidth = 4;
-  const gap = 6;
+  const barWidth = 3;
+  const gap = 5;
   const numBars = Math.floor(canvas.width / (barWidth + gap));
 
   for (let i = 0; i < numBars; i++) {
     const val = dataArray[i % dataArray.length] || 0;
-    const barHeight = Math.max(4, (val / 255) * canvas.height * 0.85);
+    const barHeight = Math.max(4, (val / 255) * canvas.height * 0.75);
     const x = i * (barWidth + gap) + gap;
     const y = canvas.height - barHeight;
 
-    canvasCtx.fillStyle = `rgba(255, 255, 255, ${0.3 + (val / 255) * 0.6})`;
+    canvasCtx.fillStyle = `rgba(255, 255, 255, ${0.25 + (val / 255) * 0.65})`;
     canvasCtx.beginPath();
     canvasCtx.roundRect(x, y, barWidth, barHeight, 2);
     canvasCtx.fill();
   }
 }
 
-// Initial Fetch
+// Initializing Default Playlist
 async function init() {
   try {
     const res = await fetch(API_BASE);
@@ -499,7 +482,7 @@ async function init() {
       loadTrack(0);
     }
   } catch (e) {
-    console.error("Failed to load playlist:", e);
+    console.error("Playlist init failed:", e);
   }
 }
 

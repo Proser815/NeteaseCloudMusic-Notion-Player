@@ -6,16 +6,15 @@
 }
 
 :root {
-  --accent-rgb: 255, 255, 255;
-  --glow-color: rgba(255, 255, 255, 0.6);
   --glass-tint-opacity: 0.5;
-  --ios-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --glass-blur: 25px;
+  --ios-spring: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 html, body {
   width: 100%;
   height: 100%;
-  background: transparent !important;
+  background: #0f0f11 !important;
   overflow: hidden;
   color: #ffffff;
   display: flex;
@@ -23,98 +22,91 @@ html, body {
   justify-content: center;
 }
 
-/* Dynamic Island Mode */
+/* iOS Dynamic Island Mini Pill Mode */
 .dynamic-island {
   position: absolute;
-  top: 12px;
+  top: 16px;
   z-index: 100;
-  height: 36px;
-  min-width: 160px;
-  max-width: 380px;
-  width: auto;
-  padding: 0 12px;
+  height: 38px;
+  padding: 0 14px;
   background: #000000;
   border-radius: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   cursor: pointer;
-  transition: all 0.4s var(--ios-spring);
-  overflow: hidden;
+  transition: transform 0.4s var(--ios-spring), opacity 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dynamic-island.hidden {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
 }
 
-.island-collapsed-content {
+.island-content {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
+  gap: 10px;
 }
 
-.island-collapsed-content img {
-  width: 22px;
-  height: 22px;
+.island-content img {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.island-collapsed-content span {
-  font-size: 0.75rem;
+.island-content span {
+  font-size: 0.8rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
+  max-width: 140px;
 }
 
-.eq-bars {
+.island-eq {
   display: flex;
   gap: 2px;
   align-items: flex-end;
   height: 12px;
-  margin-left: auto;
 }
 
-.eq-bars span {
+.island-eq span {
   width: 3px;
   height: 100%;
   background: #34c759;
   border-radius: 2px;
-  animation: eqAnim 1s ease-in-out infinite alternate;
+  animation: eqBounce 1s ease-in-out infinite alternate;
 }
 
-.eq-bars span:nth-child(2) { animation-delay: 0.2s; }
-.eq-bars span:nth-child(3) { animation-delay: 0.4s; }
+.island-eq span:nth-child(2) { animation-delay: 0.2s; }
+.island-eq span:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes eqAnim {
-  0% { height: 20%; }
+@keyframes eqBounce {
+  0% { height: 25%; }
   100% { height: 100%; }
 }
 
-.island-hover-controls {
-  display: none;
-}
-
-/* Main Player Card Container */
+/* Main iOS Glass Player Card */
 .player-card {
   position: relative;
-  width: 340px;
-  border-radius: 28px;
+  width: 360px;
+  border-radius: 36px;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-  background: rgba(20, 20, 20, 0.4);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  background: rgba(25, 25, 25, 0.35);
+  backdrop-filter: blur(var(--glass-blur)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(190%);
   transition: transform 0.4s var(--ios-spring), opacity 0.3s ease;
 }
 
 .player-card.hidden {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
 }
 
 .glass-backdrop {
@@ -128,9 +120,8 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(40px) brightness(0.6);
-  transform: scale(1.2);
-  transition: src 0.5s ease;
+  filter: blur(50px) brightness(0.5);
+  transform: scale(1.3);
 }
 
 .glass-overlay {
@@ -146,29 +137,69 @@ html, body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 80px;
+  height: 90px;
   z-index: 2;
   pointer-events: none;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .player-content {
   position: relative;
   z-index: 3;
-  padding: 24px;
+  padding: 24px 28px 28px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Cover Wrapper */
+/* Top iOS Navigation Header */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.top-nav-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.3px;
+}
+
+.ios-icon-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  transition: transform 0.2s var(--ios-spring), background 0.2s ease;
+}
+
+.ios-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.ios-icon-btn:active {
+  transform: scale(0.88);
+}
+
+/* Artwork Styling */
 .cover-wrapper {
-  width: 180px;
-  height: 180px;
-  border-radius: 20px;
+  width: 200px;
+  height: 200px;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-  margin-bottom: 16px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+  margin-bottom: 20px;
   transition: transform 0.4s var(--ios-spring);
 }
 
@@ -179,14 +210,14 @@ html, body {
 }
 
 .cover-wrapper:hover {
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
-/* Track Metadata */
+/* Track Meta */
 .track-info {
   text-align: center;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .title {
@@ -195,52 +226,57 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.2px;
 }
 
 .artist {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.75);
-  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Lyric Bar */
+/* Synchronized Lyrics Container */
 .lyric-container {
-  height: 28px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   width: 100%;
-  text-align: center;
 }
 
 .lyric-text {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.25s ease;
 }
 
 /* Progress Scrub Bar */
 .progress-section {
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .progress-bar-bg {
   width: 100%;
-  height: 6px;
+  height: 5px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  transition: height 0.2s ease;
+}
+
+.progress-bar-bg:hover {
+  height: 8px;
 }
 
 .progress-bar-fill {
@@ -248,24 +284,24 @@ html, body {
   height: 100%;
   background: #ffffff;
   border-radius: 3px;
-  transition: width 0.1s linear;
 }
 
 .time-display {
   display: flex;
   justify-content: space-between;
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   margin-top: 6px;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Primary Player Controls */
+/* Primary Playback Controls */
 .controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .control-btn {
@@ -276,31 +312,33 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: transform 0.2s var(--ios-spring), background 0.2s ease;
 }
 
 .control-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   fill: currentColor;
 }
 
 .btn-play {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
+  width: 54px;
+  height: 54px;
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .btn-play svg {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
 }
 
-.spring-btn:active {
+.control-btn:active, .btn-play:active {
   transform: scale(0.88);
 }
 
@@ -308,14 +346,14 @@ html, body {
 .volume-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
 }
 
 .vol-icon {
   width: 16px;
   height: 16px;
-  fill: rgba(255, 255, 255, 0.7);
+  fill: rgba(255, 255, 255, 0.6);
 }
 
 #volume-slider {
@@ -336,17 +374,18 @@ html, body {
   cursor: pointer;
 }
 
-/* Consolidated Utility Drawer */
+/* iOS Sliding Glass Drawer Sheet */
 .utility-drawer {
   position: absolute;
   inset: 0;
   z-index: 10;
-  background: rgba(15, 15, 15, 0.92);
-  backdrop-filter: blur(20px);
-  border-radius: 28px;
+  background: rgba(20, 20, 22, 0.94);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 36px;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 16px 20px 20px 20px;
   transition: transform 0.4s var(--ios-spring), opacity 0.3s ease;
 }
 
@@ -356,49 +395,67 @@ html, body {
   pointer-events: none;
 }
 
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  align-self: center;
+  margin-bottom: 12px;
+}
+
 .drawer-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .drawer-tabs {
   display: flex;
-  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px;
+  border-radius: 10px;
+  gap: 2px;
 }
 
 .drawer-tab {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .drawer-tab.active {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .drawer-close-btn {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   color: #ffffff;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   cursor: pointer;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .drawer-body {
   flex: 1;
   overflow-y: auto;
+  padding-right: 2px;
 }
 
 .drawer-section {
@@ -409,39 +466,39 @@ html, body {
   display: block;
 }
 
-/* Search Section & iOS Suggestion Popover */
+/* Accurate Search & Live Auto-Suggest Popover */
 .search-bar-container {
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .search-bar {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .search-bar input {
   flex: 1;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  padding: 6px 10px;
+  border-radius: 12px;
+  padding: 8px 12px;
   color: #ffffff;
   font-size: 0.8rem;
   outline: none;
 }
 
 .btn-search-ios {
-  background: rgba(255, 255, 255, 0.2);
+  background: #ffffff;
   border: none;
-  border-radius: 10px;
-  width: 32px;
-  height: 32px;
+  border-radius: 12px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #ffffff;
+  color: #000000;
 }
 
 .btn-search-ios svg {
@@ -457,12 +514,12 @@ html, body {
   right: 0;
   z-index: 20;
   margin-top: 4px;
-  background: rgba(30, 30, 30, 0.95);
-  backdrop-filter: blur(20px);
+  background: rgba(35, 35, 38, 0.98);
+  backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  max-height: 160px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  max-height: 180px;
   overflow-y: auto;
 }
 
@@ -471,12 +528,12 @@ html, body {
 }
 
 .suggestion-item {
-  padding: 8px 12px;
+  padding: 9px 14px;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: background 0.2s ease;
+  transition: background 0.15s ease;
 }
 
 .suggestion-item:last-child {
@@ -490,16 +547,16 @@ html, body {
 .search-results {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .search-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
   font-size: 0.75rem;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -513,13 +570,17 @@ html, body {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   color: #ffffff;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
 }
 
-/* Drawer: Playlist Section */
+/* Playlist Queue List */
 .playlist-list {
   list-style: none;
   display: flex;
@@ -528,35 +589,50 @@ html, body {
 }
 
 .playlist-list li {
-  padding: 8px;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 0.78rem;
   background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .playlist-list li.active {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   font-weight: 600;
 }
 
-/* Drawer: Settings Section */
+/* Glass Settings Items */
 .setting-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
   font-size: 0.8rem;
 }
 
-.setting-btn {
+.setting-item label {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.setting-item input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 5px;
+  border-radius: 3px;
   background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: #ffffff;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  outline: none;
+}
+
+.setting-item input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
   cursor: pointer;
 }

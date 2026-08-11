@@ -3,38 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notion Music Player</title>
+  <title>iOS Glass Music Player</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="dynamic-island" class="dynamic-island hidden" title="Click to expand player mode">
-    <div id="island-collapsed-content" class="island-collapsed-content">
-      <img id="island-cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Island Cover">
-      <span id="island-title">Loading...</span>
-      <div id="island-eq" class="eq-bars">
+  <div id="dynamic-island" class="dynamic-island hidden" title="Tap to expand">
+    <div class="island-content">
+      <img id="island-cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
+      <span id="island-title">Playing...</span>
+      <div class="island-eq">
         <span></span><span></span><span></span>
-      </div>
-    </div>
-
-    <div class="island-hover-controls">
-      <div class="island-track-meta">
-        <img id="island-hover-cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Cover">
-        <div class="island-track-info">
-          <div id="island-hover-title" class="island-track-title">Loading...</div>
-          <div id="island-hover-artist" class="island-track-artist">Artist</div>
-        </div>
-      </div>
-      <div class="island-btn-group">
-        <button id="island-btn-prev" class="island-btn" title="Previous">
-          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-        </button>
-        <button id="island-btn-play" class="island-btn" title="Play/Pause">
-          <svg id="island-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button id="island-btn-next" class="island-btn" title="Next">
-          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-        </button>
       </div>
     </div>
   </div>
@@ -48,8 +27,18 @@
     <canvas id="eq-canvas" class="eq-canvas"></canvas>
 
     <div class="player-content">
+      <div class="top-nav">
+        <button id="btn-drawer-toggle" class="ios-icon-btn" title="Library & Search">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+        </button>
+        <span class="top-nav-title">Now Playing</span>
+        <button id="btn-toggle-island" class="ios-icon-btn" title="Dynamic Island Mode">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+        </button>
+      </div>
+
       <div id="cover-wrapper" class="cover-wrapper">
-        <img id="cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Album Cover">
+        <img id="cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Album Art">
       </div>
 
       <div class="track-info">
@@ -57,8 +46,8 @@
         <p id="artist" class="artist">Please wait</p>
       </div>
 
-      <div id="lyric-container" class="lyric-container">
-        <p id="lyric-text" class="lyric-text">♪ Playing music...</p>
+      <div class="lyric-container">
+        <p id="lyric-text" class="lyric-text">♪ Apple Music Experience</p>
       </div>
 
       <div class="progress-section">
@@ -72,24 +61,24 @@
       </div>
 
       <div class="controls">
-        <button id="btn-mode" class="control-btn spring-btn" title="Play Mode">
+        <button id="btn-mode" class="control-btn" title="Play Mode">
           <svg id="mode-icon" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
         </button>
 
-        <button id="btn-prev" class="control-btn spring-btn" title="Previous Track">
+        <button id="btn-prev" class="control-btn" title="Previous">
           <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
         </button>
 
-        <button id="btn-play" class="control-btn btn-play spring-btn" title="Play/Pause">
+        <button id="btn-play" class="control-btn btn-play" title="Play/Pause">
           <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
 
-        <button id="btn-next" class="control-btn spring-btn" title="Next Track">
+        <button id="btn-next" class="control-btn" title="Next">
           <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </button>
 
-        <button id="btn-drawer-toggle" class="control-btn spring-btn" title="Open Search & Utility Menu">
-          <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+        <button id="btn-settings-drawer" class="control-btn" title="Settings">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
         </button>
       </div>
 
@@ -100,11 +89,12 @@
     </div>
 
     <div id="utility-drawer" class="utility-drawer collapsed">
+      <div class="sheet-handle"></div>
       <div class="drawer-header">
         <div class="drawer-tabs">
           <button id="tab-btn-search" class="drawer-tab active">Search</button>
-          <button id="tab-btn-playlist" class="drawer-tab">Playlist</button>
-          <button id="tab-btn-settings" class="drawer-tab">Settings</button>
+          <button id="tab-btn-playlist" class="drawer-tab">Queue</button>
+          <button id="tab-btn-settings" class="drawer-tab">Glass</button>
         </div>
         <button id="btn-close-drawer" class="drawer-close-btn">&times;</button>
       </div>
@@ -113,8 +103,8 @@
         <div id="drawer-section-search" class="drawer-section active">
           <div class="search-bar-container">
             <div class="search-bar">
-              <input type="text" id="search-input" placeholder="Search song or artist..." autocomplete="off">
-              <button id="btn-search" class="btn-search-ios spring-btn" title="Search">
+              <input type="text" id="search-input" placeholder="Artists, Songs, Lyrics..." autocomplete="off">
+              <button id="btn-search" class="btn-search-ios" title="Search">
                 <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
               </button>
             </div>
@@ -129,24 +119,20 @@
 
         <div id="drawer-section-settings" class="drawer-section">
           <div class="setting-item">
-            <label for="glass-opacity">Glass Opacity</label>
+            <label for="glass-opacity">Glass Opacity <span id="glass-opacity-val">50%</span></label>
             <input type="range" id="glass-opacity" min="0.05" max="0.95" step="0.01" value="0.5">
-            <span id="glass-opacity-val">50%</span>
           </div>
-
+          <div class="setting-item">
+            <label for="blur-slider">Glass Blur <span id="blur-slider-val">25px</span></label>
+            <input type="range" id="blur-slider" min="5" max="60" step="1" value="25">
+          </div>
           <div class="setting-item">
             <label for="tint-picker">Accent Tint</label>
             <input type="color" id="tint-picker" value="#ffffff">
           </div>
-
           <div class="setting-item">
-            <label for="eq-toggle">Visualizer Equalizer</label>
+            <label for="eq-toggle">Equalizer Visualizer</label>
             <input type="checkbox" id="eq-toggle" checked>
-          </div>
-
-          <div class="setting-item">
-            <label for="island-toggle">Dynamic Island Pill</label>
-            <button id="btn-toggle-island" class="setting-btn">Switch to Mini Pill</button>
           </div>
         </div>
       </div>
