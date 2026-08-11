@@ -74,7 +74,7 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Hover Slider Listener for Glass Opacity
+// Hover Slider Listener for Glass Darkness Overlay
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -89,7 +89,7 @@ opacitySlider.addEventListener("input", (e) => {
   }
 });
 
-// Click Glass Icon to Mute/Cross Out Glass Tint
+// Click Glass Icon to Toggle Off / White Line Cross Out
 btnGlass.addEventListener("click", () => {
   const currentVal = parseFloat(opacitySlider.value);
   if (currentVal > 0) {
@@ -125,7 +125,7 @@ function renderPlaylist() {
 
     li.innerHTML = `
       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        ${index + 1}. ${song.title} <small style="opacity:0.6;">- ${song.author}</small>
+        ${index + 1}. ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
       </span>
       <button class="btn-delete-song" title="Delete Song">
         <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -196,7 +196,7 @@ function renderSearchResults(results) {
     li.style.cursor = "pointer";
     li.innerHTML = `
       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        ${song.title} <small style="opacity:0.6;">- ${song.author}</small>
+        ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
       </span>
       <button class="btn-add-morph" title="Add Song">+</button>
     `;

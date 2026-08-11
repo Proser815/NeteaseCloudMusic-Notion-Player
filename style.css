@@ -19,16 +19,16 @@ html, body {
   color: #ffffff;
 }
 
-/* Full Light Glass Base Container (No Dark Gray) */
+/* Glass Base Container with Ultra-Clear Contrast */
 .player-card {
   position: relative;
   width: 100%;
   height: 100%;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(40px) saturate(210%);
   -webkit-backdrop-filter: blur(40px) saturate(210%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 20px;
   overflow: hidden;
   display: flex;
@@ -54,17 +54,18 @@ html, body {
   position: absolute;
   top: -10%;
   left: -10%;
-  filter: blur(35px) brightness(1.05) saturate(160%);
+  filter: blur(35px) brightness(0.85) saturate(180%);
   transition: src 0.8s ease, filter 0.8s ease;
 }
 
+/* Darkness Glass Tint Overlay (0% Light/Clear -> 85% Deep Dark) */
 .backdrop-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, var(--glass-tint-opacity));
+  background: rgba(0, 0, 0, var(--glass-tint-opacity));
   transition: background 0.15s linear;
 }
 
@@ -102,7 +103,7 @@ html, body {
   height: 84px;
   border-radius: 14px;
   object-fit: cover;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
   display: block;
 }
 
@@ -123,21 +124,22 @@ html, body {
 
 .title {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .artist {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .lyrics-container {
@@ -170,10 +172,10 @@ html, body {
 
 .lyric-text {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.95);
-  font-weight: 500;
+  color: #ffffff;
+  font-weight: 600;
   display: inline-block;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes marquee {
@@ -198,7 +200,7 @@ html, body {
   width: 100%;
   height: 6px;
   padding: 1px 0;
-  background: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.35);
   border-radius: 4px;
   cursor: pointer;
   position: relative;
@@ -218,7 +220,9 @@ html, body {
   display: flex;
   justify-content: space-between;
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .controls {
@@ -241,9 +245,9 @@ html, body {
 .btn-icon svg {
   width: 19px;
   height: 19px;
-  fill: rgba(255, 255, 255, 0.95);
+  fill: #ffffff;
   transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), fill 0.2s ease;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
 .btn-icon:hover svg {
@@ -257,7 +261,7 @@ html, body {
 
 #btn-lyrics.active svg {
   fill: #ffffff;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
 }
 
 .btn-play svg {
@@ -299,7 +303,7 @@ input[type=range]#volume-slider {
   -webkit-appearance: none;
   width: 55px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.45);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -346,7 +350,7 @@ input[type=range]#opacity-slider {
   -webkit-appearance: none;
   width: 55px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.45);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -368,17 +372,17 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   opacity: 1;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
   overflow-y: auto;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
 .playlist-drawer::-webkit-scrollbar { width: 4px; }
 .playlist-drawer::-webkit-scrollbar-track { background: transparent; }
-.playlist-drawer::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; }
-.playlist-drawer::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+.playlist-drawer::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.4); border-radius: 4px; }
+.playlist-drawer::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.6); }
 
 .playlist-drawer.collapsed {
   max-height: 0 !important;
@@ -398,10 +402,11 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 
 .drawer-title {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .drawer-actions {
@@ -433,7 +438,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 
 .search-bar input {
   flex: 1;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 10px;
   padding: 6px 12px;
@@ -444,8 +449,8 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 }
 
 .search-bar input:focus {
-  background: rgba(255, 255, 255, 0.32);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .search-bar input::placeholder {
@@ -470,22 +475,22 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 .btn-search-ios svg { width: 15px; height: 15px; fill: #ffffff; }
 
 .search-results {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 10px;
   margin-top: 6px;
   padding: 4px;
   max-height: 140px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
 .search-results::-webkit-scrollbar { width: 4px; }
 .search-results::-webkit-scrollbar-track { background: transparent; }
-.search-results::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; }
-.search-results::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+.search-results::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.4); border-radius: 4px; }
+.search-results::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.6); }
 
 .search-results ul { list-style: none; }
 
@@ -499,7 +504,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   transition: background 0.2s ease;
 }
 
-.search-results li:hover { background: rgba(255, 255, 255, 0.2); }
+.search-results li:hover { background: rgba(255, 255, 255, 0.25); }
 
 .btn-add-morph {
   width: 24px;
@@ -509,9 +514,9 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   padding: 0;
   margin: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -526,8 +531,8 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 }
 
 .btn-add-morph:hover {
-  background: rgba(255, 255, 255, 0.35);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.7);
   color: #ffffff;
   transform: scale(1.08);
 }
@@ -537,10 +542,10 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
 }
 
 .btn-add-morph.added {
-  background: rgba(255, 255, 255, 0.45) !important;
-  border-color: rgba(255, 255, 255, 0.75) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
   color: #ffffff !important;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
   animation: iosPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
@@ -565,19 +570,19 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.9);
   transition: background 0.2s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 
 .playlist-drawer li:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   color: #ffffff;
 }
 
 .playlist-drawer li.active {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.35);
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .btn-delete-song {
@@ -589,7 +594,7 @@ input[type=range]#opacity-slider::-webkit-slider-thumb {
   transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
-.playlist-drawer li:hover .btn-delete-song { opacity: 0.8; }
+.playlist-drawer li:hover .btn-delete-song { opacity: 0.9; }
 
 .btn-delete-song:hover {
   opacity: 1 !important;
