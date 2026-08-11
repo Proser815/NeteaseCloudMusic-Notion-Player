@@ -6,8 +6,7 @@ let currentIndex = 0;
 let lyrics = [];
 let playMode = 0; // 0: Loop, 1: Single Loop, 2: Shuffle
 let isDraggingProgress = false;
-let previousVolume = 0.8;
-let previousOpacity = 0.5;
+let searchDebounceTimer = null;
 
 // Web Audio API State
 let audioCtx;
@@ -20,7 +19,6 @@ let animationFrameId;
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
-const coverWrapper = document.getElementById("cover-wrapper");
 const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
@@ -65,6 +63,7 @@ const drawerSectionSettings = document.getElementById("drawer-section-settings")
 
 const searchInput = document.getElementById("search-input");
 const btnSearch = document.getElementById("btn-search");
+const searchSuggestions = document.getElementById("search-suggestions");
 const searchResults = document.getElementById("search-results");
 const playlistList = document.getElementById("playlist-list");
 
@@ -75,6 +74,22 @@ const eqToggle = document.getElementById("eq-toggle");
 const btnToggleIsland = document.getElementById("btn-toggle-island");
 const canvas = document.getElementById("eq-canvas");
 const canvasCtx = canvas.getContext("2d");
+
+// Helper to Safely Get Track Attributes
+function getTrackTitle(track) {
+  if (!track) return "Unknown Track";
+  return track.name || track.title || "Unknown Track";
+}
+
+function getTrackArtist(track) {
+  if (!track) return "Unknown Artist";
+  return track.artist || track.author || "Unknown Artist";
+}
+
+function getTrackPic(track) {
+  if (!track) return "https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg";
+  return track.pic || track.cover || track.url_pic || "https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg";
+}
 
 // Time Formatter
 function formatTime(seconds) {
@@ -144,18 +159,22 @@ function loadTrack(index) {
   currentIndex = (index + playlist.length) % playlist.length;
   const track = playlist[currentIndex];
 
+  const trackTitle = getTrackTitle(track);
+  const trackArtist = getTrackArtist(track);
+  const trackPic = getTrackPic(track);
+
   audio.src = track.url;
-  cover.src = track.pic;
-  backdropImg.src = track.pic;
-  title.innerText = track.name;
-  artist.innerText = track.artist;
+  cover.src = trackPic;
+  backdropImg.src = trackPic;
+  title.innerText = trackTitle;
+  artist.innerText = trackArtist;
 
   // Island Sync
-  islandCover.src = track.pic;
-  islandTitle.innerText = track.name;
-  islandHoverCover.src = track.pic;
-  islandHoverTitle.innerText = track.name;
-  islandHoverArtist.innerText = track.artist;
+  islandCover.src = trackPic;
+  islandTitle.innerText = trackTitle;
+  islandHoverCover.src = trackPic;
+  islandHoverTitle.innerText = trackTitle;
+  islandHoverArtist.innerText = trackArtist;
 
   fetchLyrics(track.lrc);
   renderPlaylist();
@@ -210,9 +229,46 @@ btnMode.addEventListener("click", () => {
   }
 });
 
-// Real-Time NetEase Search API Implementation
+// Auto-Suggest & Full NetEase Search API
+async function fetchSuggestions(query) {
+  if (!query.trim()) {
+    searchSuggestions.classList.add("hidden");
+    return;
+  }
+  try {
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    renderSuggestions(data);
+  } catch (e) {
+    console.error("Suggestion error:", e);
+  }
+}
+
+function renderSuggestions(data) {
+  searchSuggestions.innerHTML = "";
+  if (!data || data.length === 0) {
+    searchSuggestions.classList.add("hidden");
+    return;
+  }
+  data.slice(0, 5).forEach(song => {
+    const sTitle = getTrackTitle(song);
+    const sArtist = getTrackArtist(song);
+    const div = document.createElement("div");
+    div.className = "suggestion-item";
+    div.innerText = `${sTitle} - ${sArtist}`;
+    div.addEventListener("click", () => {
+      searchInput.value = `${sTitle} ${sArtist}`;
+      searchSuggestions.classList.add("hidden");
+      searchSongs(searchInput.value);
+    });
+    searchSuggestions.appendChild(div);
+  });
+  searchSuggestions.classList.remove("hidden");
+}
+
 async function searchSongs(query) {
   if (!query.trim()) return;
+  searchSuggestions.classList.add("hidden");
   searchResults.innerHTML = "<div style='font-size:0.75rem; padding:8px;'>Searching...</div>";
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
@@ -231,11 +287,13 @@ function renderSearchResults(results) {
     return;
   }
   results.slice(0, 10).forEach(song => {
+    const sTitle = getTrackTitle(song);
+    const sArtist = getTrackArtist(song);
     const item = document.createElement("div");
     item.className = "search-item";
     item.innerHTML = `
       <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        <strong>${song.name}</strong> - ${song.artist}
+        <strong>${sTitle}</strong> - ${sArtist}
       </div>
       <button class="btn-add-morph" title="Add to playlist">+</button>
     `;
@@ -258,9 +316,11 @@ function renderSearchResults(results) {
 function renderPlaylist() {
   playlistList.innerHTML = "";
   playlist.forEach((song, idx) => {
+    const sTitle = getTrackTitle(song);
+    const sArtist = getTrackArtist(song);
     const li = document.createElement("li");
     if (idx === currentIndex) li.className = "active";
-    li.innerHTML = `<span>${idx + 1}. ${song.name}</span> <small>${song.artist}</small>`;
+    li.innerHTML = `<span>${idx + 1}. ${sTitle}</span> <small>${sArtist}</small>`;
     li.addEventListener("click", () => {
       loadTrack(idx);
       playTrack();
@@ -268,6 +328,21 @@ function renderPlaylist() {
     playlistList.appendChild(li);
   });
 }
+
+// Debounced Input Event Listener for Auto-Suggest
+searchInput.addEventListener("input", (e) => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    fetchSuggestions(e.target.value);
+  }, 250);
+});
+
+// Close suggestions on outside click
+document.addEventListener("click", (e) => {
+  if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+    searchSuggestions.classList.add("hidden");
+  }
+});
 
 // Progress Bar Scrubbing Callbacks
 function updateProgressFromEvent(e) {
@@ -350,7 +425,7 @@ tabBtnSettings.addEventListener("click", () => switchTab(tabBtnSettings, drawerS
 btnSearch.addEventListener("click", () => searchSongs(searchInput.value));
 searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") searchSongs(searchInput.value); });
 
-// Settings & Customization
+// Real-Time Instant Glass Opacity Updates While Dragging
 glassOpacitySlider.addEventListener("input", (e) => {
   const val = e.target.value;
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -376,7 +451,7 @@ dynamicIsland.addEventListener("click", () => {
   dynamicIsland.classList.add("hidden");
 });
 
-// Web Audio API Equalizer Canvas Visualizer
+// Web Audio API iOS Vertical Rounded Bar Visualizer
 function initAudioContext() {
   if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -398,14 +473,20 @@ function drawEQ() {
   analyser.getByteFrequencyData(dataArray);
   canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const barWidth = (canvas.width / dataArray.length) * 1.5;
-  let x = 0;
+  const barWidth = 4;
+  const gap = 6;
+  const numBars = Math.floor(canvas.width / (barWidth + gap));
 
-  for (let i = 0; i < dataArray.length; i++) {
-    const barHeight = (dataArray[i] / 255) * canvas.height;
-    canvasCtx.fillStyle = `rgba(255, 255, 255, ${dataArray[i] / 255 * 0.4})`;
-    canvasCtx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
-    x += barWidth;
+  for (let i = 0; i < numBars; i++) {
+    const val = dataArray[i % dataArray.length] || 0;
+    const barHeight = Math.max(4, (val / 255) * canvas.height * 0.85);
+    const x = i * (barWidth + gap) + gap;
+    const y = canvas.height - barHeight;
+
+    canvasCtx.fillStyle = `rgba(255, 255, 255, ${0.3 + (val / 255) * 0.6})`;
+    canvasCtx.beginPath();
+    canvasCtx.roundRect(x, y, barWidth, barHeight, 2);
+    canvasCtx.fill();
   }
 }
 
