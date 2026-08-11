@@ -33,6 +33,7 @@ const islandTitle = document.getElementById("island-title");
 const islandHoverCover = document.getElementById("island-hover-cover");
 const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
+const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
 
 // Dynamic Island Hover Control Buttons
@@ -62,6 +63,7 @@ const metaStory = document.getElementById("meta-story");
 const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
 const marqueeWrapper = document.querySelector(".marquee-wrapper");
+const islandMarqueeWrapper = document.querySelector(".island-marquee-wrapper");
 
 const progressBarBg = document.getElementById("progress-bar-bg");
 const progressBarFill = document.getElementById("progress-bar-fill");
@@ -170,10 +172,10 @@ btnIsland.addEventListener("click", () => {
   dynamicIsland.classList.remove("hidden");
 });
 
-// FIXED: Click anywhere on the Dynamic Island (except interactive controls/sliders) restores the main player
+// Click anywhere on Dynamic Island background restores full player card
 dynamicIsland.addEventListener("click", (e) => {
   if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) {
-    return; // Don't trigger restore if user interacted with control buttons or volume slider
+    return;
   }
   playerCard.classList.remove("morphed-hidden");
   dynamicIsland.classList.add("hidden");
@@ -382,7 +384,7 @@ function renderPredictions(results) {
   suggestions.forEach(song => {
     const li = document.createElement("li");
     li.innerHTML = `
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
       <span class="prediction-title">${song.title}</span>
       <span class="prediction-artist">- ${song.author}</span>
     `;
@@ -617,8 +619,13 @@ function extractDominantColor(imageUrl) {
 
 function setLyricText(text) {
   lyricText.innerText = text;
+  islandLyricText.innerText = text;
+
   marqueeWrapper.classList.remove("marquee-active");
+  islandMarqueeWrapper.classList.remove("marquee-active");
+
   if (lyricText.offsetWidth > 200) marqueeWrapper.classList.add("marquee-active");
+  if (islandLyricText.offsetWidth > 200) islandMarqueeWrapper.classList.add("marquee-active");
 }
 
 async function fetchLyrics(lrcUrl) {
