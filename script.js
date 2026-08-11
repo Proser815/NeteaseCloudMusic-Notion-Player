@@ -10,7 +10,6 @@ let previousVolume = 0.8;
 let previousOpacity = 0.6;
 let debounceTimer = null;
 
-// Web Audio API Real-Time Analyzer State
 let audioCtx;
 let analyser;
 let source;
@@ -25,7 +24,6 @@ const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 
-// Dynamic Island Elements
 const dynamicIsland = document.getElementById("dynamic-island");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
@@ -36,7 +34,6 @@ const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
 const islandBtnExit = document.getElementById("island-btn-exit");
 
-// Dynamic Island Hover Control Buttons
 const islandBtnMode = document.getElementById("island-btn-mode");
 const islandModeLoop = document.getElementById("island-mode-loop");
 const islandModeOne = document.getElementById("island-mode-one");
@@ -51,7 +48,6 @@ const islandVolIcon = document.getElementById("island-vol-icon");
 const islandMuteIcon = document.getElementById("island-mute-icon");
 const islandVolumeSlider = document.getElementById("island-volume-slider");
 
-// Track Info Metadata Elements
 const btnInfo = document.getElementById("btn-info");
 const infoDrawer = document.getElementById("info-drawer");
 const btnCloseInfo = document.getElementById("btn-close-info");
@@ -277,7 +273,6 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Transparency & Natural Light Bulb Logic
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -574,7 +569,6 @@ function updateMediaSession(song) {
   }
 }
 
-// Volume & Mute Icon Bug-Free Toggle Logic
 volumeSlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   audio.volume = val;
@@ -644,8 +638,13 @@ function setLyricText(text) {
   marqueeWrapper.classList.remove("marquee-active");
   islandMarqueeWrapper.classList.remove("marquee-active");
 
-  if (lyricText.offsetWidth > 200) marqueeWrapper.classList.add("marquee-active");
-  if (islandLyricText.offsetWidth > 200) islandMarqueeWrapper.classList.add("marquee-active");
+  // Instantly horizontal fill first without sliding in from offscreen
+  if (lyricText.scrollWidth > marqueeWrapper.clientWidth) {
+    marqueeWrapper.classList.add("marquee-active");
+  }
+  if (islandLyricText.scrollWidth > islandMarqueeWrapper.clientWidth) {
+    islandMarqueeWrapper.classList.add("marquee-active");
+  }
 }
 
 async function fetchLyrics(lrcUrl) {
@@ -668,8 +667,7 @@ function parseLRC(lrcText) {
     if (match) {
       const minutes = parseInt(match[1]);
       const seconds = parseInt(match[2]);
-      // Added a slight 0.5s offset buffer so scrolling syncs more naturally and calmly
-      let totalSec = minutes * 60 + seconds - 0.5;
+      let totalSec = minutes * 60 + seconds - 0.4;
       lyrics.push({ time: Math.max(0, totalSec), text: line.replace(timeRegex, "").trim() });
     }
   });
