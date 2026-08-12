@@ -9,6 +9,7 @@ let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
 let debounceTimer = null;
+let activePredictionIndex = -1;
 
 let audioCtx;
 let analyser;
@@ -159,7 +160,7 @@ async function initPlayer() {
   }
 }
 
-// Drawer Closures & Navigation
+// Drawers & Controls
 btnCloseInfo.addEventListener("click", () => {
   infoDrawer.classList.add("collapsed");
   btnInfo.classList.remove("active");
@@ -430,7 +431,7 @@ opacitySlider.addEventListener("input", (e) => {
   }
 });
 
-// Search and Auto-predict / Fill Fixes
+// SEARCH, AUTOFILL & PREDICTIONS
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
   btnToggleSearch.classList.toggle("active");
@@ -445,6 +446,7 @@ btnToggleSearch.addEventListener("click", () => {
 searchInput.addEventListener("input", (e) => {
   const query = e.target.value.trim();
   clearTimeout(debounceTimer);
+  activePredictionIndex = -1;
 
   if (query.length < 1) {
     searchPredictionsContainer.classList.add("hidden");
@@ -457,16 +459,19 @@ searchInput.addEventListener("input", (e) => {
       const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
       const results = await res.json();
 
-      if (results && results.length > 0) {
+      if (results && Array.isArray(results) && results.length > 0) {
         predictionsUl.innerHTML = "";
-        results.slice(0, 5).forEach(song => {
+        results.slice(0, 5).forEach((song, idx) => {
           const li = document.createElement("li");
+          li.dataset.index = idx;
           li.innerText = `${song.title} - ${song.author}`;
-          li.addEventListener("click", () => {
-            searchInput.value = `${song.title} - ${song.author}`;
-            searchPredictionsContainer.classList.add("hidden");
-            performSearch(song.title);
+          
+          // Mousedown prevents input blur before selection
+          li.addEventListener("mousedown", (evt) => {
+            evt.preventDefault();
+            selectPrediction(song);
           });
+
           predictionsUl.appendChild(li);
         });
         searchPredictionsContainer.classList.remove("hidden");
@@ -476,18 +481,67 @@ searchInput.addEventListener("input", (e) => {
     } catch (err) {
       console.warn("Prediction fetch error:", err);
     }
-  }, 250);
+  }, 200);
 });
+
+// Keyboard autofill and selection (Up, Down, Enter, Tab)
+searchInput.addEventListener("keydown", (e) => {
+  const predictionItems = predictionsUl.querySelectorAll("li");
+  if (!predictionItems.length || searchPredictionsContainer.classList.contains("hidden")) {
+    if (e.key === "Enter") {
+      const query = searchInput.value.trim();
+      if (query) performSearch(query);
+    }
+    return;
+  }
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    activePredictionIndex = (activePredictionIndex + 1) % predictionItems.length;
+    highlightPrediction(predictionItems);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    activePredictionIndex = (activePredictionIndex - 1 + predictionItems.length) % predictionItems.length;
+    highlightPrediction(predictionItems);
+  } else if (e.key === "Enter" || e.key === "Tab") {
+    if (activePredictionIndex >= 0 && predictionItems[activePredictionIndex]) {
+      e.preventDefault();
+      predictionItems[activePredictionIndex].dispatchEvent(new Event("mousedown"));
+    } else {
+      if (e.key === "Enter") {
+        const query = searchInput.value.trim();
+        if (query) performSearch(query);
+      }
+    }
+  }
+});
+
+function highlightPrediction(items) {
+  items.forEach((item, idx) => {
+    if (idx === activePredictionIndex) {
+      item.style.background = "rgba(255, 255, 255, 0.25)";
+      searchInput.value = item.innerText; // Autofill preview into bar
+    } else {
+      item.style.background = "transparent";
+    }
+  });
+}
+
+function selectPrediction(song) {
+  searchInput.value = `${song.title} - ${song.author}`;
+  searchPredictionsContainer.classList.add("hidden");
+  performSearch(song.title);
+}
 
 btnSearch.addEventListener("click", () => {
   const query = searchInput.value.trim();
   if (query) performSearch(query);
 });
 
-searchInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    const query = searchInput.value.trim();
-    if (query) performSearch(query);
+// Close predictions when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#search-section")) {
+    searchPredictionsContainer.classList.add("hidden");
   }
 });
 
@@ -503,10 +557,9 @@ async function performSearch(query) {
   }
 }
 
-// Clean Layout for Search Results
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
-  if (!results || results.length === 0) {
+  if (!results || !Array.isArray(results) || results.length === 0) {
     searchResultsUl.innerHTML = `<li style="padding: 10px; text-align: center; font-size:0.8rem;">No results found.</li>`;
     searchResultsContainer.classList.remove("hidden");
     return;
@@ -589,7 +642,6 @@ function setLyricText(str) {
   if (islandLyricText) islandLyricText.innerText = str;
 }
 
-// Clean Layout Restoration with Delete Button in Playlist Drawer
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((track, index) => {
@@ -609,13 +661,11 @@ function renderPlaylist() {
       </button>
     `;
 
-    // Click track row to play
     li.querySelector(".item-left").addEventListener("click", () => {
       loadTrack(index);
       playTrack();
     });
 
-    // Delete track button
     li.querySelector(".btn-delete-track").addEventListener("click", (e) => {
       e.stopPropagation();
       playlist.splice(index, 1);
