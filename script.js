@@ -16,14 +16,14 @@ let source;
 let dataArray;
 let animationFrameId;
 
-// SVGs for play mode icons
+// SVGs for Play Mode Icons
 const MODE_ICONS = {
   loop: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>`,
   repeatOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>`,
   shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`
 };
 
-// SVG for Trash Bin Icon
+// Trash Bin Icon SVG replacing the old cross icon
 const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="3 6 5 6 21 6"></polyline>
   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -118,6 +118,16 @@ const searchResultsUl = document.getElementById("search-results-ul");
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
+// Dynamic Slider Active Track Fill Helper
+function updateSliderTrack(slider) {
+  if (!slider) return;
+  const min = parseFloat(slider.min) || 0;
+  const max = parseFloat(slider.max) || 1;
+  const val = parseFloat(slider.value) || 0;
+  const percentage = ((val - min) / (max - min)) * 100;
+  slider.style.background = `linear-gradient(to right, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.9) ${percentage}%, rgba(255,255,255,0.2) ${percentage}%, rgba(255,255,255,0.2) 100%)`;
+}
+
 // Web Audio API Frequency Equalizer Setup
 function initAudioContext() {
   if (audioCtx) return;
@@ -165,14 +175,10 @@ function animateBars() {
 }
 
 async function initPlayer() {
-  audio.volume = 0.8;
-  volumeSlider.value = 0.8;
-  islandVolumeSlider.value = 0.8;
-  opacitySlider.value = 0.5;
-  document.documentElement.style.setProperty("--glass-tint-opacity", 0.5);
-
-  updateVolumeIcons(0.8);
+  handleVolumeChange(0.8);
+  handleOpacityChange(0.5);
   updatePlayModeUI();
+
   try {
     const res = await fetch(API_BASE);
     playlist = await res.json();
@@ -232,13 +238,15 @@ islandBtnMode.addEventListener("click", (e) => {
   cyclePlayMode();
 });
 
-// Sound Sliders Handler with full Propagation Prevention
+// Sound Sliders Handler
 const handleVolumeChange = (val) => {
   const parsedVal = parseFloat(val);
   audio.volume = parsedVal;
   volumeSlider.value = parsedVal;
   islandVolumeSlider.value = parsedVal;
   updateVolumeIcons(parsedVal);
+  updateSliderTrack(volumeSlider);
+  updateSliderTrack(islandVolumeSlider);
 };
 
 volumeSlider.addEventListener("input", (e) => {
@@ -254,6 +262,16 @@ islandVolumeSlider.addEventListener("input", (e) => {
 islandVolumeSlider.addEventListener("change", (e) => e.stopPropagation());
 
 islandBtnVolume.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (audio.volume > 0) {
+    previousVolume = audio.volume;
+    handleVolumeChange(0);
+  } else {
+    handleVolumeChange(previousVolume || 0.8);
+  }
+});
+
+btnVolume.addEventListener("click", (e) => {
   e.stopPropagation();
   if (audio.volume > 0) {
     previousVolume = audio.volume;
@@ -325,6 +343,7 @@ const handleOpacityChange = (val) => {
   opacitySlider.value = parsedVal;
   document.documentElement.style.setProperty("--glass-tint-opacity", parsedVal);
   updateTransparencyIcons(parsedVal);
+  updateSliderTrack(opacitySlider);
 };
 
 opacitySlider.addEventListener("input", (e) => {
@@ -333,7 +352,8 @@ opacitySlider.addEventListener("input", (e) => {
 });
 opacitySlider.addEventListener("change", (e) => e.stopPropagation());
 
-btnGlass.addEventListener("click", () => {
+btnGlass.addEventListener("click", (e) => {
+  e.stopPropagation();
   const currentVal = parseFloat(opacitySlider.value);
   if (currentVal >= 0.15) {
     previousOpacity = currentVal;
@@ -379,7 +399,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Render iOS Styled Playlist Drawer with Trash Bin Icon
+// Render Playlist Drawer with Trash Bin Icon
 function renderPlaylist() {
   playlistUl.className = "playlist-items-container";
   playlistUl.innerHTML = "";
@@ -452,10 +472,6 @@ function removeTrackFromPlaylist(index) {
     currentIndex--;
   }
 
-  renderPlaylist();
-}
-
-function updatePlaylistHighlight() {
   renderPlaylist();
 }
 
@@ -558,15 +574,6 @@ if (btnMode) {
     cyclePlayMode();
   });
 }
-
-btnVolume.addEventListener("click", () => {
-  if (audio.volume > 0) {
-    previousVolume = audio.volume;
-    handleVolumeChange(0);
-  } else {
-    handleVolumeChange(previousVolume || 0.8);
-  }
-});
 
 async function fetchLyrics(lrcUrl) {
   lyrics = [];
@@ -731,10 +738,10 @@ function renderPredictions(predictions) {
   }
   predictions.forEach(song => {
     const li = document.createElement("li");
-    li.className = "prediction-item-ios";
+    li.className = "playlist-item-ios";
     li.innerHTML = `
-      <span class="prediction-text">${song.title} - ${song.author}</span>
-      <span class="prediction-tag">Suggest</span>
+      <span class="playlist-item-title">${song.title} - ${song.author}</span>
+      <span style="font-size:0.65rem; opacity:0.5; flex-shrink:0; margin-left:8px;">Suggest</span>
     `;
     li.addEventListener("click", () => {
       searchInput.value = `${song.title} - ${song.author}`;
@@ -771,7 +778,7 @@ async function performSearch() {
   }
 }
 
-// Search Results Stay Active on Selection
+// Search Results stay open on song click
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -782,7 +789,7 @@ function renderSearchResults(results) {
   
   results.forEach(song => {
     const li = document.createElement("li");
-    li.className = "playlist-item-ios search-item-ios";
+    li.className = "playlist-item-ios";
     
     const albumName = song.album || "Result";
     const authorName = song.author || "Unknown Artist";
@@ -804,7 +811,7 @@ function renderSearchResults(results) {
       </button>
     `;
 
-    // Click track row to add and play without closing search window
+    // Add track & play immediately without closing search view
     li.addEventListener("click", () => {
       playlist.push(song);
       renderPlaylist();
