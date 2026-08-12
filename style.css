@@ -933,3 +933,131 @@ input[type="range"]::-webkit-slider-thumb {
 .hidden {
   display: none !important;
 }
+
+/* =========================================================
+   iOS Style Playlist Drawer & Tracks
+   ========================================================= */
+
+.playlist-drawer {
+  background: rgba(18, 18, 18, 0.88) !important;
+  backdrop-filter: blur(40px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(190%) !important;
+}
+
+.playlist-header-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.playlist-items-container {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 2px;
+  margin-top: 8px;
+}
+
+/* iOS Grouped List Style */
+.playlist-item-ios {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  transition: background 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+
+.playlist-item-ios:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.playlist-item-ios.active-track {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.playlist-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.playlist-item-cover {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+
+.playlist-item-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.playlist-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  letter-spacing: -0.2px;
+}
+
+.playlist-item-sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* iOS Red Trash Bin Delete Button */
+.btn-delete-track {
+  background: rgba(255, 59, 48, 0.12);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 10px;
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-delete-track svg {
+  width: 16px;
+  height: 16px;
+  fill: #ff3b30;
+  transition: fill 0.2s ease;
+}
+
+.btn-delete-track:hover {
+  background: #ff3b30;
+  transform: scale(1.08);
+}
+
+.btn-delete-track:hover svg {
+  fill: #ffffff;
+}
+
+.btn-delete-track:active {
+  transform: scale(0.92);
+}

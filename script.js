@@ -316,62 +316,103 @@ btnToggleSearch.addEventListener("click", () => {
   }
 });
 
+// Render iOS Styled Playlist Drawer
 function renderPlaylist() {
+  playlistUl.className = "playlist-items-container";
   playlistUl.innerHTML = "";
-  playlist.forEach((song, index) => {
+
+  if (playlist.length === 0) {
+    playlistUl.innerHTML = `
+      <div style="text-align: center; padding: 40px 10px; color: rgba(255,255,255,0.5); font-size: 0.85rem;">
+        Playlist is empty
+      </div>`;
+    return;
+  }
+
+  playlist.forEach((song, i) => {
     const li = document.createElement("li");
-    li.className = "track-item-row" + (index === currentIndex ? " active" : "");
+    li.className = `playlist-item-ios ${i === currentIndex ? "active-track" : ""}`;
     
-    // Inject the track info AND the new white iOS delete button
+    const albumName = song.album || "Single";
+    const authorName = song.author || "Unknown Artist";
+    const coverPic = song.pic || "https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg";
+
     li.innerHTML = `
-      <div class="item-left">
-        <img src="${song.pic}" alt="Cover" class="item-cover">
-        <div class="item-meta">
-          <span class="item-title">${song.title}</span>
-          <span class="item-artist">${song.author}</span>
+      <div class="playlist-item-left">
+        <img class="playlist-item-cover" src="${coverPic}" alt="Cover">
+        <div class="playlist-item-meta">
+          <div class="playlist-item-title">${song.title || "Untitled"}</div>
+          <div class="playlist-item-sub">${authorName} • ${albumName}</div>
         </div>
       </div>
-      <button class="delete-btn-ios" title="Remove track">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
+      <button class="btn-delete-track" title="Remove track">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
         </svg>
       </button>
     `;
 
-    // 1. Handle Play on Click
+    // Click track row to play
     li.addEventListener("click", () => {
-      loadTrack(index);
+      loadTrack(i);
       playTrack();
+      playlistDrawer.classList.add("collapsed");
     });
 
-    // 2. Handle Delete on Click
-    const deleteBtn = li.querySelector('.delete-btn-ios');
+    // Delete track event
+    const deleteBtn = li.querySelector(".btn-delete-track");
     deleteBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevents the song from playing when you hit delete
-      
-      // Remove from array
-      playlist.splice(index, 1);
-      
-      // Logic to keep the player running smoothly if you delete the current song
-      if (currentIndex === index) {
-        if (playlist.length === 0) {
-          audio.pause();
-          // Optional: clear UI text here if playlist is completely empty
-        } else {
-          if (currentIndex >= playlist.length) currentIndex = 0;
-          loadTrack(currentIndex);
-          playTrack();
-        }
-      } else if (currentIndex > index) {
-        currentIndex--; // Fix the index offset
-      }
-      
-      renderPlaylist(); // Re-render the updated list
+      e.stopPropagation(); // Prevents song from playing when clicking delete
+      removeTrackFromPlaylist(i);
     });
 
     playlistUl.appendChild(li);
   });
+}
+
+// Remove Song from Playlist Logic
+function removeTrackFromPlaylist(index) {
+  if (index < 0 || index >= playlist.length) return;
+
+  playlist.splice(index, 1);
+
+  if (playlist.length === 0) {
+    audio.pause();
+    audio.src = "";
+    title.textContent = "No Tracks";
+    artist.textContent = "Add songs via search";
+    cover.src = "";
+    backdropImg.src = "";
+    setPlayStateUI(false);
+  } else if (index === currentIndex) {
+    // If deleted current playing track, play next available track
+    currentIndex = currentIndex % playlist.length;
+    loadTrack(currentIndex);
+    playTrack();
+  } else if (index < currentIndex) {
+    // Adjust index position if item removed before active track
+    currentIndex--;
+  }
+
+  renderPlaylist();
+}
+
+function updatePlaylistHighlight() {
+  renderPlaylist();
+}
+
+function setPlayStateUI(isPlaying) {
+  if (isPlaying) {
+    playIcon.classList.add("hidden");
+    pauseIcon.classList.remove("hidden");
+    islandPlayIcon.classList.add("hidden");
+    islandPauseIcon.classList.remove("hidden");
+  } else {
+    playIcon.classList.remove("hidden");
+    pauseIcon.classList.add("hidden");
+    islandPlayIcon.classList.remove("hidden");
+    islandPauseIcon.classList.add("hidden");
+  }
 }
 
 function loadTrack(index) {
@@ -395,8 +436,10 @@ function loadTrack(index) {
   islandHoverTitle.innerText = track.title;
   islandHoverArtist.innerText = track.author;
 
-  document.getElementById("standby-title").innerText = track.title;
-  document.getElementById("standby-artist").innerText = track.author;
+  const standbyTitle = document.getElementById("standby-title");
+  const standbyArtist = document.getElementById("standby-artist");
+  if (standbyTitle) standbyTitle.innerText = track.title;
+  if (standbyArtist) standbyArtist.innerText = track.author;
 
   metaAlbum.innerText = track.album || track.title;
   metaBpm.innerText = track.bpm || "~120 BPM";
@@ -415,20 +458,14 @@ function playTrack() {
     audioCtx.resume();
   }
   audio.play().then(() => {
-    playIcon.classList.add("hidden");
-    pauseIcon.classList.remove("hidden");
-    islandPlayIcon.classList.add("hidden");
-    islandPauseIcon.classList.remove("hidden");
+    setPlayStateUI(true);
     animateBars();
   }).catch(e => console.log("Playback error:", e));
 }
 
 function pauseTrack() {
   audio.pause();
-  playIcon.classList.remove("hidden");
-  pauseIcon.classList.add("hidden");
-  islandPlayIcon.classList.remove("hidden");
-  islandPauseIcon.classList.add("hidden");
+  setPlayStateUI(false);
   if (animationFrameId) cancelAnimationFrame(animationFrameId);
 }
 
@@ -546,7 +583,7 @@ function setLyricText(text) {
     if (textWidth > containerWidth) {
       const overflowDistance = textWidth - containerWidth + 24; // Padding buffer
       
-      // Speed up calculations: lower divisor = faster scroll duration (45 instead of 25)
+      // Speed up calculations: lower divisor = faster scroll duration
       const duration = Math.max(3.5, overflowDistance / 45);
 
       lyricText.style.setProperty("--scroll-distance", `-${overflowDistance}px`);
