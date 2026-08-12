@@ -316,100 +316,62 @@ function renderPlaylist() {
     const li = document.createElement("li");
     const isActive = index === currentIndex;
     if (isActive) li.classList.add("active");
-
     li.innerHTML = `
-      <div style="display:flex; align-items:center; gap:6px; overflow:hidden; max-width:80%;">
-        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-          ${index + 1}. ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
-        </span>
-        ${isActive ? `
-          <div class="eq-bars" style="height:10px;">
-            <span></span><span></span><span></span>
-          </div>
-        ` : ''}
-      </div>
-      <button class="btn-delete-song spring-btn" title="Delete Song">
-        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-      </button>
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 220px;">
+        ${song.title} - <small style="opacity:0.7">${song.author}</small>
+      </span>
+      ${isActive ? '<small style="color:rgba(255,255,255,0.8)">Playing</small>' : ''}
     `;
-
-    li.addEventListener("click", (e) => {
-      if (e.target.closest(".btn-delete-song")) return;
+    li.addEventListener("click", () => {
       loadTrack(index);
       playTrack();
+      playlistDrawer.classList.add("collapsed");
     });
-
-    const btnDelete = li.querySelector(".btn-delete-song");
-    btnDelete.addEventListener("click", (e) => {
-      e.stopPropagation();
-      playlist.splice(index, 1);
-      if (playlist.length === 0) {
-        title.innerText = "No Songs";
-        artist.innerText = "";
-        audio.pause();
-      } else if (index === currentIndex) {
-        loadTrack(currentIndex % playlist.length);
-        playTrack();
-      } else if (index < currentIndex) {
-        currentIndex--;
-      }
-      renderPlaylist();
-    });
-
     playlistUl.appendChild(li);
   });
 }
 
-// Live auto-suggest while typing before pressing enter
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
   const query = searchInput.value.trim();
-
   if (!query) {
     hidePredictions();
     return;
   }
-
   debounceTimer = setTimeout(() => {
     fetchPredictions(query);
-  }, 200);
+  }, 250);
 });
 
 async function fetchPredictions(query) {
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const results = await res.json();
-    renderPredictions(results);
+    if (Array.isArray(results) && results.length > 0) {
+      showPredictions(results.slice(0, 5));
+    } else {
+      hidePredictions();
+    }
   } catch (err) {
     hidePredictions();
   }
 }
 
-function renderPredictions(results) {
+function showPredictions(items) {
   predictionsUl.innerHTML = "";
-  if (!results || results.length === 0) {
-    hidePredictions();
-    return;
-  }
-
-  const suggestions = results.slice(0, 5);
-  suggestions.forEach(song => {
+  items.forEach(song => {
     const li = document.createElement("li");
     li.innerHTML = `
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
-      <span class="prediction-title">${song.title}</span>
-      <span class="prediction-artist">- ${song.author}</span>
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;">${song.title}</span>
+      <span class="pred-artist" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:80px;">${song.author}</span>
     `;
-
     li.addEventListener("click", () => {
       searchInput.value = `${song.title} - ${song.author}`;
       hidePredictions();
       performSearch();
     });
-
     predictionsUl.appendChild(li);
   });
-
   searchPredictionsContainer.classList.remove("hidden");
 }
 
@@ -434,9 +396,7 @@ searchInput.addEventListener("keypress", (e) => {
 async function performSearch() {
   const query = searchInput.value.trim();
   if (!query) return;
-
   hidePredictions();
-
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const results = await res.json();
@@ -452,123 +412,66 @@ function renderSearchResults(results) {
     searchResultsContainer.classList.add("hidden");
     return;
   }
-
   searchResultsContainer.classList.remove("hidden");
   results.forEach(song => {
     const li = document.createElement("li");
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 220px;">
+        ${song.title} - <small style="opacity:0.7">${song.author}</small>
       </span>
-      <div class="search-actions-row">
-        <button class="btn-add-queue" title="Add to Up Next">+</button>
-      </div>
+      <small style="opacity:0.5">Play</small>
     `;
-
-    const btnAdd = li.querySelector(".btn-add-queue");
-    btnAdd.addEventListener("click", (e) => {
-      e.stopPropagation();
-      playlist.push(song);
+    li.addEventListener("click", () => {
+      playlist.unshift(song);
+      currentIndex = 0;
       renderPlaylist();
-      btnAdd.innerText = "✓";
-      btnAdd.style.background = "rgba(52, 199, 89, 0.6)";
-    });
-
-    li.addEventListener("click", (e) => {
-      if (e.target.closest(".btn-add-queue")) return;
+      loadTrack(0);
+      playTrack();
       searchResultsContainer.classList.add("hidden");
       searchSection.classList.add("collapsed");
       btnToggleSearch.classList.remove("active");
-      loadPreviewTrack(song);
-      playTrack();
     });
-
     searchResultsUl.appendChild(li);
   });
 }
 
-function loadPreviewTrack(song) {
-  currentIndex = -1;
-  applyTrackData(song);
-}
+document.getElementById("btn-close-search").addEventListener("click", () => {
+  searchResultsContainer.classList.add("hidden");
+});
 
-async function loadTrack(index) {
+function loadTrack(index) {
   currentIndex = index;
-  const song = playlist[index];
-  applyTrackData(song);
+  const track = playlist[index];
+  if (!track) return;
 
-  Array.from(playlistUl.children).forEach((li, i) => {
-    li.classList.toggle("active", i === index);
-  });
-}
+  audio.src = track.url;
+  cover.src = track.pic;
+  islandCover.src = track.pic;
+  islandHoverCover.src = track.pic;
+  backdropImg.src = track.pic;
 
-function applyTrackData(song) {
-  title.innerText = song.title;
-  artist.innerText = song.author;
-  cover.src = song.pic;
-  islandCover.src = song.pic;
-  islandTitle.innerText = song.title;
-  islandHoverCover.src = song.pic;
-  islandHoverTitle.innerText = song.title;
-  islandHoverArtist.innerText = song.author;
-  backdropImg.src = song.pic;
-  
-  audio.src = song.url;
-  audio.load();
+  title.innerText = track.title;
+  artist.innerText = track.author;
+  islandTitle.innerText = track.title;
+  islandHoverTitle.innerText = track.title;
+  islandHoverArtist.innerText = track.author;
 
-  setLyricText("");
-  extractDominantColor(song.pic);
-  fetchLyrics(song.lrc);
-  updateMediaSession(song);
-  updateSongMetadata(song);
-}
+  metaAlbum.innerText = track.album || "Single";
+  metaBpm.innerText = track.bpm ? `~${track.bpm} BPM` : "~120 BPM";
+  metaYear.innerText = track.year || "2026";
+  metaGenre.innerText = track.genre || "Pop / Acoustic";
+  metaStory.innerText = track.story || `${track.title} by ${track.author}. Pure audio immersion with real-time spectrum feedback.`;
 
-function updateSongMetadata(song) {
-  metaAlbum.innerText = song.album || "Single / Netease Release";
-  const pseudoBpm = 90 + (song.title.length * 7) % 50;
-  metaBpm.innerText = `~${pseudoBpm} BPM`;
-  const currentYear = new Date().getFullYear();
-  metaYear.innerText = song.year || `${currentYear - (song.title.length % 5)}`;
-  metaGenre.innerText = song.genre || "Pop / Acoustic";
-  metaStory.innerText = `"${song.title}" by ${song.author} is streamed directly from Netease Cloud servers.`;
-}
+  extractDominantColor(track.pic);
+  renderPlaylist();
 
-function updateMediaSession(song) {
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title,
-      artist: song.author,
-      album: 'Notion Player',
-      artwork: [{ src: song.pic, sizes: '512x512', type: 'image/jpeg' }]
-    });
-
-    navigator.mediaSession.setActionHandler('play', () => playTrack());
-    navigator.mediaSession.setActionHandler('pause', () => pauseTrack());
-    navigator.mediaSession.setActionHandler('previoustrack', () => btnPrev.click());
-    navigator.mediaSession.setActionHandler('nexttrack', () => btnNext.click());
-  }
-}
-
-volumeSlider.addEventListener("input", (e) => {
-  const val = parseFloat(e.target.value);
-  audio.volume = val;
-  islandVolumeSlider.value = val;
-  updateVolumeIcons(val);
-});
-
-btnVolume.addEventListener("click", () => {
-  if (audio.volume > 0) {
-    previousVolume = audio.volume;
-    audio.volume = 0;
-    volumeSlider.value = 0;
-    islandVolumeSlider.value = 0;
+  if (track.lrc) {
+    fetchLyrics(track.lrc);
   } else {
-    audio.volume = previousVolume || 0.8;
-    volumeSlider.value = audio.volume;
-    islandVolumeSlider.value = audio.volume;
+    lyrics = [];
+    setLyricText("Instrumental / No Lyrics");
   }
-  updateVolumeIcons(audio.volume);
-});
+}
 
 function extractDominantColor(imageUrl) {
   const img = new Image();
@@ -577,91 +480,83 @@ function extractDominantColor(imageUrl) {
   img.onload = () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    canvas.width = 50; canvas.height = 50;
+    canvas.width = 50;
+    canvas.height = 50;
     ctx.drawImage(img, 0, 0, 50, 50);
-
     const imageData = ctx.getImageData(0, 0, 50, 50).data;
     let r = 0, g = 0, b = 0, count = 0;
-
     for (let i = 0; i < imageData.length; i += 16) {
-      r += imageData[i]; g += imageData[i + 1]; b += imageData[i + 2];
+      r += imageData[i];
+      g += imageData[i + 1];
+      b += imageData[i + 2];
       count++;
     }
+    r = Math.floor(r / count);
+    g = Math.floor(g / count);
+    b = Math.floor(b / count);
 
-    r = Math.floor(r / count); g = Math.floor(g / count); b = Math.floor(b / count);
-    document.documentElement.style.setProperty("--glow-color", `rgba(${r}, ${g}, ${b}, 0.75)`);
+    document.documentElement.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
+    document.documentElement.style.setProperty("--glow-color", `rgba(${r}, ${g}, ${b}, 0.5)`);
   };
 }
 
-// Precise dynamic scrolling starting in original position without cut-off
-function setLyricText(text) {
-  lyricText.innerText = text;
-  islandLyricText.innerText = text;
-
-  lyricText.classList.remove("marquee-active");
-  islandLyricText.classList.remove("marquee-active");
-
-  setTimeout(() => {
-    const overflowDistance = lyricText.scrollWidth - marqueeWrapper.clientWidth;
-    if (overflowDistance > 4) {
-      lyricText.style.setProperty('--scroll-distance', `-${overflowDistance + 12}px`);
-      lyricText.classList.add("marquee-active");
-    }
-
-    const islandOverflow = islandLyricText.scrollWidth - islandMarqueeInner.clientWidth;
-    if (islandOverflow > 4) {
-      islandLyricText.style.setProperty('--scroll-distance', `-${islandOverflow + 10}px`);
-      islandLyricText.classList.add("marquee-active");
-    }
-  }, 100);
-}
-
 async function fetchLyrics(lrcUrl) {
-  lyrics = [];
-  if (!lrcUrl) return;
   try {
     const res = await fetch(lrcUrl);
     const text = await res.text();
-    parseLRC(text);
-  } catch (e) { lyrics = []; }
+    lyrics = parseLRC(text);
+    if (lyrics.length > 0) setLyricText(lyrics[0].text);
+  } catch (err) {
+    lyrics = [];
+    setLyricText("Lyrics unavailable");
+  }
 }
 
 function parseLRC(lrcText) {
   const lines = lrcText.split("\n");
+  const result = [];
   const timeRegex = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
-  lyrics = [];
-
-  lines.forEach(line => {
+  for (let line of lines) {
     const match = timeRegex.exec(line);
     if (match) {
       const minutes = parseInt(match[1]);
       const seconds = parseInt(match[2]);
       const millis = parseInt(match[3].padEnd(3, '0'));
-      let totalSec = minutes * 60 + seconds + millis / 1000;
-      lyrics.push({ time: Math.max(0, totalSec), text: line.replace(timeRegex, "").trim() });
+      const time = minutes * 60 + seconds + millis / 1000;
+      const text = line.replace(timeRegex, "").trim();
+      if (text) result.push({ time, text });
     }
-  });
+  }
+  return result;
+}
+
+function setLyricText(text) {
+  lyricText.innerText = text;
+  islandLyricText.innerText = text;
+
+  const textWidth = lyricText.offsetWidth;
+  const containerWidth = marqueeWrapper.offsetWidth;
+
+  if (textWidth > containerWidth) {
+    lyricText.style.animation = "none";
+    lyricText.offsetHeight; // trigger reflow
+    lyricText.style.animation = "marquee 8s linear infinite";
+  } else {
+    lyricText.style.animation = "none";
+  }
 }
 
 function playTrack() {
-  if (!audioCtx) {
-    initAudioContext();
-  } else if (audioCtx.state === "suspended") {
+  initAudioContext();
+  if (audioCtx && audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
-
-  audio.play().then(() => {
-    playIcon.classList.add("hidden");
-    pauseIcon.classList.remove("hidden");
-    islandPlayIcon.classList.add("hidden");
-    islandPauseIcon.classList.remove("hidden");
-
-    cancelAnimationFrame(animationFrameId);
-    animateBars();
-    renderPlaylist();
-  }).catch((err) => {
-    console.warn("Playback interrupted or stream CORS blocked:", err);
-  });
+  audio.play();
+  playIcon.classList.add("hidden");
+  pauseIcon.classList.remove("hidden");
+  islandPlayIcon.classList.add("hidden");
+  islandPauseIcon.classList.remove("hidden");
+  animateBars();
 }
 
 function pauseTrack() {
@@ -670,18 +565,15 @@ function pauseTrack() {
   pauseIcon.classList.add("hidden");
   islandPlayIcon.classList.remove("hidden");
   islandPauseIcon.classList.add("hidden");
-
-  cancelAnimationFrame(animationFrameId);
-
-  const bars = document.querySelectorAll(".eq-bars span");
-  bars.forEach(bar => (bar.style.height = "3px"));
-
-  renderPlaylist();
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
 }
 
 btnPlay.addEventListener("click", () => {
-  if (audio.paused) playTrack();
-  else pauseTrack();
+  if (audio.paused) {
+    playTrack();
+  } else {
+    pauseTrack();
+  }
 });
 
 btnNext.addEventListener("click", () => {
@@ -706,16 +598,45 @@ btnMode.addEventListener("click", () => {
   syncPlayModeUI();
 });
 
+volumeSlider.addEventListener("input", (e) => {
+  const val = parseFloat(e.target.value);
+  audio.volume = val;
+  islandVolumeSlider.value = val;
+  updateVolumeIcons(val);
+});
+
+btnVolume.addEventListener("click", () => {
+  if (audio.volume > 0) {
+    previousVolume = audio.volume;
+    audio.volume = 0;
+    volumeSlider.value = 0;
+    islandVolumeSlider.value = 0;
+  } else {
+    audio.volume = previousVolume || 0.8;
+    volumeSlider.value = audio.volume;
+    islandVolumeSlider.value = audio.volume;
+  }
+  updateVolumeIcons(audio.volume);
+});
+
 btnList.addEventListener("click", () => {
   playlistDrawer.classList.toggle("collapsed");
 });
 
+function formatTime(sec) {
+  if (isNaN(sec)) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
+
 function updateProgressFromEvent(e) {
-  if (!audio.duration) return;
   const rect = progressBarBg.getBoundingClientRect();
-  let percent = (e.clientX - rect.left) / rect.width;
-  percent = Math.max(0, Math.min(1, percent));
-  
+  const clickX = e.clientX - rect.left;
+  const width = rect.width;
+  let percent = clickX / width;
+  if (percent < 0) percent = 0;
+  if (percent > 1) percent = 1;
   progressBarFill.style.width = `${percent * 100}%`;
   currentTimeEl.innerText = formatTime(percent * audio.duration);
   return percent;
@@ -755,14 +676,12 @@ audio.addEventListener("timeupdate", () => {
 });
 
 audio.addEventListener("ended", () => {
-  if (playMode === 1) { audio.currentTime = 0; playTrack(); }
-  else { btnNext.click(); }
+  if (playMode === 1) {
+    audio.currentTime = 0;
+    playTrack();
+  } else {
+    btnNext.click();
+  }
 });
-
-function formatTime(seconds) {
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-  return `${min}:${sec < 10 ? "0" : ""}${sec}`;
-}
 
 initPlayer();

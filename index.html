@@ -91,27 +91,24 @@
             <ul id="predictions-ul"></ul>
           </div>
         </div>
-        <div id="search-results" class="search-results hidden">
-          <ul id="search-results-ul"></ul>
-        </div>
       </div>
 
-      <div id="cover-wrapper" class="cover-wrapper spring-btn" title="Click to toggle standby card">
-        <img id="cover" src="" alt="Album Art">
+      <div id="cover-wrapper" class="cover-wrapper" title="Click for Standby mode">
+        <img id="cover" src="" alt="Album Cover">
         <div class="standby-overlay">
-          <span id="standby-title">Notion Player</span>
-          <span id="standby-sub">Ambient Audio Engine</span>
+          <span id="standby-title">Standby</span>
+          <span id="standby-sub">Click cover to exit</span>
         </div>
       </div>
 
       <div class="track-info">
         <div class="title-row">
-          <h2 id="title">Loading...</h2>
-          <div class="eq-bars">
+          <span id="title">Loading...</span>
+          <div id="main-eq" class="eq-bars">
             <span></span><span></span><span></span>
           </div>
         </div>
-        <p id="artist">Artist Name</p>
+        <div id="artist">--</div>
       </div>
 
       <div id="lyrics-container" class="lyrics-container collapsed">
@@ -120,16 +117,18 @@
         </div>
       </div>
 
-      <div class="progress-container">
-        <span id="current-time" class="time-label">0:00</span>
+      <div class="progress-section">
         <div id="progress-bar-bg" class="progress-bar-bg">
           <div id="progress-bar-fill" class="progress-bar-fill"></div>
         </div>
-        <span id="duration-time" class="time-label">0:00</span>
+        <div class="time-row">
+          <span id="current-time">0:00</span>
+          <span id="duration-time">0:00</span>
+        </div>
       </div>
 
-      <div class="controls-row">
-        <button id="btn-mode" class="btn-ctrl spring-btn" title="Playback Mode">
+      <div class="controls">
+        <button id="btn-mode" class="btn-ctrl spring-btn" title="Toggle Play Mode">
           <svg id="mode-loop" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01-.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
           <svg id="mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
           <svg id="mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
@@ -138,8 +137,8 @@
           <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
         </button>
         <button id="btn-play" class="btn-ctrl btn-play-main spring-btn" title="Play/Pause">
-          <svg id="play-icon" class="hidden" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <svg id="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
         <button id="btn-next" class="btn-ctrl spring-btn" title="Next Track">
           <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
@@ -160,23 +159,33 @@
         </div>
 
         <div class="glass-box">
-          <button id="btn-glass" class="spring-btn" title="Toggle Transparency">
-            <svg id="glass-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1zM9 20h6v2H9z"/></svg>
-            <svg id="glass-off-icon" class="hidden" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1zM9 20h6v2H9z"/><path d="M2.81 2.81L21.19 21.19l-1.42 1.42L1.39 4.23z" fill="#ffffff"/></svg>
+          <button id="btn-glass" class="spring-btn" title="Toggle Background Glass Opacity">
+            <svg id="glass-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+            <svg id="glass-off-icon" class="hidden" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6 0 1.01.25 1.97.7 2.8l8.1-8.1C13.97 6.25 13.01 6 12 6z"/></svg>
           </button>
-          <input type="range" id="opacity-slider" min="0" max="0.95" step="0.05" value="0.5">
+          <input type="range" id="opacity-slider" min="0" max="1" step="0.05" value="0.5">
         </div>
 
-        <button id="btn-list" class="spring-btn" title="Up Next Queue">
+        <button id="btn-list" class="spring-btn" title="Playlist">
           <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
         </button>
       </div>
     </div>
 
+    <div id="search-results" class="search-results-overlay hidden">
+      <div class="search-results-header">
+        <span>Search Results</span>
+        <button id="btn-close-search" class="btn-exit-drawer" title="Close Search Results">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <ul id="search-results-ul"></ul>
+    </div>
+
     <div id="playlist-drawer" class="playlist-drawer collapsed">
-      <div class="drawer-header-row">
-        <h3>Up Next</h3>
-        <button id="btn-close-playlist" class="btn-exit-drawer spring-btn" title="Close Queue">
+      <div class="playlist-header">
+        <span>Current Playlist</span>
+        <button id="btn-close-playlist" class="btn-exit-drawer" title="Close Playlist">
           <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </div>
@@ -185,7 +194,7 @@
 
     <div id="info-drawer" class="info-drawer collapsed">
       <div class="ios-settings-header">
-        <button id="btn-close-info" class="btn-exit-drawer spring-btn" title="Close Info">
+        <button id="btn-close-info" class="btn-exit-drawer" title="Close Drawer">
           <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
         <h3>Track Information</h3>
@@ -214,15 +223,18 @@
       </div>
 
       <div class="ios-settings-group">
-        <div class="ios-settings-title">Playback Story &amp; Details</div>
+        <div class="ios-settings-title">Behind the Track</div>
         <div class="ios-settings-card">
-          <p id="meta-story" class="ios-story-text">Streamed globally using Netease CDN. High fidelity audio analyzer active.</p>
+          <p id="meta-story" class="ios-story-text">
+            Experience crisp acoustic notes paired with low-fi rhythm dynamics. Designed for deep focus and seamless playback.
+          </p>
         </div>
       </div>
     </div>
   </div>
 
   <audio id="audio-player" crossorigin="anonymous"></audio>
+
   <script src="script.js"></script>
 </body>
 </html>
