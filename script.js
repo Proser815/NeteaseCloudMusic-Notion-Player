@@ -30,7 +30,6 @@ const islandTitle = document.getElementById("island-title");
 const islandHoverCover = document.getElementById("island-hover-cover");
 const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
-const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
 
 const islandBtnMode = document.getElementById("island-btn-mode");
@@ -60,7 +59,6 @@ const metaStory = document.getElementById("meta-story");
 const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
 const marqueeWrapper = document.getElementById("marquee-wrapper");
-const islandMarqueeInner = document.getElementById("island-marquee-inner");
 
 const progressBarBg = document.getElementById("progress-bar-bg");
 const progressBarFill = document.getElementById("progress-bar-fill");
@@ -310,18 +308,65 @@ btnToggleSearch.addEventListener("click", () => {
   }
 });
 
+/* White iOS Trash Bin Icon HTML helper */
+const TRASH_ICON = `
+  <svg viewBox="0 0 24 24">
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+  </svg>
+`;
+
+function deleteTrack(index, event) {
+  event.stopPropagation();
+  playlist.splice(index, 1);
+  if (playlist.length === 0) {
+    audio.pause();
+    title.innerText = "No Songs Left";
+    artist.innerText = "--";
+    renderPlaylist();
+    return;
+  }
+  if (index === currentIndex) {
+    currentIndex = currentIndex % playlist.length;
+    loadTrack(currentIndex);
+    playTrack();
+  } else if (index < currentIndex) {
+    currentIndex--;
+  }
+  renderPlaylist();
+}
+
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((song, index) => {
     const li = document.createElement("li");
     const isActive = index === currentIndex;
     if (isActive) li.classList.add("active");
-    li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 220px;">
-        ${song.title} - <small style="opacity:0.7">${song.author}</small>
-      </span>
-      ${isActive ? '<small style="color:rgba(255,255,255,0.8)">Playing</small>' : ''}
-    `;
+
+    const trackSpan = document.createElement("span");
+    trackSpan.style.cssText = "overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 190px;";
+    trackSpan.innerHTML = `${song.title} - <small style="opacity:0.7">${song.author}</small>`;
+
+    const rightContainer = document.createElement("div");
+    rightContainer.style.cssText = "display:flex; align-items:center; gap:8px;";
+
+    if (isActive) {
+      const playingBadge = document.createElement("small");
+      playingBadge.style.color = "rgba(255,255,255,0.8)";
+      playingBadge.innerText = "Playing";
+      rightContainer.appendChild(playingBadge);
+    }
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-delete";
+    delBtn.title = "Delete Track";
+    delBtn.innerHTML = TRASH_ICON;
+    delBtn.addEventListener("click", (e) => deleteTrack(index, e));
+
+    rightContainer.appendChild(delBtn);
+
+    li.appendChild(trackSpan);
+    li.appendChild(rightContainer);
+
     li.addEventListener("click", () => {
       loadTrack(index);
       playTrack();
@@ -532,14 +577,13 @@ function parseLRC(lrcText) {
 
 function setLyricText(text) {
   lyricText.innerText = text;
-  islandLyricText.innerText = text;
 
   const textWidth = lyricText.offsetWidth;
   const containerWidth = marqueeWrapper.offsetWidth;
 
   if (textWidth > containerWidth) {
     lyricText.style.animation = "none";
-    lyricText.offsetHeight; // trigger reflow
+    lyricText.offsetHeight;
     lyricText.style.animation = "marquee 8s linear infinite";
   } else {
     lyricText.style.animation = "none";

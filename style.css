@@ -9,7 +9,6 @@
   --accent-rgb: 255, 255, 255;
   --glow-color: rgba(255, 255, 255, 0.6);
   --glass-tint-opacity: 0.5;
-  /* Smoother, less intense animation curve */
   --ios-spring: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -60,13 +59,14 @@ html, body {
   fill: #fff;
 }
 
-/* Dynamic Island: Expands naturally on Hover */
+/* Dynamic Island Mode */
 .dynamic-island {
   position: absolute;
   top: 12px;
   z-index: 50;
   height: 40px;
   min-width: 180px;
+  max-width: 90vw;
   width: auto;
   padding: 0 14px;
   background: #000000;
@@ -111,22 +111,24 @@ html, body {
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.95);
   backdrop-filter: blur(25px);
-  padding: 0 16px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 10px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
   white-space: nowrap;
-  width: max-content;
-  min-width: 100%;
+  width: 100%;
 }
 
 .dynamic-island:hover {
   height: 44px;
-  padding: 0 18px;
+  padding: 0 14px;
   border-radius: 24px;
+  width: min-content;
+  min-width: 310px;
 }
 
 .dynamic-island:hover .island-hover-controls {
@@ -138,7 +140,9 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 130px;
 }
 
 #island-hover-cover {
@@ -146,44 +150,36 @@ html, body {
   height: 28px;
   border-radius: 6px;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .island-track-text {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 #island-hover-title {
   font-size: 0.75rem;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #island-hover-artist {
   font-size: 0.6rem;
   opacity: 0.7;
-}
-
-.island-marquee-container {
-  overflow: hidden;
-  max-width: 200px;
-  margin: 0 4px;
-  flex-shrink: 1;
-}
-
-.island-marquee-inner {
   white-space: nowrap;
-  display: inline-block;
-}
-
-#island-lyric-text {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.85);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .island-action-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -212,7 +208,7 @@ html, body {
 }
 
 #island-volume-slider {
-  width: 55px;
+  width: 45px;
   accent-color: #fff;
   height: 3px;
 }
@@ -220,7 +216,7 @@ html, body {
 .player-card {
   position: relative;
   width: 320px;
-  height: 540px;
+  height: 520px;
   background: rgba(20, 20, 20, var(--glass-tint-opacity));
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -262,7 +258,7 @@ html, body {
 }
 
 .player-content {
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -274,7 +270,7 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .top-actions-right {
@@ -310,12 +306,12 @@ html, body {
   fill: #fff;
 }
 
-/* Live Auto-Suggest Search Section */
+/* Search Section */
 .search-section {
   position: absolute;
   top: 60px;
-  left: 20px;
-  right: 20px;
+  left: 18px;
+  right: 18px;
   z-index: 30;
   transition: all 0.35s var(--ios-spring);
 }
@@ -377,7 +373,6 @@ html, body {
   fill: #fff;
 }
 
-/* Predictions Overlay Dropdown */
 .search-predictions {
   position: absolute;
   top: 48px;
@@ -424,13 +419,12 @@ html, body {
   color: rgba(255,255,255,0.5);
 }
 
-/* Search Results Drawer Overlay */
 .search-results-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(20, 20, 20, 0.96);
   backdrop-filter: blur(35px);
-  padding: 20px;
+  padding: 18px;
   z-index: 40;
   display: flex;
   flex-direction: column;
@@ -476,9 +470,9 @@ html, body {
 
 .cover-wrapper {
   position: relative;
-  width: 170px;
-  height: 170px;
-  margin: 10px auto 14px auto;
+  width: 165px;
+  height: 165px;
+  margin: 6px auto 10px auto;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
@@ -513,7 +507,7 @@ html, body {
   border-radius: 50%;
   width: 130px;
   height: 130px;
-  margin: 14px auto;
+  margin: 10px auto;
 }
 
 #standby-title {
@@ -529,7 +523,7 @@ html, body {
 
 .track-info {
   text-align: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .title-row {
@@ -540,7 +534,7 @@ html, body {
 }
 
 #title {
-  font-size: 1.02rem;
+  font-size: 1rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -549,9 +543,9 @@ html, body {
 }
 
 #artist {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   opacity: 0.7;
-  margin-top: 2px;
+  margin-top: 1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -572,15 +566,15 @@ html, body {
   transition: height 0.1s ease;
 }
 
-/* Lyrics Section with iOS Smooth Marquee */
+/* Reduced Lyric Space */
 .lyrics-container {
-  height: 28px;
-  margin: 4px 0 8px 0;
+  height: 20px;
+  margin: 2px 0 6px 0;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .lyrics-container.collapsed {
@@ -598,13 +592,13 @@ html, body {
 
 #lyric-text {
   display: inline-block;
-  font-size: 0.76rem;
+  font-size: 0.73rem;
   color: rgba(255, 255, 255, 0.9);
   transition: transform 0.3s ease;
 }
 
 .progress-section {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .progress-bar-bg {
@@ -630,14 +624,14 @@ html, body {
   justify-content: space-between;
   font-size: 0.68rem;
   opacity: 0.6;
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
 .controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .btn-ctrl {
@@ -665,8 +659,8 @@ html, body {
 
 .btn-play-main {
   background: #ffffff !important;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
 }
 
 .btn-play-main svg {
@@ -680,7 +674,7 @@ html, body {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 10px;
+  padding-top: 8px;
   margin-top: auto;
 }
 
@@ -726,13 +720,13 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
-/* Playlist Drawer Slide-up */
+/* Playlist Drawer */
 .playlist-drawer {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(20, 20, 20, 0.96);
   backdrop-filter: blur(35px);
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   transition: transform 0.35s var(--ios-spring);
@@ -779,6 +773,30 @@ input[type="range"]::-webkit-slider-thumb {
 #playlist-ul li.active {
   background: rgba(255, 255, 255, 0.22);
   font-weight: 600;
+}
+
+/* iOS White Delete Bin Icon */
+.btn-delete {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s, transform 0.15s ease;
+}
+
+.btn-delete:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.btn-delete svg {
+  width: 15px;
+  height: 15px;
+  fill: rgba(255, 255, 255, 0.85);
 }
 
 /* Track Info Settings Drawer */
@@ -862,7 +880,6 @@ input[type="range"]::-webkit-slider-thumb {
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* iOS Spring Scale Click Effect */
 .spring-btn {
   transition: transform 0.25s var(--ios-spring), background 0.2s ease;
 }
