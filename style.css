@@ -251,6 +251,96 @@ html, body {
 .btn-play-main svg { width: 22px; height: 22px; }
 .btn-play-main:hover { transform: scale(1.08); background: #f0f0f0; }
 
+/* =========================================
+   iOS White Delete Button (Playlist)
+   ========================================= */
+.delete-btn-ios {
+  background: rgba(255, 255, 255, 0.9);
+  color: #1c1c1e;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8) translateX(10px);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth iOS Spring */
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+
+.track-item-row:hover .delete-btn-ios {
+  opacity: 1;
+  transform: scale(1) translateX(0);
+}
+
+.delete-btn-ios:hover {
+  background: #ff3b30; /* Snaps to iOS Red on hover */
+  color: white;
+  transform: scale(1.1);
+}
+
+/* =========================================
+   Dynamic Island Stretch & Buttons
+   ========================================= */
+.dynamic-island {
+  /* Ensure the base island has the spring transition */
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
+              height 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
+              border-radius 0.5s ease;
+  overflow: hidden;
+}
+
+/* The Stretch */
+.dynamic-island:hover, 
+.dynamic-island.expanded {
+  width: 360px !important; /* Stretch wide */
+  height: 140px !important; /* Stretch tall */
+  border-radius: 40px;
+}
+
+/* Hide collapsed pill content smoothly */
+.dynamic-island:hover .island-collapsed-content,
+.dynamic-island.expanded .island-collapsed-content {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+  transition: all 0.3s ease;
+}
+
+/* Reveal all buttons inside the stretched island */
+.island-hover-controls {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  transform: scale(0.95);
+  transition: opacity 0.4s ease 0.1s, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s;
+}
+
+.dynamic-island:hover .island-hover-controls,
+.dynamic-island.expanded .island-hover-controls {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Align the control buttons nicely inside the island */
+.island-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly; /* Spaces out prev, play, next */
+  width: 100%;
+  margin-top: 10px;
+}
+
 /* Bottom Action Bar */
 .bottom-action-bar { display: flex; align-items: center; justify-content: space-around; padding: 8px 12px 10px; background: rgba(0,0,0,0.15); border-top: 1px solid rgba(255,255,255,0.08); border-radius: 0 0 32px 32px; }
 .btn-bottom { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; padding: 6px; border-radius: 10px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }

@@ -341,23 +341,58 @@ btnCloseInfo.addEventListener("click", () => infoDrawer.classList.add("collapsed
 
 function renderPlaylist() {
   playlistUl.innerHTML = "";
-  playlist.forEach((song, idx) => {
+  playlist.forEach((song, index) => {
     const li = document.createElement("li");
-    li.className = `track-item-row ${idx === currentIndex ? 'active' : ''}`;
+    li.className = "track-item-row" + (index === currentIndex ? " active" : "");
+    
+    // Inject the track info AND the new white iOS delete button
     li.innerHTML = `
       <div class="item-left">
-        <img class="item-cover" src="${song.pic}" alt="Cover">
+        <img src="${song.pic}" alt="Cover" class="item-cover">
         <div class="item-meta">
           <span class="item-title">${song.title}</span>
           <span class="item-artist">${song.author}</span>
         </div>
       </div>
+      <button class="delete-btn-ios" title="Remove track">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     `;
+
+    // 1. Handle Play on Click
     li.addEventListener("click", () => {
-      loadTrack(idx);
+      loadTrack(index);
       playTrack();
-      playlistDrawer.classList.add("collapsed");
     });
+
+    // 2. Handle Delete on Click
+    const deleteBtn = li.querySelector('.delete-btn-ios');
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevents the song from playing when you hit delete
+      
+      // Remove from array
+      playlist.splice(index, 1);
+      
+      // Logic to keep the player running smoothly if you delete the current song
+      if (currentIndex === index) {
+        if (playlist.length === 0) {
+          audio.pause();
+          // Optional: clear UI text here if playlist is completely empty
+        } else {
+          if (currentIndex >= playlist.length) currentIndex = 0;
+          loadTrack(currentIndex);
+          playTrack();
+        }
+      } else if (currentIndex > index) {
+        currentIndex--; // Fix the index offset
+      }
+      
+      renderPlaylist(); // Re-render the updated list
+    });
+
     playlistUl.appendChild(li);
   });
 }
