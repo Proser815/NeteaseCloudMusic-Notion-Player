@@ -9,6 +9,7 @@ let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
 let debounceTimer = null;
+let activePredictionIndex = -1;
 
 let audioCtx;
 let analyser;
@@ -101,7 +102,7 @@ const searchResultsUl = document.getElementById("search-results-ul");
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
-// Web Audio API Frequency Equalizer Setup
+// Web Audio API Visualizer Setup
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -160,7 +161,7 @@ async function initPlayer() {
   }
 }
 
-// Drawer Closures & Navigation
+// Drawers & Dynamic Island Controls
 btnCloseInfo.addEventListener("click", () => {
   infoDrawer.classList.add("collapsed");
   btnInfo.classList.remove("active");
@@ -175,7 +176,6 @@ btnInfo.addEventListener("click", () => {
   btnInfo.classList.toggle("active");
 });
 
-// Dynamic Island Morphing
 btnIsland.addEventListener("click", () => {
   playerCard.classList.add("morphed-hidden");
   dynamicIsland.classList.remove("hidden");
@@ -264,7 +264,7 @@ function syncPlayModeUI() {
   islandModeShuffle.classList.toggle("hidden", playMode !== 2);
 }
 
-// Standby Display Toggle
+// Cover Standby Toggle
 coverWrapper.addEventListener("click", () => {
   playerCard.classList.toggle("standby-mode");
 });
@@ -274,7 +274,7 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Glass Tint Opacity Controller
+// Opacity Controls
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
@@ -304,7 +304,7 @@ function updateTransparencyIcons(val) {
   }
 }
 
-// Search Toggle
+// Search Drawer Toggle
 btnToggleSearch.addEventListener("click", () => {
   const isCollapsed = searchSection.classList.contains("collapsed");
   searchSection.classList.toggle("collapsed");
@@ -362,12 +362,10 @@ function loadTrack(index) {
   title.innerText = track.title;
   artist.innerText = track.author;
 
-  // Sync Collapsed Island (Horizontal View)
   islandCover.src = track.pic;
   islandTitle.innerText = track.title;
   if (islandArtist) islandArtist.innerText = track.author;
 
-  // Sync Expanded Island
   islandHoverCover.src = track.pic;
   islandHoverTitle.innerText = track.title;
   islandHoverArtist.innerText = track.author;
@@ -506,7 +504,6 @@ function parseLrc(lrcText) {
 function setLyricText(text) {
   if (!lyricText) return;
 
-  // Reset animation state
   lyricText.classList.remove("animate-lyric");
   lyricText.style.transform = "translateX(0)";
   lyricText.innerText = text;
@@ -515,21 +512,17 @@ function setLyricText(text) {
     islandLyricText.innerText = text;
   }
 
-  // Measure text width vs container width and scroll if needed
   requestAnimationFrame(() => {
     const containerWidth = lyricsContainer.clientWidth;
     const textWidth = lyricText.scrollWidth;
 
     if (textWidth > containerWidth) {
-      const overflowDistance = textWidth - containerWidth + 24; // Padding buffer
-      
-      // Speed up calculations: lower divisor = faster scroll duration (45 instead of 25)
+      const overflowDistance = textWidth - containerWidth + 24;
       const duration = Math.max(3.5, overflowDistance / 45);
 
       lyricText.style.setProperty("--scroll-distance", `-${overflowDistance}px`);
       lyricText.style.setProperty("--scroll-duration", `${duration}s`);
       
-      // Force layout update & add animation class
       void lyricText.offsetWidth;
       lyricText.classList.add("animate-lyric");
     }
@@ -595,27 +588,82 @@ audio.addEventListener("ended", () => {
   }
 });
 
+// ACCURATE NETEASE SEARCH ENGINE WITH FALLBACK
+async function queryNetEaseAPI(query) {
+  const clean = query.trim().replace(/[^\w\s\u4e00-\u9fa5]/gi, ' ');
+  
+  // Primary Endpoint: Meting API using &keyword=
+  try {
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(clean)}`);
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) return data;
+  } catch (err) {
+    console.warn("Primary endpoint warning, trying secondary...", err);
+  }
+
+  // Secondary Endpoint Fallback
+  try {
+    const fallbackRes = await fetch(`https://api.injahow.cn/meting/?type=search&id=${encodeURIComponent(clean)}`);
+    const fallbackData = await fallbackRes.json();
+    if (Array.isArray(fallbackData) && fallbackData.length > 0) return fallbackData;
+  } catch (err) {
+    console.warn("Secondary search failed:", err);
+  }
+
+  return [];
+}
+
+// Prediction & Key Nav Logic
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
+  activePredictionIndex = -1;
   const query = searchInput.value.trim();
-  if (query.length < 2) {
+  if (query.length < 1) {
     hidePredictions();
     return;
   }
-  debounceTimer = setTimeout(() => {
-    fetchSearchPredictions(query);
-  }, 250);
+  debounceTimer = setTimeout(async () => {
+    const results = await queryNetEaseAPI(query);
+    renderPredictions(results.slice(0, 5));
+  }, 200);
 });
 
-async function fetchSearchPredictions(query) {
-  try {
-    // FIXED: Changed &id= to &keyword=
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
-    const results = await res.json();
-    renderPredictions(results.slice(0, 5));
-  } catch (err) {
-    hidePredictions();
+searchInput.addEventListener("keydown", (e) => {
+  const items = predictionsUl.querySelectorAll("li");
+  if (!items.length || searchPredictionsContainer.classList.contains("hidden")) {
+    if (e.key === "Enter") performSearch();
+    return;
   }
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    activePredictionIndex = (activePredictionIndex + 1) % items.length;
+    highlightAndAutofill(items);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    activePredictionIndex = (activePredictionIndex - 1 + items.length) % items.length;
+    highlightAndAutofill(items);
+  } else if (e.key === "Enter" || e.key === "Tab") {
+    if (activePredictionIndex >= 0 && items[activePredictionIndex]) {
+      e.preventDefault();
+      items[activePredictionIndex].dispatchEvent(new Event("mousedown"));
+    } else if (e.key === "Enter") {
+      performSearch();
+    }
+  }
+});
+
+function highlightAndAutofill(items) {
+  items.forEach((item, idx) => {
+    if (idx === activePredictionIndex) {
+      item.style.background = "rgba(255, 255, 255, 0.25)";
+      if (item.dataset.songTitle) {
+        searchInput.value = item.dataset.songTitle;
+      }
+    } else {
+      item.style.background = "transparent";
+    }
+  });
 }
 
 function renderPredictions(predictions) {
@@ -624,20 +672,28 @@ function renderPredictions(predictions) {
     hidePredictions();
     return;
   }
-  predictions.forEach(song => {
+
+  predictions.forEach((song, idx) => {
     const li = document.createElement("li");
+    li.dataset.index = idx;
+    li.dataset.songTitle = `${song.title} - ${song.author}`;
     li.innerHTML = `
       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${song.title} - ${song.author}</span>
       <span style="font-size:0.65rem; opacity:0.5; flex-shrink:0; margin-left:8px;">Suggest</span>
     `;
-    li.addEventListener("click", () => {
-      // Direct song play on click
+
+    li.addEventListener("mousedown", (evt) => {
+      evt.preventDefault();
       playlist.push(song);
       renderPlaylist();
       loadTrack(playlist.length - 1);
       playTrack();
       hidePredictions();
+      searchResultsContainer.classList.add("hidden");
+      searchSection.classList.add("collapsed");
+      btnToggleSearch.classList.remove("active");
     });
+
     predictionsUl.appendChild(li);
   });
   searchPredictionsContainer.classList.remove("hidden");
@@ -648,39 +704,30 @@ function hidePredictions() {
 }
 
 document.addEventListener("click", (e) => {
-  if (!e.target.closest(".search-bar-wrapper")) {
+  if (!e.target.closest("#search-section")) {
     hidePredictions();
   }
 });
 
 btnSearch.addEventListener("click", performSearch);
-searchInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    hidePredictions();
-    performSearch();
-  }
-});
 
 async function performSearch() {
   const query = searchInput.value.trim();
   if (!query) return;
   hidePredictions();
-  try {
-    // FIXED: Changed &id= to &keyword=
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
-    const results = await res.json();
-    renderSearchResults(results);
-  } catch (err) {
-    alert("Search failed.");
-  }
+  
+  const results = await queryNetEaseAPI(query);
+  renderSearchResults(results);
 }
 
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
-    searchResultsContainer.classList.add("hidden");
+    searchResultsUl.innerHTML = `<li style="padding:10px; text-align:center;">No results found.</li>`;
+    searchResultsContainer.classList.remove("hidden");
     return;
   }
+  
   searchResultsContainer.classList.remove("hidden");
   results.forEach(song => {
     const li = document.createElement("li");
@@ -690,6 +737,7 @@ function renderSearchResults(results) {
       </span>
       <span class="add-btn" style="font-size:0.75rem; color:#fff; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:6px;">+ Add</span>
     `;
+    
     li.addEventListener("click", () => {
       playlist.push(song);
       renderPlaylist();
@@ -699,6 +747,7 @@ function renderSearchResults(results) {
       searchSection.classList.add("collapsed");
       btnToggleSearch.classList.remove("active");
     });
+    
     searchResultsUl.appendChild(li);
   });
 }
