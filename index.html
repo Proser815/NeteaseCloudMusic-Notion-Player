@@ -40,54 +40,47 @@
         <button id="island-btn-mode" class="island-ctrl-btn" title="Toggle Play Mode">
           <svg id="island-mode-loop" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
           <svg id="island-mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>
-          <svg id="island-mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+          <svg id="island-mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.83 18.83 16.24 20.24 21.01 15.5 16.24 10.76z"/></svg>
         </button>
         <button id="island-btn-prev" class="island-ctrl-btn" title="Previous Track">
           <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
         </button>
-        <button id="island-btn-play" class="island-ctrl-btn" title="Play/Pause">
+        <button id="island-btn-play" class="island-ctrl-btn island-play-btn" title="Play/Pause">
           <svg id="island-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           <svg id="island-pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
         <button id="island-btn-next" class="island-ctrl-btn" title="Next Track">
           <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </button>
-
-        <div class="island-volume-container">
+        <div class="island-volume-group">
           <button id="island-btn-volume" class="island-ctrl-btn" title="Mute/Unmute">
             <svg id="island-vol-low-icon" class="hidden" viewBox="0 0 24 24"><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/></svg>
             <svg id="island-vol-high-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-            <svg id="island-mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C22.63 14.85 23 13.45 23 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            <svg id="island-mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
           </button>
-          <input type="range" id="island-volume-slider" class="island-volume-slider" min="0" max="1" step="0.01" value="0.8">
+          <input type="range" id="island-volume-slider" min="0" max="1" step="0.01" value="0.8">
         </div>
       </div>
     </div>
   </div>
 
+  <div class="backdrop-wrapper">
+    <img id="backdrop-img" src="" alt="Backdrop">
+    <div class="backdrop-overlay"></div>
+  </div>
+
   <div id="player-card" class="player-card">
-    <div class="backdrop-container">
-      <img id="backdrop-img" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Backdrop">
-      <div class="backdrop-overlay"></div>
-    </div>
-
-    <div class="top-action-bar">
-      <button id="btn-glass" class="btn-top" title="Toggle Glass Opacity">
-        <svg id="glass-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-        <svg id="glass-off-icon" class="hidden" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 6.5 1 10.12 3.07 13.75 7.31 16.24 12 16.24c1.78 0 3.47-.38 5-1.07l2.07 2.07C17.06 18.3 14.61 19 12 19c-5.52 0-10-4.48-10-10 0-1.72.45-3.33 1.23-4.74L2.28 3.05 3.7 1.63l18.67 18.67-1.42 1.42L15.9 17.5c-1.1.48-2.3.75-3.57.75-4.97 0-9-4.03-9-9 0-1.87.57-3.61 1.54-5.06L4.85 5.54C3.7 7.15 3 9.15 3 11.35 3 15.91 6.85 19.5 11.5 19.5c2.35 0 4.5-.95 6.07-2.48l1.43 1.43 1.41-1.41L13.42 11.5c.37-.99.58-2.07.58-3.19 0-4.42-3.58-8-8-8z"/></svg>
-      </button>
-
-      <div class="opacity-slider-wrapper">
-        <input type="range" id="opacity-slider" min="0.05" max="0.95" step="0.05" value="0.5">
-      </div>
-
+    
+    <div class="top-bar">
       <button id="btn-island" class="btn-top" title="Collapse to Dynamic Island">
-        <svg viewBox="0 0 24 24"><path d="M12 4c-4.42 0-8 3.58-8 8h2c0-3.31 2.69-6 6-6s6 2.69 6 6h2c0-4.42-3.58-8-8-8z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
       </button>
-
       <div class="top-right-group">
         <button id="btn-toggle-search" class="btn-top" title="Search Songs">
           <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </button>
+        <button id="btn-settings" class="btn-top" title="Glass Settings">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
         </button>
         <button id="btn-info" class="btn-top" title="Track Info">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
@@ -98,69 +91,65 @@
     <div id="search-section" class="search-section collapsed">
       <div class="search-bar-wrapper">
         <div class="search-bar">
-          <input type="text" id="search-input" placeholder="Search NetEase music catalog...">
-          <button id="btn-search" class="btn-search-ios">
+          <input type="text" id="search-input" placeholder="Search song, artist, or playlist ID...">
+          <button id="search-submit-btn" title="Search">
             <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
           </button>
         </div>
-        <div id="search-predictions" class="search-predictions hidden">
-          <ul id="predictions-ul"></ul>
+        <div id="search-results-container" class="search-results-container hidden">
+          <ul id="search-results-ul"></ul>
         </div>
-      </div>
-      <div id="search-results" class="search-results hidden">
-        <ul id="search-results-ul"></ul>
       </div>
     </div>
 
-    <div class="card-content-wrapper">
-      <div id="cover-wrapper" class="cover-wrapper">
-        <div class="vinyl-disc"></div>
-        <img id="cover" src="https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg" alt="Album Cover">
+    <div id="cover-wrapper" class="cover-wrapper vinyl-mode" title="Click to toggle Vinyl / Normal mode">
+      <div class="vinyl-grooves"></div>
+      <img id="cover" src="" alt="Album Cover" crossorigin="anonymous">
+      <div class="vinyl-center-hole"></div>
+    </div>
+
+    <div class="meta-container">
+      <h2 id="title">Loading...</h2>
+      <p id="artist">Please wait</p>
+    </div>
+
+    <div id="lyrics-container" class="lyrics-container">
+      <div class="marquee-wrapper">
+        <span id="lyric-text">Enjoy the music</span>
       </div>
+    </div>
 
-      <div class="track-info">
-        <h2 id="title">Probably Up</h2>
-        <p id="artist">Lawrence</p>
+    <div class="progress-container">
+      <span id="current-time" class="time-label">00:00</span>
+      <div id="progress-bar-bg" class="progress-bar-bg">
+        <div id="progress-bar-fill" class="progress-bar-fill"></div>
       </div>
+      <span id="duration-time" class="time-label">00:00</span>
+    </div>
 
-      <div id="lyrics-container" class="lyrics-container">
-        <div class="marquee-wrapper">
-          <span id="lyric-text">Lyrics will appear here...</span>
-        </div>
-      </div>
+    <div class="controls-container">
+      <button id="btn-mode" class="btn-ctrl" title="Play Mode">
+        <svg id="mode-loop" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+        <svg id="mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>
+        <svg id="mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.83 18.83 16.24 20.24 21.01 15.5 16.24 10.76z"/></svg>
+      </button>
 
-      <div class="progress-section">
-        <span id="current-time" class="time-label">0:00</span>
-        <div id="progress-bar-bg" class="progress-bar-bg">
-          <div id="progress-bar-fill" class="progress-bar-fill"></div>
-        </div>
-        <span id="duration-time" class="time-label">0:00</span>
-      </div>
+      <button id="btn-prev" class="btn-ctrl" title="Previous">
+        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
 
-      <div class="controls-bar">
-        <button id="btn-mode" class="btn-ctrl" title="Play Mode">
-          <svg id="mode-loop" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-          <svg id="mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>
-          <svg id="mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
-        </button>
+      <button id="btn-play" class="btn-ctrl btn-play-main" title="Play/Pause">
+        <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
 
-        <button id="btn-prev" class="btn-ctrl" title="Previous">
-          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-        </button>
+      <button id="btn-next" class="btn-ctrl" title="Next">
+        <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
 
-        <button id="btn-play" class="btn-ctrl btn-play-main" title="Play/Pause">
-          <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <svg id="pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-        </button>
-
-        <button id="btn-next" class="btn-ctrl" title="Next">
-          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-        </button>
-
-        <button id="btn-lyrics" class="btn-ctrl active" title="Toggle Lyrics">
-          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-        </button>
-      </div>
+      <button id="btn-lyrics" class="btn-ctrl active" title="Toggle Lyrics">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+      </button>
     </div>
 
     <div class="bottom-action-bar">
@@ -172,64 +161,69 @@
         <button id="btn-volume" class="btn-bottom" title="Mute/Unmute">
           <svg id="vol-low-icon" class="hidden" viewBox="0 0 24 24"><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/></svg>
           <svg id="vol-high-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-          <svg id="mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C22.63 14.85 23 13.45 23 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+          <svg id="mute-icon" class="hidden" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
         </button>
-        <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.01" value="0.8">
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
       </div>
     </div>
+  </div>
 
-    <div id="playlist-drawer" class="playlist-drawer collapsed">
-      <div class="ios-settings-header">
-        <button id="btn-close-playlist" class="btn-exit-drawer">
-          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-        <h3>Playlist</h3>
-      </div>
-      <div class="playlist-list-container">
-        <ul id="playlist-ul"></ul>
+  <audio id="audio-player" preload="auto"></audio>
+
+  <div id="playlist-drawer" class="playlist-drawer collapsed">
+    <div class="ios-settings-header">
+      <h3>Playlist</h3>
+      <button id="btn-close-drawer" class="btn-exit-drawer">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <div class="playlist-items-container">
+      <ul id="playlist-ul"></ul>
+    </div>
+  </div>
+
+  <div id="info-drawer" class="info-drawer collapsed">
+    <div class="ios-settings-header">
+      <h3>Track Information</h3>
+      <button id="btn-close-info" class="btn-exit-drawer">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <div class="ios-settings-group">
+      <div class="ios-settings-title">Metadata</div>
+      <div class="ios-settings-card">
+        <div class="ios-row"><span class="ios-row-label">Album</span><span id="meta-album" class="ios-row-value">Single</span></div>
+        <div class="ios-row"><span class="ios-row-label">Tempo</span><span id="meta-bpm" class="ios-row-value">~120 BPM</span></div>
+        <div class="ios-row"><span class="ios-row-label">Release Year</span><span id="meta-year" class="ios-row-value">2026</span></div>
+        <div class="ios-row"><span class="ios-row-label">Genre</span><span id="meta-genre" class="ios-row-value">Pop / Acoustic</span></div>
       </div>
     </div>
-
-    <div id="info-drawer" class="info-drawer collapsed">
-      <div class="ios-settings-header">
-        <button id="btn-close-info" class="btn-exit-drawer">
-          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-        <h3>Track Information</h3>
+    <div class="ios-settings-group">
+      <div class="ios-settings-title">Story / Notes</div>
+      <div class="ios-settings-card">
+        <p id="meta-story" class="ios-row-desc">Embedded seamlessly inside your Notion workspace with immersive visual aesthetics.</p>
       </div>
+    </div>
+  </div>
 
-      <div class="ios-settings-group">
-        <div class="ios-settings-title">Metadata</div>
-        <div class="ios-settings-card">
-          <div class="ios-row">
-            <span class="ios-row-label">Album</span>
-            <span id="meta-album" class="ios-row-value">Single</span>
-          </div>
-          <div class="ios-row">
-            <span class="ios-row-label">Tempo</span>
-            <span id="meta-bpm" class="ios-row-value">~120 BPM</span>
-          </div>
-          <div class="ios-row">
-            <span class="ios-row-label">Release Year</span>
-            <span id="meta-year" class="ios-row-value">2026</span>
-          </div>
-          <div class="ios-row">
-            <span class="ios-row-label">Genre</span>
-            <span id="meta-genre" class="ios-row-value">Pop / Acoustic</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="ios-settings-group">
-        <div class="ios-settings-title">Story / Notes</div>
-        <div class="ios-settings-card">
-          <p id="meta-story" class="ios-story-text">Enjoy smooth glassmorphism vibes powered by NetEase Music & Notion.</p>
+  <div id="settings-drawer" class="info-drawer collapsed">
+    <div class="ios-settings-header">
+      <h3>Player Appearance</h3>
+      <button id="btn-close-settings" class="btn-exit-drawer">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <div class="ios-settings-group">
+      <div class="ios-settings-title">Glass Tint Transparency</div>
+      <div class="ios-settings-card">
+        <div class="ios-row slider-row">
+          <span class="ios-row-label">Opacity Level</span>
+          <input type="range" id="opacity-slider" min="0.05" max="0.95" step="0.05" value="0.5">
         </div>
       </div>
     </div>
   </div>
 
-  <audio id="audio-player" crossorigin="anonymous"></audio>
   <script src="script.js"></script>
 </body>
 </html>
