@@ -346,8 +346,9 @@ function renderPlaylist() {
         </div>
       </div>
       <button class="btn-delete-track" title="Remove track">
-        <svg viewBox="0 0 24 24">
-          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
     `;
@@ -385,12 +386,10 @@ function removeTrackFromPlaylist(index) {
     backdropImg.src = "";
     setPlayStateUI(false);
   } else if (index === currentIndex) {
-    // If deleted current playing track, play next available track
     currentIndex = currentIndex % playlist.length;
     loadTrack(currentIndex);
     playTrack();
   } else if (index < currentIndex) {
-    // Adjust index position if item removed before active track
     currentIndex--;
   }
 
@@ -426,7 +425,7 @@ function loadTrack(index) {
   title.innerText = track.title;
   artist.innerText = track.author;
 
-  // Sync Collapsed Island (Horizontal View)
+  // Sync Collapsed Island
   islandCover.src = track.pic;
   islandTitle.innerText = track.title;
   if (islandArtist) islandArtist.innerText = track.author;
@@ -566,7 +565,6 @@ function parseLrc(lrcText) {
 function setLyricText(text) {
   if (!lyricText) return;
 
-  // Reset animation state
   lyricText.classList.remove("animate-lyric");
   lyricText.style.transform = "translateX(0)";
   lyricText.innerText = text;
@@ -575,21 +573,17 @@ function setLyricText(text) {
     islandLyricText.innerText = text;
   }
 
-  // Measure text width vs container width and scroll if needed
   requestAnimationFrame(() => {
     const containerWidth = lyricsContainer.clientWidth;
     const textWidth = lyricText.scrollWidth;
 
     if (textWidth > containerWidth) {
-      const overflowDistance = textWidth - containerWidth + 24; // Padding buffer
-      
-      // Speed up calculations: lower divisor = faster scroll duration
+      const overflowDistance = textWidth - containerWidth + 24;
       const duration = Math.max(3.5, overflowDistance / 45);
 
       lyricText.style.setProperty("--scroll-distance", `-${overflowDistance}px`);
       lyricText.style.setProperty("--scroll-duration", `${duration}s`);
       
-      // Force layout update & add animation class
       void lyricText.offsetWidth;
       lyricText.classList.add("animate-lyric");
     }
@@ -685,9 +679,10 @@ function renderPredictions(predictions) {
   }
   predictions.forEach(song => {
     const li = document.createElement("li");
+    li.className = "prediction-item-ios";
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${song.title} - ${song.author}</span>
-      <span style="font-size:0.65rem; opacity:0.5; flex-shrink:0; margin-left:8px;">Suggest</span>
+      <span class="prediction-text">${song.title} - ${song.author}</span>
+      <span class="prediction-tag">Suggest</span>
     `;
     li.addEventListener("click", () => {
       searchInput.value = `${song.title} - ${song.author}`;
@@ -730,6 +725,7 @@ async function performSearch() {
   }
 }
 
+// iOS Styled Search Results
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -737,14 +733,32 @@ function renderSearchResults(results) {
     return;
   }
   searchResultsContainer.classList.remove("hidden");
+  
   results.forEach(song => {
     const li = document.createElement("li");
+    li.className = "playlist-item-ios search-item-ios";
+    
+    const albumName = song.album || "Result";
+    const authorName = song.author || "Unknown Artist";
+    const coverPic = song.pic || "https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg";
+
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        ${song.title} - ${song.author}
-      </span>
-      <span class="add-btn" style="font-size:0.75rem; color:#fff; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:6px;">+ Add</span>
+      <div class="playlist-item-left">
+        <img class="playlist-item-cover" src="${coverPic}" alt="Cover">
+        <div class="playlist-item-meta">
+          <div class="playlist-item-title">${song.title || "Untitled"}</div>
+          <div class="playlist-item-sub">${authorName} • ${albumName}</div>
+        </div>
+      </div>
+      <button class="btn-add-track" title="Add track">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
     `;
+
+    // Click row or button to add & play song
     li.addEventListener("click", () => {
       playlist.push(song);
       renderPlaylist();
@@ -754,6 +768,7 @@ function renderSearchResults(results) {
       searchSection.classList.add("collapsed");
       btnToggleSearch.classList.remove("active");
     });
+
     searchResultsUl.appendChild(li);
   });
 }
