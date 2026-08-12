@@ -35,59 +35,44 @@ html, body {
   border-radius: 4px;
 }
 
-.btn-exit-drawer {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.25s var(--ios-spring);
+.hidden {
+  display: none !important;
 }
 
-.btn-exit-drawer:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-}
-
-.btn-exit-drawer svg {
-  width: 14px;
-  height: 14px;
-  fill: #fff;
-}
-
-/* Dynamic Island Base Styling & Smooth Stretch Animation */
+/* =========================================
+   Dynamic Island Stretch & Controls
+   ========================================= */
 .dynamic-island {
-  position: absolute;
-  top: 12px;
-  z-index: 50;
-  height: 40px;
-  min-width: 200px;
-  max-width: 320px;
-  width: auto;
-  padding: 0 14px;
-  background: #000000;
-  border-radius: 22px;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 15, 15, 0.92);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  border-radius: 25px;
+  width: 220px;
+  height: 44px;
+  z-index: 100;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-  transition: width 0.5s var(--ios-spring), 
-              height 0.5s var(--ios-spring), 
-              border-radius 0.5s var(--ios-spring),
-              opacity 0.4s var(--ios-spring),
-              transform 0.4s var(--ios-spring);
-  cursor: pointer;
+  padding: 6px 12px;
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
+              height 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
+              border-radius 0.5s ease;
   overflow: hidden;
 }
 
-.dynamic-island.hidden {
-  opacity: 0;
-  transform: translateY(-20px) scale(0.85);
-  pointer-events: none;
+/* Dynamic Island Stretch on Hover or Expanded state */
+.dynamic-island:hover, 
+.dynamic-island.expanded {
+  width: 360px !important;
+  height: 140px !important;
+  border-radius: 40px;
 }
 
 .island-collapsed-content {
@@ -95,316 +80,273 @@ html, body {
   align-items: center;
   gap: 10px;
   width: 100%;
-  overflow: hidden;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+/* Smoothly hide collapsed content on expand */
+.dynamic-island:hover .island-collapsed-content,
+.dynamic-island.expanded .island-collapsed-content {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
 }
 
 #island-cover {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
-/* Horizontal Song Name + Author Collapsed Layout */
 .island-collapsed-meta {
   display: flex;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-}
-
-#island-title {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 500;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .island-meta-separator {
-  font-size: 0.65rem;
   opacity: 0.5;
-  flex-shrink: 0;
 }
 
-#island-artist {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Equalizer Animation */
+.eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+  margin-left: auto;
 }
 
-/* Dynamic Island Hover Expanded View (Smooth Stretch) */
+.eq-bars span {
+  width: 3px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  animation: bounce 0.8s ease-in-out infinite alternate;
+}
+
+.eq-bars span:nth-child(1) { height: 60%; animation-delay: 0s; }
+.eq-bars span:nth-child(2) { height: 100%; animation-delay: 0.2s; }
+.eq-bars span:nth-child(3) { height: 40%; animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0% { height: 20%; }
+  100% { height: 100%; }
+}
+
+/* Controls Revealed on Stretch */
 .island-hover-controls {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.95);
-  backdrop-filter: blur(25px);
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease 0.05s;
-  white-space: nowrap;
-  width: max-content;
-  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  transform: scale(0.95);
+  transition: opacity 0.4s ease 0.1s, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s;
 }
 
-.dynamic-island:hover {
-  width: 310px !important;
-  height: 48px !important;
-  border-radius: 26px;
-  padding: 0 16px;
-}
-
-.dynamic-island:hover .island-hover-controls {
+.dynamic-island:hover .island-hover-controls,
+.dynamic-island.expanded .island-hover-controls {
   opacity: 1;
   pointer-events: auto;
+  transform: scale(1);
 }
 
 .island-track-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 #island-hover-cover {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   object-fit: cover;
 }
 
-.island-track-text {
+.island-track-info {
   display: flex;
   flex-direction: column;
-}
-
-#island-hover-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fff;
-}
-
-#island-hover-artist {
-  font-size: 0.65rem;
-  color: rgba(255,255,255,0.6);
-}
-
-.island-marquee-container {
   overflow: hidden;
-  width: 110px;
-  flex-shrink: 0;
 }
 
-.island-marquee-inner {
-  display: inline-block;
+.island-title-text {
+  font-size: 0.95rem;
+  font-weight: 600;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-#island-lyric-text {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.85);
+.island-artist-text {
+  font-size: 0.8rem;
+  opacity: 0.7;
 }
 
-.island-action-buttons {
+.island-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-evenly;
+  width: 100%;
+  margin-top: 10px;
 }
 
-.island-ctrl-btn {
+.island-btn {
   background: transparent;
   border: none;
-  color: #fff;
-  width: 24px;
-  height: 24px;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  opacity: 0.8;
-  transition: opacity 0.2s, transform 0.2s;
 }
 
-.island-ctrl-btn:hover {
-  opacity: 1;
+.island-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
   transform: scale(1.1);
 }
 
-.island-ctrl-btn svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
+.island-btn-play {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px;
 }
 
-.island-vol-control {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.island-volume-slider {
-  width: 45px;
-  height: 3px;
-  accent-color: #ffffff;
-  cursor: pointer;
-}
-
-/* Equalizer Bars in Collapsed Island */
-.eq-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-  flex-shrink: 0;
-}
-
-.eq-bars span {
-  width: 2px;
-  height: 100%;
-  background: #ffffff;
-  border-radius: 1px;
-  animation: eqAnim 0.8s ease-in-out infinite alternate;
-}
-
-.eq-bars span:nth-child(1) { animation-delay: 0s; }
-.eq-bars span:nth-child(2) { animation-delay: 0.2s; }
-.eq-bars span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes eqAnim {
-  0% { height: 3px; }
-  100% { height: 12px; }
-}
-
-/* Player Card Container */
+/* =========================================
+   Main Player Card
+   ========================================= */
 .player-card {
   position: relative;
-  width: 320px;
-  height: 520px;
-  border-radius: 32px;
+  width: 360px;
+  height: 600px;
+  border-radius: 36px;
   overflow: hidden;
-  background: rgba(255, 255, 255, var(--glass-tint-opacity));
+  background: rgba(20, 20, 20, 0.65);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 0 30px var(--glow-color);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.4s var(--ios-spring);
-}
-
-/* Dynamic Ambient Glow */
-.player-card::before {
-  content: "";
-  position: absolute;
-  top: -50%; left: -50%; right: -50%; bottom: -50%;
-  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.3) 0%, rgba(0, 0, 0, 0) 70%);
-  pointer-events: none;
-  z-index: 0;
-  transition: background 0.8s ease;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.4s var(--ios-spring), opacity 0.4s ease;
 }
 
 .backdrop-blur {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 1;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
+  opacity: 0.4;
 }
 
 #backdrop-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(30px) brightness(0.6);
-  transform: scale(1.2);
-  transition: src 0.5s ease;
+  filter: blur(50px) saturate(180%);
+  transform: scale(1.3);
 }
 
-.glass-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(0,0,0,0.25));
-  z-index: 2;
-  pointer-events: none;
-}
-
-.header, .cover-wrapper, .track-info, .lyrics-container, .progress-section, .controls-row, .bottom-tools-row, .search-section {
+.card-content {
   position: relative;
-  z-index: 3;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
 }
 
-/* Header & Glass Control Slider */
-.header {
+/* Top Bar Controls */
+.top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.glass-controls {
+.top-bar-right {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.25);
-  padding: 4px 8px;
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-}
-
-.opacity-slider {
-  width: 60px;
-  height: 3px;
-  accent-color: #ffffff;
-  cursor: pointer;
+  gap: 8px;
 }
 
 .icon-btn {
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  transition: background 0.2s, transform 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   transform: scale(1.05);
 }
 
-.icon-btn svg {
-  width: 18px;
-  height: 18px;
-  fill: currentColor;
+.icon-btn.active {
+  background: rgba(255, 255, 255, 0.4);
 }
 
-/* Cover Wrapper */
-.cover-wrapper {
-  width: 170px;
-  height: 170px;
-  margin: 0 auto;
-  border-radius: 20px;
+/* Search Container */
+.search-section {
+  position: relative;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.search-section.collapsed {
+  max-height: 0;
+  opacity: 0;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-  transition: transform 0.4s var(--ios-spring);
+  margin-bottom: 0;
+}
+
+#search-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  outline: none;
+  font-size: 0.88rem;
+}
+
+.search-results-container {
+  position: absolute;
+  top: 44px;
+  left: 0; right: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 50;
+}
+
+/* Cover Image */
+.cover-wrapper {
+  width: 220px;
+  height: 220px;
+  margin: 10px auto;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
 }
 
 #cover {
@@ -413,57 +355,51 @@ html, body {
   object-fit: cover;
 }
 
-/* Track Info */
+/* Track Metadata */
 .track-info {
   text-align: center;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
-.title {
-  font-size: 1.15rem;
+#title {
+  font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: -0.3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.artist {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.75);
-  margin-top: 2px;
+#artist {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-top: 4px;
 }
 
-/* Lyric Banner Container */
-.lyrics-container {
-  height: 24px;
-  overflow: hidden;
+/* Lyrics */
+.lyric-container {
   text-align: center;
-  margin: 2px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 12px 0;
+  min-height: 24px;
 }
 
-.lyric-text {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.9);
+#lyric-text {
+  font-size: 0.85rem;
+  opacity: 0.85;
   font-weight: 500;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-/* Progress Section */
+/* Progress Bar Section */
 .progress-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  margin-top: auto;
+  margin-bottom: 12px;
 }
 
 .progress-bar-bg {
   width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 2px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -473,18 +409,19 @@ html, body {
   width: 0%;
   height: 100%;
   background: #ffffff;
-  border-radius: 2px;
+  border-radius: 3px;
   transition: width 0.1s linear;
 }
 
-.time-info {
+.time-stamps {
   display: flex;
   justify-content: space-between;
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+  opacity: 0.6;
+  margin-top: 6px;
 }
 
-/* Main Player Control Row */
+/* Playback Controls */
 .controls-row {
   display: flex;
   align-items: center;
@@ -492,125 +429,51 @@ html, body {
 }
 
 .play-btn {
-  width: 44px;
-  height: 44px;
-  background: #ffffff !important;
-  color: #000000 !important;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
-}
-
-.play-btn svg {
-  fill: #000000 !important;
-  width: 22px;
-  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
 }
 
 .play-btn:hover {
-  transform: scale(1.08) !important;
+  transform: scale(1.08);
 }
 
-/* Bottom Tools Row */
-.bottom-tools-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.volume-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 2px 8px;
-  border-radius: 14px;
-}
-
-.volume-slider {
-  width: 60px;
-  height: 3px;
-  accent-color: #ffffff;
-  cursor: pointer;
-}
-
-/* Inline Search Overlay Container */
-.search-section {
+/* Volume Popover */
+.volume-popover {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(20, 20, 20, 0.95);
-  backdrop-filter: blur(25px);
-  padding: 12px;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  transition: transform 0.35s var(--ios-spring);
+  bottom: 80px;
+  right: 24px;
+  background: rgba(20, 20, 20, 0.9);
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
   z-index: 30;
-  max-height: 240px;
-  display: flex;
-  flex-direction: column;
 }
 
-.search-section.collapsed {
-  transform: translateY(100%);
-}
-
-.search-bar-row {
-  display: flex;
-  gap: 8px;
-}
-
-.search-bar-row input {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 6px 12px;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 0.8rem;
-  outline: none;
-}
-
-.btn-search {
-  background: #ffffff;
-  color: #000;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.78rem;
+#volume-slider {
+  accent-color: #ffffff;
+  width: 100px;
   cursor: pointer;
-}
-
-.search-predictions, .search-results {
-  margin-top: 8px;
-  overflow-y: auto;
-  max-height: 160px;
-}
-
-.search-predictions ul, .search-results ul {
-  list-style: none;
-}
-
-.search-predictions li, .search-results li {
-  padding: 6px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.75rem;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.search-predictions li:hover, .search-results li:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Playlist & Info Drawers */
 .playlist-drawer, .info-drawer {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   background: rgba(20, 20, 20, 0.96);
   backdrop-filter: blur(35px);
-  padding: 18px;
+  -webkit-backdrop-filter: blur(35px);
+  padding: 20px;
   display: flex;
   flex-direction: column;
   transition: transform 0.35s var(--ios-spring);
@@ -623,6 +486,19 @@ html, body {
 
 .info-drawer.collapsed {
   transform: translateX(100%);
+}
+
+.btn-exit-drawer {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .ios-settings-header {
@@ -640,59 +516,13 @@ html, body {
   margin-right: 28px;
 }
 
-.ios-settings-group {
-  margin-bottom: 16px;
-}
-
-.ios-settings-title {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 6px;
-}
-
-.ios-settings-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  overflow: hidden;
-  padding: 0 12px;
-}
-
-.ios-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.85rem;
-}
-
-.ios-row:last-child {
-  border-bottom: none;
-}
-
-.ios-row-label {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.ios-row-value {
-  font-weight: 500;
-  color: #ffffff;
-}
-
-.ios-story-text {
-  padding: 12px 0;
-  font-size: 0.82rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-/* Playlist UL Styling */
-.playlist-ul {
-  list-style: none;
-  overflow-y: auto;
+.playlist-scroll-area {
   flex: 1;
+  overflow-y: auto;
+}
+
+#playlist-ul {
+  list-style: none;
 }
 
 .track-item-row {
@@ -705,6 +535,7 @@ html, body {
   border-radius: 10px;
   margin-bottom: 4px;
   transition: background 0.2s ease;
+  position: relative;
 }
 
 .track-item-row:hover {
@@ -748,36 +579,28 @@ html, body {
 
 .item-artist {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.65);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hidden {
-  display: none !important;
+  opacity: 0.6;
 }
 
 /* =========================================
    iOS White Delete Button (Playlist)
    ========================================= */
 .delete-btn-ios {
-  background: #ffffff;
-  color: #000000;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1c1c1e;
   border: none;
   border-radius: 50%;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
   transform: scale(0.8) translateX(10px);
-  transition: all 0.35s var(--ios-spring);
-  margin-left: 8px;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth iOS Spring */
+  margin-left: 10px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .track-item-row:hover .delete-btn-ios {
@@ -786,13 +609,46 @@ html, body {
 }
 
 .delete-btn-ios:hover {
-  background: #ff3b30;
-  color: #ffffff;
+  background: #ff3b30; /* Snaps to iOS Red on hover */
+  color: white;
   transform: scale(1.1);
 }
 
-.delete-btn-ios svg {
-  width: 12px;
-  height: 12px;
-  stroke: currentColor;
+/* Metadata Info Card */
+.ios-settings-group {
+  margin-bottom: 16px;
+}
+
+.ios-settings-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 6px;
+}
+
+.ios-settings-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 4px 12px;
+}
+
+.ios-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.85rem;
+}
+
+.ios-row:last-child {
+  border-bottom: none;
+}
+
+.ios-row-label {
+  opacity: 0.8;
+}
+
+.ios-row-value {
+  font-weight: 500;
 }
