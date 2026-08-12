@@ -16,6 +16,15 @@ let source;
 let dataArray;
 let animationFrameId;
 
+// SVGs for play mode icons
+const MODE_ICONS = {
+  loop: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>`,
+  repeatOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>`,
+  shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`
+};
+
+const MODE_TITLES = ["Loop Playlist", "Repeat One", "Shuffle"];
+
 // DOM Elements
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
@@ -150,6 +159,7 @@ function animateBars() {
 async function initPlayer() {
   audio.volume = 0.8;
   updateVolumeIcons(0.8);
+  updatePlayModeUI();
   try {
     const res = await fetch(API_BASE);
     playlist = await res.json();
@@ -206,8 +216,7 @@ islandBtnNext.addEventListener("click", (e) => {
 
 islandBtnMode.addEventListener("click", (e) => {
   e.stopPropagation();
-  btnMode.click();
-  syncPlayModeUI();
+  cyclePlayMode();
 });
 
 islandVolumeSlider.addEventListener("input", (e) => {
@@ -258,10 +267,25 @@ function updateVolumeIcons(val) {
   }
 }
 
+function updatePlayModeUI() {
+  if (btnMode) {
+    if (playMode === 0) btnMode.innerHTML = MODE_ICONS.loop;
+    else if (playMode === 1) btnMode.innerHTML = MODE_ICONS.repeatOne;
+    else if (playMode === 2) btnMode.innerHTML = MODE_ICONS.shuffle;
+    btnMode.title = MODE_TITLES[playMode];
+  }
+  syncPlayModeUI();
+}
+
 function syncPlayModeUI() {
-  islandModeLoop.classList.toggle("hidden", playMode !== 0);
-  islandModeOne.classList.toggle("hidden", playMode !== 1);
-  islandModeShuffle.classList.toggle("hidden", playMode !== 2);
+  if (islandModeLoop) islandModeLoop.classList.toggle("hidden", playMode !== 0);
+  if (islandModeOne) islandModeOne.classList.toggle("hidden", playMode !== 1);
+  if (islandModeShuffle) islandModeShuffle.classList.toggle("hidden", playMode !== 2);
+}
+
+function cyclePlayMode() {
+  playMode = (playMode + 1) % 3;
+  updatePlayModeUI();
 }
 
 // Standby Display Toggle
@@ -494,13 +518,11 @@ btnList.addEventListener("click", () => {
   playlistDrawer.classList.toggle("collapsed");
 });
 
-btnMode.addEventListener("click", () => {
-  playMode = (playMode + 1) % 3;
-  if (playMode === 0) btnMode.title = "Loop Playlist";
-  if (playMode === 1) btnMode.title = "Repeat One";
-  if (playMode === 2) btnMode.title = "Shuffle";
-  syncPlayModeUI();
-});
+if (btnMode) {
+  btnMode.addEventListener("click", () => {
+    cyclePlayMode();
+  });
+}
 
 volumeSlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
@@ -640,11 +662,22 @@ audio.addEventListener("timeupdate", () => {
   }
 });
 
+// Handle Auto-Advance when Track Ends according to playMode
 audio.addEventListener("ended", () => {
   if (playMode === 1) {
-    audio.currentTime = 0;
+    // Repeat One
+    loadTrack(currentIndex);
+    playTrack();
+  } else if (playMode === 2) {
+    // Shuffle
+    let randomIndex = Math.floor(Math.random() * playlist.length);
+    if (playlist.length > 1 && randomIndex === currentIndex) {
+      randomIndex = (currentIndex + 1) % playlist.length;
+    }
+    loadTrack(randomIndex);
     playTrack();
   } else {
+    // Loop (Next Track)
     btnNext.click();
   }
 });
