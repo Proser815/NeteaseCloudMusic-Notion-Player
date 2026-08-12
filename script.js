@@ -443,6 +443,32 @@ btnToggleSearch.addEventListener("click", () => {
   }
 });
 
+// Primary + Fallback search fetcher for accurate results
+async function fetchNetEaseSearch(query) {
+  const cleanQuery = query.trim().replace(/[^\w\s\u4e00-\u9fa5]/gi, ' ');
+  const primaryUrl = `https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(cleanQuery)}`;
+  
+  try {
+    const res = await fetch(primaryUrl);
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) return data;
+  } catch (err) {
+    console.warn("Primary NetEase search failed, trying fallback...", err);
+  }
+
+  // Secondary Fallback API Endpoint
+  try {
+    const fallbackUrl = `https://api.injahow.cn/meting/?type=search&id=${encodeURIComponent(cleanQuery)}`;
+    const res = await fetch(fallbackUrl);
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) return data;
+  } catch (err) {
+    console.warn("Fallback search failed:", err);
+  }
+
+  return [];
+}
+
 searchInput.addEventListener("input", (e) => {
   const query = e.target.value.trim();
   clearTimeout(debounceTimer);
@@ -456,20 +482,19 @@ searchInput.addEventListener("input", (e) => {
 
   debounceTimer = setTimeout(async () => {
     try {
-      const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
-      const results = await res.json();
+      const results = await fetchNetEaseSearch(query);
 
-      if (results && Array.isArray(results) && results.length > 0) {
+      if (results && results.length > 0) {
         predictionsUl.innerHTML = "";
         results.slice(0, 5).forEach((song, idx) => {
           const li = document.createElement("li");
           li.dataset.index = idx;
           li.innerText = `${song.title} - ${song.author}`;
           
-          // Mousedown prevents input blur before selection
+          // Using mousedown to capture selection immediately without losing focus
           li.addEventListener("mousedown", (evt) => {
             evt.preventDefault();
-            selectPrediction(song);
+            selectAndPlayPrediction(song);
           });
 
           predictionsUl.appendChild(li);
@@ -479,12 +504,12 @@ searchInput.addEventListener("input", (e) => {
         searchPredictionsContainer.classList.add("hidden");
       }
     } catch (err) {
-      console.warn("Prediction fetch error:", err);
+      console.warn("Prediction error:", err);
     }
   }, 200);
 });
 
-// Keyboard autofill and selection (Up, Down, Enter, Tab)
+// Keyboard Navigation & Autofill Sync
 searchInput.addEventListener("keydown", (e) => {
   const predictionItems = predictionsUl.querySelectorAll("li");
   if (!predictionItems.length || searchPredictionsContainer.classList.contains("hidden")) {
@@ -498,39 +523,45 @@ searchInput.addEventListener("keydown", (e) => {
   if (e.key === "ArrowDown") {
     e.preventDefault();
     activePredictionIndex = (activePredictionIndex + 1) % predictionItems.length;
-    highlightPrediction(predictionItems);
+    highlightAndAutofill(predictionItems);
   } else if (e.key === "ArrowUp") {
     e.preventDefault();
     activePredictionIndex = (activePredictionIndex - 1 + predictionItems.length) % predictionItems.length;
-    highlightPrediction(predictionItems);
+    highlightAndAutofill(predictionItems);
   } else if (e.key === "Enter" || e.key === "Tab") {
     if (activePredictionIndex >= 0 && predictionItems[activePredictionIndex]) {
       e.preventDefault();
       predictionItems[activePredictionIndex].dispatchEvent(new Event("mousedown"));
-    } else {
-      if (e.key === "Enter") {
-        const query = searchInput.value.trim();
-        if (query) performSearch(query);
-      }
+    } else if (e.key === "Enter") {
+      const query = searchInput.value.trim();
+      if (query) performSearch(query);
     }
   }
 });
 
-function highlightPrediction(items) {
+function highlightAndAutofill(items) {
   items.forEach((item, idx) => {
     if (idx === activePredictionIndex) {
       item.style.background = "rgba(255, 255, 255, 0.25)";
-      searchInput.value = item.innerText; // Autofill preview into bar
+      searchInput.value = item.innerText; // Autofill input bar dynamically
     } else {
       item.style.background = "transparent";
     }
   });
 }
 
-function selectPrediction(song) {
+function selectAndPlayPrediction(song) {
   searchInput.value = `${song.title} - ${song.author}`;
   searchPredictionsContainer.classList.add("hidden");
-  performSearch(song.title);
+  
+  // Directly add exact song object to playlist for 100% precision
+  playlist.push(song);
+  renderPlaylist();
+  loadTrack(playlist.length - 1);
+  playTrack();
+  searchResultsContainer.classList.add("hidden");
+  searchSection.classList.add("collapsed");
+  btnToggleSearch.classList.remove("active");
 }
 
 btnSearch.addEventListener("click", () => {
@@ -538,7 +569,6 @@ btnSearch.addEventListener("click", () => {
   if (query) performSearch(query);
 });
 
-// Close predictions when clicking outside
 document.addEventListener("click", (e) => {
   if (!e.target.closest("#search-section")) {
     searchPredictionsContainer.classList.add("hidden");
@@ -548,8 +578,7 @@ document.addEventListener("click", (e) => {
 async function performSearch(query) {
   searchPredictionsContainer.classList.add("hidden");
   try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
-    const results = await res.json();
+    const results = await fetchNetEaseSearch(query);
     renderSearchResults(results);
   } catch (err) {
     searchResultsUl.innerHTML = `<li style="padding: 10px; text-align: center; font-size:0.8rem;">Search failed. Try again.</li>`;
@@ -560,7 +589,7 @@ async function performSearch(query) {
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || !Array.isArray(results) || results.length === 0) {
-    searchResultsUl.innerHTML = `<li style="padding: 10px; text-align: center; font-size:0.8rem;">No results found.</li>`;
+    searchResultsUl.innerHTML = `<li style="padding: 10px; text-align: center; font-size:0.8rem;">No accurate results found.</li>`;
     searchResultsContainer.classList.remove("hidden");
     return;
   }
