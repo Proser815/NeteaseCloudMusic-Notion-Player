@@ -23,6 +23,14 @@ const MODE_ICONS = {
   shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`
 };
 
+// SVG for Trash Bin Icon
+const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="3 6 5 6 21 6"></polyline>
+  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+  <line x1="10" y1="11" x2="10" y2="17"></line>
+  <line x1="14" y1="11" x2="14" y2="17"></line>
+</svg>`;
+
 const MODE_TITLES = ["Loop Playlist", "Repeat One", "Shuffle"];
 
 // DOM Elements
@@ -158,6 +166,11 @@ function animateBars() {
 
 async function initPlayer() {
   audio.volume = 0.8;
+  volumeSlider.value = 0.8;
+  islandVolumeSlider.value = 0.8;
+  opacitySlider.value = 0.5;
+  document.documentElement.style.setProperty("--glass-tint-opacity", 0.5);
+
   updateVolumeIcons(0.8);
   updatePlayModeUI();
   try {
@@ -219,27 +232,35 @@ islandBtnMode.addEventListener("click", (e) => {
   cyclePlayMode();
 });
 
+// Sound Sliders Handler with full Propagation Prevention
+const handleVolumeChange = (val) => {
+  const parsedVal = parseFloat(val);
+  audio.volume = parsedVal;
+  volumeSlider.value = parsedVal;
+  islandVolumeSlider.value = parsedVal;
+  updateVolumeIcons(parsedVal);
+};
+
+volumeSlider.addEventListener("input", (e) => {
+  e.stopPropagation();
+  handleVolumeChange(e.target.value);
+});
+volumeSlider.addEventListener("change", (e) => e.stopPropagation());
+
 islandVolumeSlider.addEventListener("input", (e) => {
   e.stopPropagation();
-  const val = parseFloat(e.target.value);
-  audio.volume = val;
-  volumeSlider.value = val;
-  updateVolumeIcons(val);
+  handleVolumeChange(e.target.value);
 });
+islandVolumeSlider.addEventListener("change", (e) => e.stopPropagation());
 
 islandBtnVolume.addEventListener("click", (e) => {
   e.stopPropagation();
   if (audio.volume > 0) {
     previousVolume = audio.volume;
-    audio.volume = 0;
-    volumeSlider.value = 0;
-    islandVolumeSlider.value = 0;
+    handleVolumeChange(0);
   } else {
-    audio.volume = previousVolume || 0.8;
-    volumeSlider.value = audio.volume;
-    islandVolumeSlider.value = audio.volume;
+    handleVolumeChange(previousVolume || 0.8);
   }
-  updateVolumeIcons(audio.volume);
 });
 
 function updateVolumeIcons(val) {
@@ -298,24 +319,28 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Glass Tint Opacity Controller
+// Opacity Controller Fix
+const handleOpacityChange = (val) => {
+  const parsedVal = parseFloat(val);
+  opacitySlider.value = parsedVal;
+  document.documentElement.style.setProperty("--glass-tint-opacity", parsedVal);
+  updateTransparencyIcons(parsedVal);
+};
+
 opacitySlider.addEventListener("input", (e) => {
-  const val = parseFloat(e.target.value);
-  document.documentElement.style.setProperty("--glass-tint-opacity", val);
-  updateTransparencyIcons(val);
+  e.stopPropagation();
+  handleOpacityChange(e.target.value);
 });
+opacitySlider.addEventListener("change", (e) => e.stopPropagation());
 
 btnGlass.addEventListener("click", () => {
   const currentVal = parseFloat(opacitySlider.value);
   if (currentVal >= 0.15) {
     previousOpacity = currentVal;
-    opacitySlider.value = 0;
-    document.documentElement.style.setProperty("--glass-tint-opacity", 0);
+    handleOpacityChange(0);
   } else {
-    opacitySlider.value = previousOpacity || 0.5;
-    document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
+    handleOpacityChange(previousOpacity || 0.5);
   }
-  updateTransparencyIcons(parseFloat(opacitySlider.value));
 });
 
 function updateTransparencyIcons(val) {
@@ -328,19 +353,33 @@ function updateTransparencyIcons(val) {
   }
 }
 
-// Search Toggle
-btnToggleSearch.addEventListener("click", () => {
+// Search Toggle & Outside Click Handler
+btnToggleSearch.addEventListener("click", (e) => {
+  e.stopPropagation();
   const isCollapsed = searchSection.classList.contains("collapsed");
   searchSection.classList.toggle("collapsed");
   btnToggleSearch.classList.toggle("active", isCollapsed);
   if (isCollapsed) {
     searchInput.focus();
   } else {
-    hidePredictions();
+    hideSearchInterface();
   }
 });
 
-// Render iOS Styled Playlist Drawer
+function hideSearchInterface() {
+  hidePredictions();
+  searchResultsContainer.classList.add("hidden");
+  searchSection.classList.add("collapsed");
+  btnToggleSearch.classList.remove("active");
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#search-section") && !e.target.closest("#btn-toggle-search")) {
+    hideSearchInterface();
+  }
+});
+
+// Render iOS Styled Playlist Drawer with Trash Bin Icon
 function renderPlaylist() {
   playlistUl.className = "playlist-items-container";
   playlistUl.innerHTML = "";
@@ -370,10 +409,7 @@ function renderPlaylist() {
         </div>
       </div>
       <button class="btn-delete-track" title="Remove track">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        ${TRASH_BIN_SVG}
       </button>
     `;
 
@@ -387,7 +423,7 @@ function renderPlaylist() {
     // Delete track event
     const deleteBtn = li.querySelector(".btn-delete-track");
     deleteBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevents song from playing when clicking delete
+      e.stopPropagation();
       removeTrackFromPlaylist(i);
     });
 
@@ -395,7 +431,6 @@ function renderPlaylist() {
   });
 }
 
-// Remove Song from Playlist Logic
 function removeTrackFromPlaylist(index) {
   if (index < 0 || index >= playlist.length) return;
 
@@ -524,25 +559,13 @@ if (btnMode) {
   });
 }
 
-volumeSlider.addEventListener("input", (e) => {
-  const val = parseFloat(e.target.value);
-  audio.volume = val;
-  islandVolumeSlider.value = val;
-  updateVolumeIcons(val);
-});
-
 btnVolume.addEventListener("click", () => {
   if (audio.volume > 0) {
     previousVolume = audio.volume;
-    audio.volume = 0;
-    volumeSlider.value = 0;
-    islandVolumeSlider.value = 0;
+    handleVolumeChange(0);
   } else {
-    audio.volume = previousVolume || 0.8;
-    volumeSlider.value = audio.volume;
-    islandVolumeSlider.value = audio.volume;
+    handleVolumeChange(previousVolume || 0.8);
   }
-  updateVolumeIcons(audio.volume);
 });
 
 async function fetchLyrics(lrcUrl) {
@@ -662,14 +685,11 @@ audio.addEventListener("timeupdate", () => {
   }
 });
 
-// Handle Auto-Advance when Track Ends according to playMode
 audio.addEventListener("ended", () => {
   if (playMode === 1) {
-    // Repeat One
     loadTrack(currentIndex);
     playTrack();
   } else if (playMode === 2) {
-    // Shuffle
     let randomIndex = Math.floor(Math.random() * playlist.length);
     if (playlist.length > 1 && randomIndex === currentIndex) {
       randomIndex = (currentIndex + 1) % playlist.length;
@@ -677,7 +697,6 @@ audio.addEventListener("ended", () => {
     loadTrack(randomIndex);
     playTrack();
   } else {
-    // Loop (Next Track)
     btnNext.click();
   }
 });
@@ -731,12 +750,6 @@ function hidePredictions() {
   searchPredictionsContainer.classList.add("hidden");
 }
 
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".search-bar-wrapper")) {
-    hidePredictions();
-  }
-});
-
 btnSearch.addEventListener("click", performSearch);
 searchInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
@@ -758,7 +771,7 @@ async function performSearch() {
   }
 }
 
-// iOS Styled Search Results
+// Search Results Stay Active on Selection
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -791,15 +804,12 @@ function renderSearchResults(results) {
       </button>
     `;
 
-    // Click row or button to add & play song
+    // Click track row to add and play without closing search window
     li.addEventListener("click", () => {
       playlist.push(song);
       renderPlaylist();
       loadTrack(playlist.length - 1);
       playTrack();
-      searchResultsContainer.classList.add("hidden");
-      searchSection.classList.add("collapsed");
-      btnToggleSearch.classList.remove("active");
     });
 
     searchResultsUl.appendChild(li);
