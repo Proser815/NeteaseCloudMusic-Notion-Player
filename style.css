@@ -100,8 +100,20 @@ html, body {
 .island-ctrl-btn { background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s; }
 .island-ctrl-btn:hover { opacity: 1; }
 .island-ctrl-btn svg { width: 18px; height: 18px; fill: currentColor; }
-.island-volume-container { display: flex; align-items: center; gap: 6px; }
-.island-volume-container input[type="range"] { width: 55px; accent-color: #fff; cursor: pointer; }
+
+/* Dynamic Island Volume always collapsed unless hovered */
+.island-volume-container { display: flex; align-items: center; position: relative; }
+.island-volume-container .slider-popup {
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+}
+.island-volume-container:hover .slider-popup {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.island-volume-container input[type="range"] { width: 65px; accent-color: #fff; cursor: pointer; }
 
 /* Main Player Card */
 .player-card {
@@ -161,6 +173,23 @@ html, body {
 .prediction-item { padding: 8px 12px; font-size: 0.8rem; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .prediction-item:hover { background: rgba(255,255,255,0.15); }
 
+.search-results {
+  position: absolute;
+  top: 42px;
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  background: rgba(25, 25, 25, 0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  z-index: 30;
+  list-style: none;
+  margin-top: 4px;
+  padding: 4px;
+}
+.search-results.hidden { display: none; }
+
 /* Larger Album Art Section */
 .album-art-container { display: flex; justify-content: center; align-items: center; margin: 4px 0; }
 .cover-wrapper {
@@ -179,7 +208,8 @@ html, body {
 #artist { font-size: 0.8rem; color: rgba(255,255,255,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Lyrics Marquee Display */
-.lyrics-container { height: 26px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.lyrics-container { height: 26px; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: opacity 0.2s ease; }
+.lyrics-container.hidden { display: none; }
 .marquee-wrapper { width: 100%; text-align: center; overflow: hidden; }
 #lyric-text { font-size: 0.84rem; font-weight: 500; color: rgba(255,255,255,0.85); white-space: nowrap; }
 
@@ -192,7 +222,7 @@ html, body {
 /* Main Controls */
 .controls-main { display: flex; align-items: center; justify-content: space-around; padding: 2px 8px; }
 .btn-ctrl { background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.75; transition: 0.2s; }
-.btn-ctrl:hover { opacity: 1; transform: scale(1.05); }
+.btn-ctrl:hover, .btn-ctrl.active { opacity: 1; transform: scale(1.05); }
 .btn-ctrl svg { width: 20px; height: 20px; fill: currentColor; }
 .btn-play-main { width: 44px; height: 44px; background: #ffffff; color: #000; border-radius: 50%; opacity: 1; box-shadow: 0 6px 16px rgba(255,255,255,0.25); }
 .btn-play-main svg { width: 22px; height: 22px; }

@@ -25,7 +25,10 @@ const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
 const btnIsland = document.getElementById("btn-island");
 
+const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
+const btnLyrics = document.getElementById("btn-lyrics");
+
 const currentTimeEl = document.getElementById("current-time");
 const durationTimeEl = document.getElementById("duration-time");
 const progressBarBg = document.getElementById("progress-bar-bg");
@@ -50,6 +53,11 @@ const volumeSlider = document.getElementById("volume-slider");
 const volLowIcon = document.getElementById("vol-low-icon");
 const volHighIcon = document.getElementById("vol-high-icon");
 const muteIcon = document.getElementById("mute-icon");
+
+const islandBtnVolume = document.getElementById("island-btn-volume");
+const islandVolLowIcon = document.getElementById("island-vol-low-icon");
+const islandVolHighIcon = document.getElementById("island-vol-high-icon");
+const islandMuteIcon = document.getElementById("island-mute-icon");
 
 const opacitySlider = document.getElementById("opacity-slider");
 const btnList = document.getElementById("btn-list");
@@ -196,6 +204,12 @@ audio.addEventListener("ended", () => {
   }
 });
 
+// Lyrics Toggle
+btnLyrics.addEventListener("click", () => {
+  lyricsContainer.classList.toggle("hidden");
+  btnLyrics.classList.toggle("active");
+});
+
 // Time & Progress Updates
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration || isDraggingProgress) return;
@@ -248,18 +262,23 @@ function applyVolume(val) {
   audio.volume = val;
   volumeSlider.value = val;
   islandVolumeSlider.value = val;
+  
+  volLowIcon.classList.add("hidden");
+  volHighIcon.classList.add("hidden");
+  muteIcon.classList.add("hidden");
+  islandVolLowIcon.classList.add("hidden");
+  islandVolHighIcon.classList.add("hidden");
+  islandMuteIcon.classList.add("hidden");
+
   if (val == 0) {
     muteIcon.classList.remove("hidden");
-    volLowIcon.classList.add("hidden");
-    volHighIcon.classList.add("hidden");
+    islandMuteIcon.classList.remove("hidden");
   } else if (val < 0.5) {
     volLowIcon.classList.remove("hidden");
-    volHighIcon.classList.add("hidden");
-    muteIcon.classList.add("hidden");
+    islandVolLowIcon.classList.remove("hidden");
   } else {
     volHighIcon.classList.remove("hidden");
-    volLowIcon.classList.add("hidden");
-    muteIcon.classList.add("hidden");
+    islandVolHighIcon.classList.remove("hidden");
   }
 }
 
@@ -267,6 +286,15 @@ volumeSlider.addEventListener("input", (e) => applyVolume(e.target.value));
 islandVolumeSlider.addEventListener("input", (e) => applyVolume(e.target.value));
 
 btnVolume.addEventListener("click", () => {
+  if (audio.volume > 0) {
+    previousVolume = audio.volume;
+    applyVolume(0);
+  } else {
+    applyVolume(previousVolume || 0.8);
+  }
+});
+
+islandBtnVolume.addEventListener("click", () => {
   if (audio.volume > 0) {
     previousVolume = audio.volume;
     applyVolume(0);
@@ -341,7 +369,7 @@ function updateActivePlaylistRow() {
   });
 }
 
-// Fully Working Search & Predictions Filter
+// Fully Working Search, Predictions & Autofill
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
   btnToggleSearch.classList.toggle("active");
@@ -356,7 +384,6 @@ btnToggleSearch.addEventListener("click", () => {
 searchInput.addEventListener("input", (e) => {
   const query = e.target.value.toLowerCase().trim();
   predictionsUl.innerHTML = "";
-  searchResultsUl.innerHTML = "";
 
   if (!query) {
     searchPredictions.classList.add("hidden");
@@ -377,6 +404,7 @@ searchInput.addEventListener("input", (e) => {
         loadTrack(realIdx);
         playTrack();
         searchPredictions.classList.add("hidden");
+        searchResults.classList.add("hidden");
         searchSection.classList.add("collapsed");
         btnToggleSearch.classList.remove("active");
         searchInput.value = "";
