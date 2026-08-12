@@ -4,7 +4,7 @@ const API_BASE = `https://api.i-meto.com/meting/api?server=netease&type=playlist
 let playlist = [];
 let currentIndex = 0;
 let lyrics = [];
-let playMode = 0; // 0: Loop, 1: Repeat One, 2: Shuffle
+let playMode = 0; // 0: Loop, 1: One, 2: Shuffle
 let isDraggingProgress = false;
 let previousVolume = 0.8;
 
@@ -19,10 +19,10 @@ const artist = document.getElementById("artist");
 const dynamicIsland = document.getElementById("dynamic-island");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
+const islandArtist = document.getElementById("island-artist");
 const islandHoverCover = document.getElementById("island-hover-cover");
 const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
-const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
 
 const lyricText = document.getElementById("lyric-text");
@@ -56,14 +56,21 @@ const btnList = document.getElementById("btn-list");
 const playlistDrawer = document.getElementById("playlist-drawer");
 const btnClosePlaylist = document.getElementById("btn-close-playlist");
 const playlistUl = document.getElementById("playlist-ul");
-const btnSearchToggle = document.getElementById("btn-search-toggle");
+
+const btnToggleSearch = document.getElementById("btn-toggle-search");
 const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
-const searchSubmit = document.getElementById("search-submit");
-const searchResultsContainer = document.getElementById("search-results-container");
+const searchPredictions = document.getElementById("search-predictions");
+const predictionsUl = document.getElementById("predictions-ul");
+const searchResults = document.getElementById("search-results");
 const searchResultsUl = document.getElementById("search-results-ul");
 
-// Initialize Player Data
+const btnInfo = document.getElementById("btn-info");
+const infoDrawer = document.getElementById("info-drawer");
+const btnCloseInfo = document.getElementById("btn-close-info");
+const metaAlbum = document.getElementById("meta-album");
+
+// Load Playlist Data
 fetch(API_BASE)
   .then(res => res.json())
   .then(data => {
@@ -89,9 +96,11 @@ function loadTrack(index) {
 
   islandCover.src = track.pic;
   islandTitle.innerText = track.title;
+  islandArtist.innerText = track.author;
   islandHoverCover.src = track.pic;
   islandHoverTitle.innerText = track.title;
   islandHoverArtist.innerText = track.author;
+  metaAlbum.innerText = track.album || "Single";
 
   fetchLyrics(track.lrc);
   updateActivePlaylistRow();
@@ -99,18 +108,18 @@ function loadTrack(index) {
 
 function fetchLyrics(lrcUrl) {
   if (!lrcUrl) {
-    setLyricText("No lyrics available");
+    lyricText.innerText = "No lyrics available";
     return;
   }
   fetch(lrcUrl)
     .then(res => res.text())
     .then(data => {
       lyrics = parseLRC(data);
-      if (lyrics.length === 0) setLyricText("Instrumental / No lyrics");
+      if (lyrics.length === 0) lyricText.innerText = "Instrumental / No lyrics";
     })
     .catch(() => {
       lyrics = [];
-      setLyricText("Lyrics unavailable");
+      lyricText.innerText = "Lyrics unavailable";
     });
 }
 
@@ -133,17 +142,9 @@ function parseLRC(lrcString) {
   return result.sort((a, b) => a.time - b.time);
 }
 
-function setLyricText(text) {
-  lyricText.innerText = text;
-  islandLyricText.innerText = text;
-}
-
 function togglePlay() {
-  if (audio.paused) {
-    playTrack();
-  } else {
-    pauseTrack();
-  }
+  if (audio.paused) playTrack();
+  else pauseTrack();
 }
 
 function playTrack() {
@@ -165,7 +166,6 @@ function pauseTrack() {
 
 btnPlay.addEventListener("click", togglePlay);
 islandBtnPlay.addEventListener("click", togglePlay);
-
 btnPrev.addEventListener("click", () => handlePrevTrack());
 islandBtnPrev.addEventListener("click", () => handlePrevTrack());
 btnNext.addEventListener("click", () => handleNextTrack());
@@ -206,9 +206,7 @@ audio.addEventListener("timeupdate", () => {
 
   if (lyrics.length > 0) {
     let currentLine = lyrics.filter(l => l.time <= curTime).pop();
-    if (currentLine) {
-      setLyricText(currentLine.text);
-    }
+    if (currentLine) lyricText.innerText = currentLine.text;
   }
 });
 
@@ -245,7 +243,7 @@ window.addEventListener("mouseup", (e) => {
   }
 });
 
-// Volume & Opacity Sliders
+// Volume & Opacity Handling
 function applyVolume(val) {
   audio.volume = val;
   volumeSlider.value = val;
@@ -281,33 +279,36 @@ opacitySlider.addEventListener("input", (e) => {
   document.documentElement.style.setProperty("--glass-tint-opacity", e.target.value);
 });
 
-// Dynamic Island Toggle Modes
+// Dynamic Island Modes
 btnIsland.addEventListener("click", () => {
   playerCard.classList.add("hidden");
   dynamicIsland.classList.remove("hidden");
 });
 
 dynamicIsland.addEventListener("click", (e) => {
-  if (e.target.closest(".island-controls") || e.target.closest(".island-right-controls")) return;
+  if (e.target.closest(".island-action-buttons")) return;
   dynamicIsland.classList.add("hidden");
   playerCard.classList.remove("hidden");
 });
 
 // Loop Modes
 const modeIcons = [
-  '<svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>',
   '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>',
-  '<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>'
+  '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>',
+  '<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>'
 ];
-
+let modeIndex = 0;
 btnMode.addEventListener("click", () => {
-  playMode = (playMode + 1) % 3;
-  btnMode.innerHTML = modeIcons[playMode];
+  modeIndex = (modeIndex + 1) % 3;
+  playMode = modeIndex;
+  btnMode.innerHTML = modeIcons[modeIndex];
 });
 
-// Playlist Drawer Handling
+// Drawers
 btnList.addEventListener("click", () => playlistDrawer.classList.toggle("collapsed"));
 btnClosePlaylist.addEventListener("click", () => playlistDrawer.classList.add("collapsed"));
+btnInfo.addEventListener("click", () => infoDrawer.classList.toggle("collapsed"));
+btnCloseInfo.addEventListener("click", () => infoDrawer.classList.add("collapsed"));
 
 function renderPlaylist() {
   playlistUl.innerHTML = "";
@@ -326,6 +327,7 @@ function renderPlaylist() {
     li.addEventListener("click", () => {
       loadTrack(idx);
       playTrack();
+      playlistDrawer.classList.add("collapsed");
     });
     playlistUl.appendChild(li);
   });
@@ -339,45 +341,84 @@ function updateActivePlaylistRow() {
   });
 }
 
-// Playlist Search Filtering
-btnSearchToggle.addEventListener("click", () => {
+// Fully Working Search & Predictions Filter
+btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
-  btnSearchToggle.classList.toggle("active");
+  btnToggleSearch.classList.toggle("active");
+  if (!searchSection.classList.contains("collapsed")) {
+    searchInput.focus();
+  } else {
+    searchPredictions.classList.add("hidden");
+    searchResults.classList.add("hidden");
+  }
 });
 
 searchInput.addEventListener("input", (e) => {
   const query = e.target.value.toLowerCase().trim();
+  predictionsUl.innerHTML = "";
   searchResultsUl.innerHTML = "";
+
   if (!query) {
-    searchResultsContainer.classList.add("hidden");
+    searchPredictions.classList.add("hidden");
+    searchResults.classList.add("hidden");
     return;
   }
+
   const filtered = playlist.filter(s => s.title.toLowerCase().includes(query) || s.author.toLowerCase().includes(query));
-  if (filtered.length === 0) {
-    searchResultsContainer.classList.add("hidden");
-    return;
-  }
-  searchResultsContainer.classList.remove("hidden");
-  filtered.forEach(song => {
-    const realIdx = playlist.indexOf(song);
-    const li = document.createElement("li");
-    li.className = "track-item-row";
-    li.innerHTML = `
-      <div class="item-left">
-        <img class="item-cover" src="${song.pic}" alt="Cover">
-        <div class="item-meta">
-          <span class="item-title">${song.title}</span>
-          <span class="item-artist">${song.author}</span>
-        </div>
-      </div>
-    `;
-    li.addEventListener("click", () => {
-      loadTrack(realIdx);
-      playTrack();
-      searchResultsContainer.classList.add("hidden");
-      searchSection.classList.add("collapsed");
-      btnSearchToggle.classList.remove("active");
+
+  if (filtered.length > 0) {
+    searchPredictions.classList.remove("hidden");
+    filtered.slice(0, 5).forEach(song => {
+      const realIdx = playlist.indexOf(song);
+      const li = document.createElement("li");
+      li.className = "prediction-item";
+      li.innerText = `${song.title} — ${song.author}`;
+      li.addEventListener("click", () => {
+        loadTrack(realIdx);
+        playTrack();
+        searchPredictions.classList.add("hidden");
+        searchSection.classList.add("collapsed");
+        btnToggleSearch.classList.remove("active");
+        searchInput.value = "";
+      });
+      predictionsUl.appendChild(li);
     });
-    searchResultsUl.appendChild(li);
-  });
+  } else {
+    searchPredictions.classList.add("hidden");
+  }
+});
+
+document.getElementById("btn-search").addEventListener("click", () => {
+  const query = searchInput.value.toLowerCase().trim();
+  if (!query) return;
+  searchResultsUl.innerHTML = "";
+  const filtered = playlist.filter(s => s.title.toLowerCase().includes(query) || s.author.toLowerCase().includes(query));
+  
+  if (filtered.length > 0) {
+    searchResults.classList.remove("hidden");
+    searchPredictions.classList.add("hidden");
+    filtered.forEach(song => {
+      const realIdx = playlist.indexOf(song);
+      const li = document.createElement("li");
+      li.className = "track-item-row";
+      li.innerHTML = `
+        <div class="item-left">
+          <img class="item-cover" src="${song.pic}" alt="Cover">
+          <div class="item-meta">
+            <span class="item-title">${song.title}</span>
+            <span class="item-artist">${song.author}</span>
+          </div>
+        </div>
+      `;
+      li.addEventListener("click", () => {
+        loadTrack(realIdx);
+        playTrack();
+        searchResults.classList.add("hidden");
+        searchSection.classList.add("collapsed");
+        btnToggleSearch.classList.remove("active");
+        searchInput.value = "";
+      });
+      searchResultsUl.appendChild(li);
+    });
+  }
 });
