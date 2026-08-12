@@ -148,15 +148,38 @@ function animateBars() {
 }
 
 async function initPlayer() {
-  audio.volume = 0.8;
-  updateVolumeIcons(0.8);
+  if (audio) {
+    audio.volume = 0.8;
+    updateVolumeIcons(0.8);
+  }
+  
   try {
     const res = await fetch(API_BASE);
-    playlist = await res.json();
-    renderPlaylist();
-    if (playlist.length > 0) loadTrack(0);
+    if (!res.ok) throw new Error("API network response was not ok");
+    const data = await res.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
+      playlist = data;
+    } else {
+      throw new Error("Invalid playlist format returned from API");
+    }
   } catch (err) {
-    title.innerText = "Error Loading Playlist";
+    console.warn("API load failed, using fallback track:", err);
+    // Fallback sample track if API is blocked or offline
+    playlist = [
+      {
+        title: "Probably Up",
+        author: "Lawrence",
+        url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        pic: "https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg",
+        lrc: ""
+      }
+    ];
+  }
+
+  renderPlaylist();
+  if (playlist.length > 0) {
+    loadTrack(0);
   }
 }
 
@@ -768,4 +791,7 @@ function extractDominantColor(imageUrl) {
   };
 }
 
-initPlayer();
+// Safely launch player when page elements are fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  initPlayer();
+});
