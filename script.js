@@ -96,11 +96,12 @@ function toggleDrawer(drawer, button) {
   }
 }
 
-// Smooth Lyric Expansion Toggle
+// Smooth Lyric Expansion Toggle & Island Height Recalculation
 btnLyrics.addEventListener("click", (e) => {
   e.stopPropagation();
-  btnLyrics.classList.toggle("active");
-  islandMarqueeContainer.classList.toggle("collapsed-lyric");
+  const isActive = btnLyrics.classList.toggle("active");
+  islandMarqueeContainer.classList.toggle("collapsed-lyric", !isActive);
+  dynamicIsland.classList.toggle("lyrics-hidden", !isActive);
 });
 
 // Equalizer Visualizer
@@ -165,12 +166,16 @@ function loadTrack(index) {
   const song = playlist[currentIndex];
 
   audio.src = song.url;
-  islandCover.src = song.pic || "";
-  islandHoverCover.src = song.pic || "";
-  islandTitle.innerText = song.title || "Unknown Title";
-  islandHoverTitle.innerText = song.title || "Unknown Title";
-  islandArtist.innerText = song.author || "Unknown Artist";
-  islandHoverArtist.innerText = song.author || "Unknown Artist";
+  islandCover.src = song.pic || song.cover || "";
+  islandHoverCover.src = song.pic || song.cover || "";
+  
+  const title = song.title || song.name || "Unknown Title";
+  const artist = song.author || song.artist || "Unknown Artist";
+
+  islandTitle.innerText = title;
+  islandHoverTitle.innerText = title;
+  islandArtist.innerText = artist;
+  islandHoverArtist.innerText = artist;
 
   fetchLyrics(song.lrc);
   renderPlaylist();
@@ -380,8 +385,11 @@ function renderPlaylist() {
   playlist.forEach((song, i) => {
     const li = document.createElement("li");
     li.className = `playlist-item-ios ${i === currentIndex ? "active" : ""}`;
+    const songName = song.title || song.name || "Unknown";
+    const songArtist = song.author || song.artist || "Unknown";
+
     li.innerHTML = `
-      <span>${song.title} - ${song.author}</span>
+      <span>${songName} - ${songArtist}</span>
       <button class="btn-remove" title="Remove" style="background:none;border:none;color:#ff3b30;cursor:pointer;">${TRASH_BIN_SVG}</button>
     `;
 
@@ -423,7 +431,8 @@ searchInput.addEventListener("input", (e) => {
 
 async function fetchSearchPredictions(query) {
   try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(query)}`);
+    // Meting API requires type=search and id=QUERY
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const data = await res.json();
     
     if (Array.isArray(data) && data.length > 0) {
@@ -441,11 +450,13 @@ function renderSearchPredictions(suggestions) {
   suggestions.forEach((item) => {
     const li = document.createElement("li");
     li.className = "playlist-item-ios";
-    li.innerText = `${item.title} - ${item.author || item.artist || "Unknown"}`;
+    const title = item.title || item.name || "Unknown";
+    const artist = item.author || item.artist || "Unknown";
+    li.innerText = `${title} - ${artist}`;
     
     li.addEventListener("click", (e) => {
       e.stopPropagation();
-      searchInput.value = item.title;
+      searchInput.value = title;
       searchPredictionsContainer.classList.add("hidden");
       addSongToPlaylist(item);
     });
@@ -477,11 +488,12 @@ async function performSearch() {
   searchResultsContainer.classList.remove("hidden");
 
   try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(q)}`);
+    // Meting API requires type=search and id=QUERY
+    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(q)}`);
     const results = await res.json();
 
     searchResultsUl.innerHTML = "";
-    if (!results || !results.length) {
+    if (!Array.isArray(results) || !results.length) {
       searchResultsUl.innerHTML = "<li class='playlist-item-ios'>No songs found</li>";
       return;
     }
@@ -489,7 +501,10 @@ async function performSearch() {
     results.slice(0, 8).forEach((song) => {
       const li = document.createElement("li");
       li.className = "playlist-item-ios";
-      li.innerText = `${song.title} - ${song.author || song.artist || "Unknown"}`;
+      const title = song.title || song.name || "Unknown";
+      const artist = song.author || song.artist || "Unknown";
+      li.innerText = `${title} - ${artist}`;
+      
       li.addEventListener("click", (e) => {
         e.stopPropagation();
         addSongToPlaylist(song);
