@@ -19,6 +19,8 @@ const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="11" height="11" fill="non
 
 // DOM Elements
 const audio = document.getElementById("audio-player");
+const dynamicIsland = document.getElementById("dynamic-island");
+
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
 const islandArtist = document.getElementById("island-artist");
@@ -54,12 +56,12 @@ const progressBarFill = document.getElementById("progress-bar-fill");
 const currentTimeEl = document.getElementById("current-time");
 const durationTimeEl = document.getElementById("duration-time");
 
-// Drawers & Search
+// Drawers & Search Elements
 const btnToggleSearch = document.getElementById("btn-toggle-search");
 const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
 const btnSearch = document.getElementById("btn-search");
-const searchPredictionsUl = document.getElementById("predictions-ul");
+const predictionsUl = document.getElementById("predictions-ul");
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const searchResultsUl = document.getElementById("search-results-ul");
 const searchResultsContainer = document.getElementById("search-results");
@@ -78,6 +80,7 @@ function closeAllDrawers() {
   [btnToggleSearch, btnList].forEach(b => {
     if (b) b.classList.remove("active");
   });
+  dynamicIsland.classList.remove("search-active");
 }
 
 function toggleDrawer(drawer, button) {
@@ -86,17 +89,21 @@ function toggleDrawer(drawer, button) {
   if (isCollapsed) {
     drawer.classList.remove("collapsed");
     button.classList.add("active");
+    if (drawer === searchSection) {
+      dynamicIsland.classList.add("search-active");
+      searchInput.focus();
+    }
   }
 }
 
-// Toggle lyrics row visibility directly
+// Smooth Lyric Expansion Toggle
 btnLyrics.addEventListener("click", (e) => {
   e.stopPropagation();
   btnLyrics.classList.toggle("active");
-  islandMarqueeContainer.classList.toggle("hidden");
+  islandMarqueeContainer.classList.toggle("collapsed-lyric");
 });
 
-// Audio Visualizer
+// Equalizer Visualizer
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -131,7 +138,7 @@ function animateBars() {
   animationFrameId = requestAnimationFrame(animateBars);
 }
 
-// App Initialization
+// Initialize Application
 async function initPlayer() {
   handleVolumeChange(0.8);
   handleOpacityChange(0.85);
@@ -151,7 +158,7 @@ btnToggleSearch.addEventListener("click", (e) => { e.stopPropagation(); toggleDr
 btnList.addEventListener("click", (e) => { e.stopPropagation(); toggleDrawer(playlistDrawer, btnList); });
 btnClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); closeAllDrawers(); });
 
-// Track Loading
+// Track Player Controls
 function loadTrack(index) {
   if (index < 0 || index >= playlist.length) return;
   currentIndex = index;
@@ -206,7 +213,7 @@ islandBtnNext.addEventListener("click", (e) => {
   playTrack();
 });
 
-// Mode Toggle
+// Mode Controls
 islandBtnMode.addEventListener("click", (e) => {
   e.stopPropagation();
   playMode = (playMode + 1) % 3;
@@ -219,7 +226,7 @@ function syncPlayModeUI() {
   islandModeShuffle.classList.toggle("hidden", playMode !== 2);
 }
 
-// Audio Progress Listener
+// Progress Tracker
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   const pct = (audio.currentTime / audio.duration) * 100;
@@ -258,7 +265,7 @@ function formatTime(sec) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-// Lyrics Fetcher
+// Lyrics Parser
 async function fetchLyrics(lrcUrl) {
   lyrics = [];
   islandLyricText.innerText = "No lyrics found";
@@ -302,7 +309,7 @@ function updateCurrentLyric(currentTime) {
   if (activeLyric) islandLyricText.innerText = activeLyric;
 }
 
-// Volume Slider
+// Volume Controls
 function handleVolumeChange(val) {
   const parsed = parseFloat(val);
   audio.volume = parsed;
@@ -398,7 +405,7 @@ function renderPlaylist() {
   });
 }
 
-// Restored Original Search & Autocomplete Logic
+// Live Autocomplete Predict & Search Functions
 searchInput.addEventListener("input", (e) => {
   const query = e.target.value.trim();
   clearTimeout(debounceTimer);
@@ -411,7 +418,7 @@ searchInput.addEventListener("input", (e) => {
 
   debounceTimer = setTimeout(() => {
     fetchSearchPredictions(query);
-  }, 300);
+  }, 250);
 });
 
 async function fetchSearchPredictions(query) {
@@ -430,11 +437,11 @@ async function fetchSearchPredictions(query) {
 }
 
 function renderSearchPredictions(suggestions) {
-  searchPredictionsUl.innerHTML = "";
+  predictionsUl.innerHTML = "";
   suggestions.forEach((item) => {
     const li = document.createElement("li");
     li.className = "playlist-item-ios";
-    li.innerText = `${item.title} - ${item.author}`;
+    li.innerText = `${item.title} - ${item.author || item.artist || "Unknown"}`;
     
     li.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -443,8 +450,9 @@ function renderSearchPredictions(suggestions) {
       addSongToPlaylist(item);
     });
 
-    searchPredictionsUl.appendChild(li);
+    predictionsUl.appendChild(li);
   });
+  searchResultsContainer.classList.add("hidden");
   searchPredictionsContainer.classList.remove("hidden");
 }
 
@@ -478,10 +486,10 @@ async function performSearch() {
       return;
     }
 
-    results.slice(0, 6).forEach((song) => {
+    results.slice(0, 8).forEach((song) => {
       const li = document.createElement("li");
       li.className = "playlist-item-ios";
-      li.innerText = `${song.title} - ${song.author}`;
+      li.innerText = `${song.title} - ${song.author || song.artist || "Unknown"}`;
       li.addEventListener("click", (e) => {
         e.stopPropagation();
         addSongToPlaylist(song);
@@ -500,6 +508,7 @@ function addSongToPlaylist(song) {
   playTrack();
   closeAllDrawers();
   searchResultsContainer.classList.add("hidden");
+  searchPredictionsContainer.classList.add("hidden");
   searchInput.value = "";
 }
 

@@ -9,7 +9,7 @@
 
 :root {
   --glass-tint-opacity: 0.85;
-  --ios-spring: cubic-bezier(0.25, 1, 0.5, 1);
+  --ios-spring: cubic-bezier(0.25, 1, 0.4, 1.1);
 }
 
 html, body {
@@ -130,13 +130,19 @@ html, body {
   border-radius: 1px;
 }
 
-/* Expanded/Hovered Compact Dimensions */
+/* Expanded/Hovered Default State */
 .dynamic-island:hover, 
 .dynamic-island.expanded {
   width: 360px !important;
   height: 155px !important;
   border-radius: 32px;
   padding: 0;
+}
+
+/* Auto Expansion for Larger Search Panel */
+.dynamic-island:hover.search-active,
+.dynamic-island.expanded.search-active {
+  height: 230px !important;
 }
 
 .dynamic-island:hover .island-collapsed-content,
@@ -168,7 +174,7 @@ html, body {
   transform: scale(1);
 }
 
-/* Compact Top Bar */
+/* Top Navigation Bar */
 .island-top-bar {
   display: flex;
   align-items: center;
@@ -247,28 +253,28 @@ html, body {
   fill: #ffffff;
 }
 
-/* Compact Island Drawers */
+/* Larger Drawers Inside Island */
 .island-drawer {
   position: absolute;
   top: 46px;
   left: 8px;
   right: 8px;
-  bottom: 44px;
+  height: 135px;
   background: rgba(15, 15, 15, 0.95);
   backdrop-filter: blur(20px);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 8px;
-  z-index: 10;
+  z-index: 20;
   overflow-y: auto;
-  transition: opacity 0.2s ease, transform 0.2s var(--ios-spring);
+  transition: opacity 0.25s ease, transform 0.25s var(--ios-spring);
   display: flex;
   flex-direction: column;
 }
 
 .island-drawer.collapsed {
   opacity: 0;
-  transform: translateY(-6px) scale(0.96);
+  transform: translateY(-8px) scale(0.95);
   pointer-events: none;
 }
 
@@ -294,12 +300,13 @@ html, body {
   cursor: pointer;
 }
 
-/* Search Area */
+/* Expanded Search Styling */
 .search-bar {
   display: flex;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  padding: 2px 4px;
+  padding: 3px 6px;
+  flex-shrink: 0;
 }
 
 #search-input {
@@ -308,13 +315,13 @@ html, body {
   border: none;
   padding: 2px 4px;
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   outline: none;
 }
 
 .search-predictions, .search-results {
-  margin-top: 4px;
-  max-height: 100px;
+  margin-top: 6px;
+  flex: 1;
   overflow-y: auto;
 }
 
@@ -326,16 +333,17 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 6px;
-  margin-bottom: 3px;
+  padding: 5px 8px;
+  margin-bottom: 4px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.05);
   font-size: 0.7rem;
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
 .playlist-item-ios:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .playlist-item-ios.active {
@@ -343,14 +351,28 @@ html, body {
   font-weight: 600;
 }
 
-/* Toggleable Marquee Lyric Container */
+/* Smooth Lyric Expansion Animation */
 .island-marquee-container {
   width: 100%;
   overflow: hidden;
-  margin: 2px 0;
   display: flex;
   align-items: center;
-  height: 16px;
+  max-height: 20px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.25s ease, 
+              margin 0.3s ease, 
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 3px 0;
+}
+
+.island-marquee-container.collapsed-lyric {
+  max-height: 0px;
+  opacity: 0;
+  margin: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
 }
 
 .island-marquee-inner {
@@ -363,7 +385,7 @@ html, body {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Compact Progress Section */
+/* Progress Section */
 .island-progress-section {
   display: flex;
   align-items: center;
@@ -389,7 +411,7 @@ html, body {
   border-radius: 2px;
 }
 
-/* Bottom Action Controls */
+/* Bottom Action Bar */
 .island-action-buttons {
   display: flex;
   align-items: center;
