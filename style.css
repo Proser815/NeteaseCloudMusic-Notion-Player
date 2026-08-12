@@ -201,22 +201,35 @@ html, body {
   fill: currentColor;
 }
 
+/* Dynamic Island Volume - Hidden by default, expands on hover */
 .island-volume-container {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  position: relative;
 }
 
 #island-volume-slider {
-  width: 45px;
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
   accent-color: #fff;
   height: 3px;
+  transition: width 0.3s var(--ios-spring), opacity 0.25s ease, margin 0.25s ease;
+  margin-left: 0;
+}
+
+.island-volume-container:hover #island-volume-slider {
+  width: 50px;
+  opacity: 1;
+  pointer-events: auto;
+  margin-left: 4px;
 }
 
 .player-card {
   position: relative;
   width: 320px;
-  height: 520px;
+  height: 560px; /* Slightly taller for cleaner vertical breathing room */
   background: rgba(20, 20, 20, var(--glass-tint-opacity));
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -258,7 +271,7 @@ html, body {
 }
 
 .player-content {
-  padding: 18px;
+  padding: 20px 18px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -270,7 +283,7 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 12px; /* Wider vertical space */
 }
 
 .top-actions-right {
@@ -468,11 +481,12 @@ html, body {
   background: rgba(255, 255, 255, 0.12);
 }
 
+/* Album Cover Spacing */
 .cover-wrapper {
   position: relative;
   width: 165px;
   height: 165px;
-  margin: 6px auto 10px auto;
+  margin: 12px auto 18px auto; /* Wider vertical margin */
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
@@ -507,7 +521,7 @@ html, body {
   border-radius: 50%;
   width: 130px;
   height: 130px;
-  margin: 10px auto;
+  margin: 14px auto;
 }
 
 #standby-title {
@@ -521,9 +535,10 @@ html, body {
   opacity: 0.6;
 }
 
+/* Track Info Spacing */
 .track-info {
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 12px; /* Increased bottom spacing */
 }
 
 .title-row {
@@ -545,7 +560,7 @@ html, body {
 #artist {
   font-size: 0.78rem;
   opacity: 0.7;
-  margin-top: 1px;
+  margin-top: 4px; /* Slightly increased gap between title and artist */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -566,10 +581,10 @@ html, body {
   transition: height 0.1s ease;
 }
 
-/* Reduced Lyric Space */
+/* Lyric Container Spacing */
 .lyrics-container {
-  height: 20px;
-  margin: 2px 0 6px 0;
+  height: 22px;
+  margin: 6px 0 12px 0; /* Clean vertical margin */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -597,8 +612,9 @@ html, body {
   transition: transform 0.3s ease;
 }
 
+/* Progress Section Spacing */
 .progress-section {
-  margin-bottom: 10px;
+  margin-bottom: 16px; /* Wider vertical gap before controls */
 }
 
 .progress-bar-bg {
@@ -624,14 +640,15 @@ html, body {
   justify-content: space-between;
   font-size: 0.68rem;
   opacity: 0.6;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
+/* Main Controls Spacing */
 .controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 16px; /* Wider vertical gap before bottom bar */
 }
 
 .btn-ctrl {
@@ -669,12 +686,13 @@ html, body {
   height: 20px;
 }
 
+/* Bottom Action Bar */
 .bottom-action-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 8px;
+  padding-top: 12px;
   margin-top: auto;
 }
 
