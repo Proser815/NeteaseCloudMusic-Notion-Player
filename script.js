@@ -7,7 +7,7 @@ let lyrics = [];
 let playMode = 0;
 let isDraggingProgress = false;
 let previousVolume = 0.8;
-let previousOpacity = 0.6;
+let previousOpacity = 0.5;
 let debounceTimer = null;
 
 let audioCtx;
@@ -222,18 +222,7 @@ islandVolumeSlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   audio.volume = val;
   volumeSlider.value = val;
-  if (val > 0) {
-    previousVolume = val;
-    islandVolIcon.classList.remove("hidden");
-    islandMuteIcon.classList.add("hidden");
-    volIcon.classList.remove("hidden");
-    muteIcon.classList.add("hidden");
-  } else {
-    islandVolIcon.classList.add("hidden");
-    islandMuteIcon.classList.remove("hidden");
-    volIcon.classList.add("hidden");
-    muteIcon.classList.remove("hidden");
-  }
+  updateVolumeIcons(val);
 });
 
 islandBtnVolume.addEventListener("click", (e) => {
@@ -243,20 +232,27 @@ islandBtnVolume.addEventListener("click", (e) => {
     audio.volume = 0;
     volumeSlider.value = 0;
     islandVolumeSlider.value = 0;
-    islandVolIcon.classList.add("hidden");
-    islandMuteIcon.classList.remove("hidden");
-    volIcon.classList.add("hidden");
-    muteIcon.classList.remove("hidden");
   } else {
     audio.volume = previousVolume || 0.8;
     volumeSlider.value = audio.volume;
     islandVolumeSlider.value = audio.volume;
-    islandVolIcon.classList.remove("hidden");
-    islandMuteIcon.classList.add("hidden");
+  }
+  updateVolumeIcons(audio.volume);
+});
+
+function updateVolumeIcons(val) {
+  if (val > 0) {
     volIcon.classList.remove("hidden");
     muteIcon.classList.add("hidden");
+    islandVolIcon.classList.remove("hidden");
+    islandMuteIcon.classList.add("hidden");
+  } else {
+    volIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+    islandVolIcon.classList.add("hidden");
+    islandMuteIcon.classList.remove("hidden");
   }
-});
+}
 
 function syncPlayModeUI() {
   islandModeLoop.classList.toggle("hidden", playMode !== 0);
@@ -276,13 +272,7 @@ btnLyrics.addEventListener("click", () => {
 opacitySlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
-  if (val < 0.15) {
-    glassIcon.classList.add("hidden");
-    glassOffIcon.classList.remove("hidden");
-  } else {
-    glassIcon.classList.remove("hidden");
-    glassOffIcon.classList.add("hidden");
-  }
+  updateTransparencyIcons(val);
 });
 
 btnGlass.addEventListener("click", () => {
@@ -291,15 +281,22 @@ btnGlass.addEventListener("click", () => {
     previousOpacity = currentVal;
     opacitySlider.value = 0;
     document.documentElement.style.setProperty("--glass-tint-opacity", 0);
+  } else {
+    opacitySlider.value = previousOpacity || 0.5;
+    document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
+  }
+  updateTransparencyIcons(parseFloat(opacitySlider.value));
+});
+
+function updateTransparencyIcons(val) {
+  if (val < 0.15) {
     glassIcon.classList.add("hidden");
     glassOffIcon.classList.remove("hidden");
   } else {
-    opacitySlider.value = previousOpacity || 0.6;
-    document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
     glassIcon.classList.remove("hidden");
     glassOffIcon.classList.add("hidden");
   }
-});
+}
 
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
@@ -573,18 +570,7 @@ volumeSlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
   audio.volume = val;
   islandVolumeSlider.value = val;
-  if (val > 0) {
-    previousVolume = val;
-    volIcon.classList.remove("hidden");
-    muteIcon.classList.add("hidden");
-    islandVolIcon.classList.remove("hidden");
-    islandMuteIcon.classList.add("hidden");
-  } else {
-    volIcon.classList.add("hidden");
-    muteIcon.classList.remove("hidden");
-    islandVolIcon.classList.add("hidden");
-    islandMuteIcon.classList.remove("hidden");
-  }
+  updateVolumeIcons(val);
 });
 
 btnVolume.addEventListener("click", () => {
@@ -593,19 +579,12 @@ btnVolume.addEventListener("click", () => {
     audio.volume = 0;
     volumeSlider.value = 0;
     islandVolumeSlider.value = 0;
-    volIcon.classList.add("hidden");
-    muteIcon.classList.remove("hidden");
-    islandVolIcon.classList.add("hidden");
-    islandMuteIcon.classList.remove("hidden");
   } else {
     audio.volume = previousVolume || 0.8;
     volumeSlider.value = audio.volume;
     islandVolumeSlider.value = audio.volume;
-    volIcon.classList.remove("hidden");
-    muteIcon.classList.add("hidden");
-    islandVolIcon.classList.remove("hidden");
-    islandMuteIcon.classList.add("hidden");
   }
+  updateVolumeIcons(audio.volume);
 });
 
 function extractDominantColor(imageUrl) {
@@ -638,7 +617,6 @@ function setLyricText(text) {
   marqueeWrapper.classList.remove("marquee-active");
   islandMarqueeWrapper.classList.remove("marquee-active");
 
-  // Instantly horizontal fill first without sliding in from offscreen
   if (lyricText.scrollWidth > marqueeWrapper.clientWidth) {
     marqueeWrapper.classList.add("marquee-active");
   }
@@ -667,7 +645,7 @@ function parseLRC(lrcText) {
     if (match) {
       const minutes = parseInt(match[1]);
       const seconds = parseInt(match[2]);
-      let totalSec = minutes * 60 + seconds - 0.4;
+      let totalSec = minutes * 60 + seconds - 0.15; // Smooth timing offset buffer to sync naturally
       lyrics.push({ time: Math.max(0, totalSec), text: line.replace(timeRegex, "").trim() });
     }
   });
