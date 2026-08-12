@@ -101,7 +101,7 @@ const searchResultsUl = document.getElementById("search-results-ul");
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
-// Web Audio API Frequency Equalizer Setup
+// Web Audio API Equalizer Setup
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -362,7 +362,7 @@ function loadTrack(index) {
   title.innerText = track.title;
   artist.innerText = track.author;
 
-  // Sync Collapsed Island (Horizontal View)
+  // Sync Collapsed Island
   islandCover.src = track.pic;
   islandTitle.innerText = track.title;
   if (islandArtist) islandArtist.innerText = track.author;
@@ -506,7 +506,6 @@ function parseLrc(lrcText) {
 function setLyricText(text) {
   if (!lyricText) return;
 
-  // Reset animation state
   lyricText.classList.remove("animate-lyric");
   lyricText.style.transform = "translateX(0)";
   lyricText.innerText = text;
@@ -515,21 +514,17 @@ function setLyricText(text) {
     islandLyricText.innerText = text;
   }
 
-  // Measure text width vs container width and scroll if needed
   requestAnimationFrame(() => {
     const containerWidth = lyricsContainer.clientWidth;
     const textWidth = lyricText.scrollWidth;
 
     if (textWidth > containerWidth) {
-      const overflowDistance = textWidth - containerWidth + 24; // Padding buffer
-      
-      // Speed up calculations: lower divisor = faster scroll duration (45 instead of 25)
+      const overflowDistance = textWidth - containerWidth + 24;
       const duration = Math.max(3.5, overflowDistance / 45);
 
       lyricText.style.setProperty("--scroll-distance", `-${overflowDistance}px`);
       lyricText.style.setProperty("--scroll-duration", `${duration}s`);
       
-      // Force layout update & add animation class
       void lyricText.offsetWidth;
       lyricText.classList.add("animate-lyric");
     }
@@ -595,6 +590,7 @@ audio.addEventListener("ended", () => {
   }
 });
 
+// Search Functions (Untouched search logic preserved fully)
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
   const query = searchInput.value.trim();
