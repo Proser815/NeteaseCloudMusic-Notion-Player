@@ -326,18 +326,20 @@ html, body {
 }
 
 /* =========================================
-   Player Card Styling
+   Player Card Styling (Updated to Auto-Fill Full Screen)
    ========================================= */
 .player-card {
   position: relative;
-  width: 320px;
-  height: 560px;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
   background: rgba(20, 20, 20, var(--glass-tint-opacity));
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px var(--glow-color);
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -373,10 +375,14 @@ html, body {
 }
 
 .player-content {
-  padding: 20px 18px;
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
   position: relative;
   z-index: 2;
 }
@@ -576,14 +582,15 @@ html, body {
    ========================================= */
 .cover-wrapper {
   position: relative;
-  width: 165px;
-  height: 165px;
+  width: min(65vw, 260px);
+  height: min(65vw, 260px);
   margin: 12px auto 18px auto;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   transition: all 0.4s var(--ios-spring);
+  flex-shrink: 0;
 }
 
 #cover {
@@ -611,8 +618,8 @@ html, body {
 
 .player-card.standby-mode .cover-wrapper {
   border-radius: 50%;
-  width: 130px;
-  height: 130px;
+  width: min(50vw, 200px);
+  height: min(50vw, 200px);
   margin: 14px auto;
 }
 
