@@ -101,7 +101,6 @@ const searchResultsUl = document.getElementById("search-results-ul");
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
-// Web Audio API Frequency Equalizer Setup
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -117,7 +116,7 @@ function initAudioContext() {
 
     dataArray = new Uint8Array(analyser.frequencyBinCount);
   } catch (e) {
-    console.warn("Web Audio API hook note:", e);
+    console.warn("Audio context init note:", e);
   }
 }
 
@@ -175,7 +174,7 @@ btnInfo.addEventListener("click", () => {
   btnInfo.classList.toggle("active");
 });
 
-// Dynamic Island Morphing
+// Dynamic Island
 btnIsland.addEventListener("click", () => {
   playerCard.classList.add("morphed-hidden");
   dynamicIsland.classList.remove("hidden");
@@ -271,20 +270,19 @@ function loadTrack(index) {
   islandHoverTitle.innerText = track.title;
   islandHoverArtist.innerText = track.author;
 
-  cover.src = track.pic;
-  backdropImg.src = track.pic;
-  islandCover.src = track.pic;
-  islandHoverCover.src = track.pic;
+  cover.src = track.pic || 'https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg';
+  backdropImg.src = track.pic || 'https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg';
+  islandCover.src = track.pic || 'https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg';
+  islandHoverCover.src = track.pic || 'https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg';
 
   audio.src = track.url;
-  extractDominantColor(track.pic);
+  if (track.pic) extractDominantColor(track.pic);
 
-  // Set Metadata info drawer values
   if (metaAlbum) metaAlbum.innerText = track.album || "Single";
   if (metaBpm) metaBpm.innerText = `~${Math.floor(Math.random() * 40) + 100} BPM`;
   if (metaYear) metaYear.innerText = track.year || new Date().getFullYear();
   if (metaGenre) metaGenre.innerText = track.genre || "Pop / Acoustic";
-  if (metaStory) metaStory.innerText = track.story || `Enjoying "${track.title}" by ${track.author}. Default track information automatically synchronized.`;
+  if (metaStory) metaStory.innerText = track.story || `Enjoying "${track.title}" by ${track.author}. Tracks are auto-synced.`;
 
   fetchLyrics(track.lrc);
   renderPlaylist();
@@ -302,7 +300,7 @@ function playTrack() {
     islandPauseIcon.classList.remove("hidden");
     coverWrapper.classList.remove("paused");
     animateBars();
-  }).catch(e => console.warn("Auto-play prevented:", e));
+  }).catch(e => console.warn("Playback prevented:", e));
 }
 
 function pauseTrack() {
@@ -432,6 +430,7 @@ opacitySlider.addEventListener("input", (e) => {
   }
 });
 
+// Search and Auto-predict / Fill Fixes
 btnToggleSearch.addEventListener("click", () => {
   searchSection.classList.toggle("collapsed");
   btnToggleSearch.classList.toggle("active");
@@ -447,8 +446,9 @@ searchInput.addEventListener("input", (e) => {
   const query = e.target.value.trim();
   clearTimeout(debounceTimer);
 
-  if (query.length < 2) {
+  if (query.length < 1) {
     searchPredictionsContainer.classList.add("hidden");
+    searchResultsContainer.classList.add("hidden");
     return;
   }
 
@@ -465,7 +465,7 @@ searchInput.addEventListener("input", (e) => {
           li.addEventListener("click", () => {
             searchInput.value = `${song.title} - ${song.author}`;
             searchPredictionsContainer.classList.add("hidden");
-            performSearch(query);
+            performSearch(song.title);
           });
           predictionsUl.appendChild(li);
         });
@@ -476,7 +476,7 @@ searchInput.addEventListener("input", (e) => {
     } catch (err) {
       console.warn("Prediction fetch error:", err);
     }
-  }, 300);
+  }, 250);
 });
 
 btnSearch.addEventListener("click", () => {
@@ -498,27 +498,36 @@ async function performSearch(query) {
     const results = await res.json();
     renderSearchResults(results);
   } catch (err) {
-    searchResultsUl.innerHTML = `<li style="justify-content:center;">Search failed. Try again.</li>`;
+    searchResultsUl.innerHTML = `<li style="padding: 10px; text-align: center; font-size:0.8rem;">Search failed. Try again.</li>`;
     searchResultsContainer.classList.remove("hidden");
   }
 }
 
+// Clean Layout for Search Results
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
-    searchResultsUl.innerHTML = `<li style="justify-content:center;">No results found.</li>`;
+    searchResultsUl.innerHTML = `<li style="padding: 10px; text-align: center; font-size:0.8rem;">No results found.</li>`;
     searchResultsContainer.classList.remove("hidden");
     return;
   }
 
   results.forEach(song => {
     const li = document.createElement("li");
+    li.className = "track-item-row";
     li.innerHTML = `
-      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 80%;">
-        ${song.title} - ${song.author}
-      </span>
-      <span class="add-btn" style="font-size:0.75rem; color:#fff; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:6px;">+ Add</span>
+      <div class="item-left">
+        <img class="item-cover" src="${song.pic || 'https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg'}" alt="Cover">
+        <div class="item-meta">
+          <span class="item-title">${song.title}</span>
+          <span class="item-artist">${song.author}</span>
+        </div>
+      </div>
+      <button class="btn-item-action" title="Add Track">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
     `;
+    
     li.addEventListener("click", () => {
       playlist.push(song);
       renderPlaylist();
@@ -528,6 +537,7 @@ function renderSearchResults(results) {
       searchSection.classList.add("collapsed");
       btnToggleSearch.classList.remove("active");
     });
+
     searchResultsUl.appendChild(li);
   });
   searchResultsContainer.classList.remove("hidden");
@@ -579,19 +589,48 @@ function setLyricText(str) {
   if (islandLyricText) islandLyricText.innerText = str;
 }
 
+// Clean Layout Restoration with Delete Button in Playlist Drawer
 function renderPlaylist() {
   playlistUl.innerHTML = "";
   playlist.forEach((track, index) => {
     const li = document.createElement("li");
-    if (index === currentIndex) li.classList.add("active");
+    li.className = `track-item-row ${index === currentIndex ? "active" : ""}`;
+    
     li.innerHTML = `
-      <span>${index + 1}. ${track.title}</span>
-      <span style="opacity:0.6; font-size:0.75rem;">${track.author}</span>
+      <div class="item-left">
+        <img class="item-cover" src="${track.pic || 'https://p2.music.126.net/L3d8xO_09zW94sP7XhP23g==/109951163584824558.jpg'}" alt="Cover">
+        <div class="item-meta">
+          <span class="item-title">${track.title}</span>
+          <span class="item-artist">${track.author}</span>
+        </div>
+      </div>
+      <button class="btn-item-action btn-delete-track" title="Remove Track">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
     `;
-    li.addEventListener("click", () => {
+
+    // Click track row to play
+    li.querySelector(".item-left").addEventListener("click", () => {
       loadTrack(index);
       playTrack();
     });
+
+    // Delete track button
+    li.querySelector(".btn-delete-track").addEventListener("click", (e) => {
+      e.stopPropagation();
+      playlist.splice(index, 1);
+      if (currentIndex >= playlist.length) {
+        currentIndex = Math.max(0, playlist.length - 1);
+      }
+      renderPlaylist();
+      if (playlist.length > 0) {
+        loadTrack(currentIndex);
+      } else {
+        title.innerText = "Playlist Empty";
+        artist.innerText = "-";
+      }
+    });
+
     playlistUl.appendChild(li);
   });
 }
