@@ -155,9 +155,9 @@ function animateBars() {
   const mid = dataArray[8] || 0;
   const high = dataArray[15] || 0;
 
-  const bar1Height = Math.max(3, (low / 255) * 14);
-  const bar2Height = Math.max(3, (mid / 255) * 14);
-  const bar3Height = Math.max(3, (high / 255) * 14);
+  const bar1Height = Math.max(3, (low / 255) * 13);
+  const bar2Height = Math.max(3, (mid / 255) * 13);
+  const bar3Height = Math.max(3, (high / 255) * 13);
 
   const allBars = document.querySelectorAll(".eq-bars span");
   allBars.forEach((_, idx) => {

@@ -2,7 +2,9 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 :root {
@@ -60,23 +62,23 @@ html, body {
 }
 
 /* =========================================
-   Dynamic Island Base & Expanded Layout Fix
+   iOS Dynamic Island Styling (Non-Hover Mode)
    ========================================= */
 .dynamic-island {
   position: absolute;
   top: 12px;
   z-index: 50;
-  height: 40px;
-  min-width: 200px;
-  max-width: 320px;
+  height: 37px;
+  min-width: 210px;
+  max-width: 330px;
   width: auto;
-  padding: 0 14px;
+  padding: 0 11px 0 6px;
   background: #000000;
-  border-radius: 22px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: width 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
               height 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
               border-radius 0.5s ease,
@@ -84,6 +86,7 @@ html, body {
               opacity 0.3s ease;
   cursor: pointer;
   overflow: hidden;
+  user-select: none;
 }
 
 .dynamic-island.hidden {
@@ -95,17 +98,73 @@ html, body {
 .island-collapsed-content {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
 #island-cover {
-  width: 26px;
-  height: 26px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.island-collapsed-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#island-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.island-meta-separator {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1;
+}
+
+#island-artist {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-size: 0.81rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: -0.2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 13px;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+.eq-bars span {
+  width: 2.5px;
+  height: 3px;
+  background: #34c759; /* iOS Native Active Green */
+  border-radius: 1px;
+  transition: height 0.1s ease;
 }
 
 /* Dynamic Island Expansion */
@@ -114,6 +173,7 @@ html, body {
   width: 360px !important;
   height: 140px !important;
   border-radius: 36px;
+  padding: 0;
 }
 
 .dynamic-island:hover .island-collapsed-content,
@@ -597,22 +657,6 @@ html, body {
   text-overflow: ellipsis;
 }
 
-.eq-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-  flex-shrink: 0;
-}
-
-.eq-bars span {
-  width: 3px;
-  height: 3px;
-  background: #ffffff;
-  border-radius: 2px;
-  transition: height 0.1s ease;
-}
-
 /* Player Card Lyrics Container */
 .lyrics-container {
   height: 24px;
@@ -735,7 +779,7 @@ html, body {
 }
 
 /* =========================================
-   Bottom Action Bar & Slider Track Styling Fix
+   Bottom Action Bar & Slider Track Styling
    ========================================= */
 .bottom-action-bar {
   display: flex;
@@ -769,7 +813,7 @@ html, body {
   fill: rgba(255, 255, 255, 0.8);
 }
 
-/* Clean Cross-Browser Range Inputs */
+/* Range Inputs */
 input[type="range"] {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
@@ -788,7 +832,6 @@ input[type="range"] {
   pointer-events: auto !important;
 }
 
-/* Webkit Track */
 input[type="range"]::-webkit-slider-runnable-track {
   width: 100%;
   height: 5px;
@@ -797,7 +840,6 @@ input[type="range"]::-webkit-slider-runnable-track {
   border: none;
 }
 
-/* Webkit Thumb */
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   appearance: none !important;
@@ -815,7 +857,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
 }
 
-/* Firefox Track & Thumb */
 input[type="range"]::-moz-range-track {
   width: 100%;
   height: 5px;
@@ -864,7 +905,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* =========================================
-   Playlist & Info Drawers + Delete Buttons
+   Playlist & Info Drawers
    ========================================= */
 .playlist-drawer, .info-drawer {
   position: absolute;
