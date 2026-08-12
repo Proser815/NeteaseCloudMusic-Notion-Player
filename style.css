@@ -160,6 +160,14 @@ html, body {
   height: 230px !important;
 }
 
+/* Expanded height for Playlist Drawer */
+.dynamic-island:hover.playlist-active,
+.dynamic-island.expanded.playlist-active,
+.dynamic-island.lyrics-hidden:hover.playlist-active,
+.dynamic-island.lyrics-hidden.expanded.playlist-active {
+  height: 230px !important;
+}
+
 .dynamic-island:hover .island-collapsed-content,
 .dynamic-island.expanded .island-collapsed-content {
   opacity: 0;
