@@ -16,14 +16,13 @@ let source;
 let dataArray;
 let animationFrameId;
 
-// SVGs for Play Mode Icons
+// Mode SVGs
 const MODE_ICONS = {
   loop: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>`,
   repeatOne: `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>`,
   shuffle: `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`
 };
 
-// Trash Bin Icon SVG replacing the old cross icon
 const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="3 6 5 6 21 6"></polyline>
   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -50,7 +49,6 @@ const islandHoverCover = document.getElementById("island-hover-cover");
 const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
 const islandLyricText = document.getElementById("island-lyric-text");
-const btnIsland = document.getElementById("btn-island");
 
 const islandBtnMode = document.getElementById("island-btn-mode");
 const islandModeLoop = document.getElementById("island-mode-loop");
@@ -128,7 +126,7 @@ function updateSliderTrack(slider) {
   slider.style.background = `linear-gradient(to right, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.9) ${percentage}%, rgba(255,255,255,0.2) ${percentage}%, rgba(255,255,255,0.2) 100%)`;
 }
 
-// Web Audio API Frequency Equalizer Setup
+// Web Audio API Frequency Equalizer
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -189,7 +187,7 @@ async function initPlayer() {
   }
 }
 
-// Drawer Closures & Navigation
+// Drawers & Navigation
 btnCloseInfo.addEventListener("click", () => {
   infoDrawer.classList.add("collapsed");
   btnInfo.classList.remove("active");
@@ -204,12 +202,7 @@ btnInfo.addEventListener("click", () => {
   btnInfo.classList.toggle("active");
 });
 
-// Dynamic Island Morphing
-btnIsland.addEventListener("click", () => {
-  playerCard.classList.add("morphed-hidden");
-  dynamicIsland.classList.remove("hidden");
-});
-
+// Dynamic Island Toggle
 dynamicIsland.addEventListener("click", (e) => {
   if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) {
     return;
@@ -217,6 +210,14 @@ dynamicIsland.addEventListener("click", (e) => {
   playerCard.classList.remove("morphed-hidden");
   dynamicIsland.classList.add("hidden");
 });
+
+const btnIsland = document.getElementById("btn-island");
+if (btnIsland) {
+  btnIsland.addEventListener("click", () => {
+    playerCard.classList.add("morphed-hidden");
+    dynamicIsland.classList.remove("hidden");
+  });
+}
 
 islandBtnPlay.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -238,7 +239,7 @@ islandBtnMode.addEventListener("click", (e) => {
   cyclePlayMode();
 });
 
-// Sound Sliders Handler
+// Sound Sliders
 const handleVolumeChange = (val) => {
   const parsedVal = parseFloat(val);
   audio.volume = parsedVal;
@@ -253,13 +254,11 @@ volumeSlider.addEventListener("input", (e) => {
   e.stopPropagation();
   handleVolumeChange(e.target.value);
 });
-volumeSlider.addEventListener("change", (e) => e.stopPropagation());
 
 islandVolumeSlider.addEventListener("input", (e) => {
   e.stopPropagation();
   handleVolumeChange(e.target.value);
 });
-islandVolumeSlider.addEventListener("change", (e) => e.stopPropagation());
 
 islandBtnVolume.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -337,7 +336,7 @@ btnLyrics.addEventListener("click", () => {
   btnLyrics.classList.toggle("active");
 });
 
-// Opacity Controller Fix
+// Opacity Controller
 const handleOpacityChange = (val) => {
   const parsedVal = parseFloat(val);
   opacitySlider.value = parsedVal;
@@ -350,7 +349,6 @@ opacitySlider.addEventListener("input", (e) => {
   e.stopPropagation();
   handleOpacityChange(e.target.value);
 });
-opacitySlider.addEventListener("change", (e) => e.stopPropagation());
 
 btnGlass.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -373,7 +371,7 @@ function updateTransparencyIcons(val) {
   }
 }
 
-// Search Toggle & Outside Click Handler
+// Search Toggle
 btnToggleSearch.addEventListener("click", (e) => {
   e.stopPropagation();
   const isCollapsed = searchSection.classList.contains("collapsed");
@@ -399,7 +397,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Render Playlist Drawer with Trash Bin Icon
+// Playlist Drawer Rendering
 function renderPlaylist() {
   playlistUl.className = "playlist-items-container";
   playlistUl.innerHTML = "";
@@ -433,14 +431,12 @@ function renderPlaylist() {
       </button>
     `;
 
-    // Click track row to play
     li.addEventListener("click", () => {
       loadTrack(i);
       playTrack();
       playlistDrawer.classList.add("collapsed");
     });
 
-    // Delete track event
     const deleteBtn = li.querySelector(".btn-delete-track");
     deleteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -614,16 +610,14 @@ function parseLrc(lrcText) {
   }
 }
 
+// Unified Lyric & Island Marquee Sync
 function setLyricText(text) {
   if (!lyricText) return;
 
+  // Main Card Lyric Animation Update
   lyricText.classList.remove("animate-lyric");
   lyricText.style.transform = "translateX(0)";
   lyricText.innerText = text;
-
-  if (islandLyricText) {
-    islandLyricText.innerText = text;
-  }
 
   requestAnimationFrame(() => {
     const containerWidth = lyricsContainer.clientWidth;
@@ -640,6 +634,34 @@ function setLyricText(text) {
       lyricText.classList.add("animate-lyric");
     }
   });
+
+  // Dynamic Island Full-Width Marquee Update
+  if (islandLyricText) {
+    const islandInner = islandLyricText.closest('.island-marquee-inner');
+    const islandContainer = islandLyricText.closest('.island-marquee-container');
+
+    if (islandInner && islandContainer) {
+      islandInner.classList.remove("animate-island-lyric");
+      islandInner.style.transform = "translateX(0)";
+      islandLyricText.innerText = text;
+
+      requestAnimationFrame(() => {
+        const cWidth = islandContainer.clientWidth;
+        const iWidth = islandInner.scrollWidth;
+
+        if (iWidth > cWidth) {
+          const overflowDistance = iWidth - cWidth + 18;
+          const duration = Math.max(3.5, overflowDistance / 35);
+
+          islandInner.style.setProperty("--island-scroll-distance", `-${overflowDistance}px`);
+          islandInner.style.setProperty("--island-scroll-duration", `${duration}s`);
+
+          void islandInner.offsetWidth;
+          islandInner.classList.add("animate-island-lyric");
+        }
+      });
+    }
+  }
 }
 
 function formatTime(seconds) {
@@ -778,7 +800,6 @@ async function performSearch() {
   }
 }
 
-// Search Results stay open on song click
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
   if (!results || results.length === 0) {
@@ -811,7 +832,6 @@ function renderSearchResults(results) {
       </button>
     `;
 
-    // Add track & play immediately without closing search view
     li.addEventListener("click", () => {
       playlist.push(song);
       renderPlaylist();
