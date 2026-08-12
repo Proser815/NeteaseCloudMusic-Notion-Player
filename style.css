@@ -379,6 +379,15 @@ html, body {
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
+.ios-add-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.08);
+}
+
+.ios-add-btn:active {
+  transform: scale(0.92);
+}
+
 .ios-playlist-item.active {
   background: rgba(255, 255, 255, 0.18) !important;
   border-color: rgba(255, 255, 255, 0.2) !important;

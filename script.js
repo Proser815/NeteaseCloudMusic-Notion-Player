@@ -698,20 +698,35 @@ async function performSearch() {
 }
 
 function renderSearchResults(results) {
+  searchResultsContainer.classList.remove("hidden");
   searchResultsUl.innerHTML = "";
-  if (!results || results.length === 0) {
-    searchResultsContainer.classList.add("hidden");
+  if (!Array.isArray(results) || results.length === 0) {
+    searchResultsUl.innerHTML = `<li style="padding: 10px; color: rgba(255,255,255,0.5); text-align:center;">No results found</li>`;
     return;
   }
-  searchResultsContainer.classList.remove("hidden");
+
   results.forEach(song => {
     const li = document.createElement("li");
+    li.className = "ios-playlist-item";
+    li.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; cursor: pointer; transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1); border: 1px solid rgba(255, 255, 255, 0.04); margin-bottom: 8px;";
+
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
-        ${song.title} - ${song.author}
-      </span>
-      <span class="add-btn" style="font-size:0.75rem; color:#fff; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:6px;">+ Add</span>
+      <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1;">
+        <img src="${song.pic || song.cover || ''}" alt="Cover" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        <div style="display: flex; flex-direction: column; overflow: hidden; gap: 2px;">
+          <span style="font-size: 0.9rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${song.title || 'Unknown Title'}</span>
+          <span style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${song.author || song.artist || 'Unknown Artist'}</span>
+        </div>
+      </div>
+      <button class="ios-add-btn" title="Add song" style="background: rgba(255, 255, 255, 0.12); color: #ffffff; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; flex-shrink: 0; margin-left: 10px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
     `;
+
+    // Click anywhere on row or add button to push song to playlist
     li.addEventListener("click", () => {
       playlist.push(song);
       renderPlaylist();
@@ -721,6 +736,7 @@ function renderSearchResults(results) {
       searchSection.classList.add("collapsed");
       btnToggleSearch.classList.remove("active");
     });
+
     searchResultsUl.appendChild(li);
   });
 }
