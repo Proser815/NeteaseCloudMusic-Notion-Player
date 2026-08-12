@@ -137,7 +137,7 @@ html, body {
   border-radius: 1px;
 }
 
-/* Dynamic Hover Heights */
+/* Dynamic Hover Heights & Expansion */
 .dynamic-island:hover, 
 .dynamic-island.expanded {
   width: 360px !important;
@@ -152,17 +152,13 @@ html, body {
   height: 130px !important;
 }
 
-/* Expanded height for Search Drawer */
+/* Expanded height for Search or Playlist Drawers on Hover/Active */
 .dynamic-island:hover.search-active,
 .dynamic-island.expanded.search-active,
-.dynamic-island.lyrics-hidden:hover.search-active,
-.dynamic-island.lyrics-hidden.expanded.search-active {
-  height: 230px !important;
-}
-
-/* Expanded height for Playlist Drawer */
 .dynamic-island:hover.playlist-active,
 .dynamic-island.expanded.playlist-active,
+.dynamic-island.lyrics-hidden:hover.search-active,
+.dynamic-island.lyrics-hidden.expanded.search-active,
 .dynamic-island.lyrics-hidden:hover.playlist-active,
 .dynamic-island.lyrics-hidden.expanded.playlist-active {
   height: 230px !important;

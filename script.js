@@ -572,7 +572,7 @@ async function performSearch() {
       searchResultsUl.appendChild(li);
     });
   } catch (err) {
-    searchResultsUl.innerHTML = "<li class='playlist-item-ios'>Error performing search</li>";
+    searchResultsUl.innerHTML = "<li class='playlist-item-ios'>Error performing search/playlist drawer expansion</li>";
   }
 }
 
