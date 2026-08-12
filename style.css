@@ -62,7 +62,7 @@ html, body {
 }
 
 /* =========================================
-   iOS Dynamic Island Styling (Non-Hover Mode)
+   iOS Dynamic Island Styling
    ========================================= */
 .dynamic-island {
   position: absolute;
@@ -123,7 +123,7 @@ html, body {
 }
 
 #island-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
   font-size: 0.81rem;
   font-weight: 600;
   color: #ffffff;
@@ -140,7 +140,7 @@ html, body {
 }
 
 #island-artist {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
   font-size: 0.81rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.65);
@@ -162,12 +162,11 @@ html, body {
 .eq-bars span {
   width: 2.5px;
   height: 3px;
-  background: #34c759; /* iOS Native Active Green */
+  background: #34c759;
   border-radius: 1px;
   transition: height 0.1s ease;
 }
 
-/* Dynamic Island Expansion */
 .dynamic-island:hover, 
 .dynamic-island.expanded {
   width: 360px !important;
@@ -253,7 +252,6 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* Island Lyric Marquee (Uses Full Width & Scrolls) */
 .island-marquee-container {
   width: 100%;
   overflow: hidden;
@@ -326,7 +324,7 @@ html, body {
 }
 
 /* =========================================
-   Player Card Styling (Updated to Auto-Fill Full Screen)
+   Player Card Styling (Auto-Fill Full Screen)
    ========================================= */
 .player-card {
   position: relative;
@@ -664,7 +662,7 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* Player Card Lyrics Container */
+/* Lyrics */
 .lyrics-container {
   height: 24px;
   margin: 6px 0 12px 0;
@@ -711,7 +709,7 @@ html, body {
   animation: lyric-scroll var(--scroll-duration, 5s) linear infinite alternate;
 }
 
-/* Progress Bar */
+/* Progress Section */
 .progress-section {
   margin-bottom: 16px;
 }
@@ -785,9 +783,7 @@ html, body {
   height: 20px;
 }
 
-/* =========================================
-   Bottom Action Bar & Slider Track Styling
-   ========================================= */
+/* Bottom Action Bar */
 .bottom-action-bar {
   display: flex;
   justify-content: space-between;
