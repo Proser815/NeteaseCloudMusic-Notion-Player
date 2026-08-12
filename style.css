@@ -10,7 +10,7 @@
 :root {
   --accent-rgb: 255, 255, 255;
   --glow-color: rgba(255, 255, 255, 0.6);
-  --glass-tint-opacity: 0.5;
+  --glass-tint-opacity: 0.85;
   --ios-spring: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -26,75 +26,51 @@ html, body {
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
 }
 
-.btn-exit-drawer {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.25s var(--ios-spring);
-}
-
-.btn-exit-drawer:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-}
-
-.btn-exit-drawer svg {
-  width: 14px;
-  height: 14px;
-  fill: #fff;
+.hidden {
+  display: none !important;
 }
 
 /* =========================================
-   iOS Dynamic Island Styling
+   iOS Dynamic Island Single Component Player
    ========================================= */
 .dynamic-island {
   position: absolute;
-  top: 12px;
-  z-index: 50;
-  height: 37px;
+  top: 14px;
+  z-index: 100;
+  height: 38px;
   min-width: 210px;
-  max-width: 330px;
+  max-width: 320px;
   width: auto;
-  padding: 0 11px 0 6px;
-  background: #000000;
+  padding: 0 12px 0 6px;
+  background: rgba(0, 0, 0, var(--glass-tint-opacity));
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   transition: width 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
               height 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
               border-radius 0.5s ease,
-              transform 0.4s var(--ios-spring),
-              opacity 0.3s ease;
+              transform 0.4s var(--ios-spring);
   cursor: pointer;
   overflow: hidden;
   user-select: none;
 }
 
-.dynamic-island.hidden {
-  opacity: 0;
-  transform: translateY(-20px) scale(0.85);
-  pointer-events: none;
-}
-
+/* Collapsed State Layout */
 .island-collapsed-content {
   display: flex;
   align-items: center;
@@ -103,11 +79,12 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  transition: opacity 0.3s ease;
 }
 
 #island-cover {
-  width: 25px;
-  height: 25px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -116,18 +93,16 @@ html, body {
 .island-collapsed-meta {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   flex: 1;
   overflow: hidden;
   white-space: nowrap;
 }
 
 #island-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
-  font-size: 0.81rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #ffffff;
-  letter-spacing: -0.2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -136,15 +111,12 @@ html, body {
 .island-meta-separator {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.45);
-  line-height: 1;
 }
 
 #island-artist {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
-  font-size: 0.81rem;
+  font-size: 0.82rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.65);
-  letter-spacing: -0.2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -156,7 +128,6 @@ html, body {
   gap: 2.5px;
   height: 13px;
   flex-shrink: 0;
-  margin-left: 2px;
 }
 
 .eq-bars span {
@@ -167,10 +138,11 @@ html, body {
   transition: height 0.1s ease;
 }
 
+/* Hover/Expanded Dynamic Island State */
 .dynamic-island:hover, 
 .dynamic-island.expanded {
-  width: 360px !important;
-  height: 140px !important;
+  width: 390px !important;
+  height: 260px !important;
   border-radius: 36px;
   padding: 0;
 }
@@ -179,16 +151,13 @@ html, body {
 .dynamic-island.expanded .island-collapsed-content {
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.9);
-  transition: all 0.3s ease;
+  display: none;
 }
 
 .island-hover-controls {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.95);
-  backdrop-filter: blur(25px);
-  padding: 14px 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -197,7 +166,7 @@ html, body {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.95);
-  transition: opacity 0.4s ease 0.1s, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s;
+  transition: opacity 0.35s ease 0.1s, transform 0.35s var(--ios-spring) 0.1s;
 }
 
 .dynamic-island:hover .island-hover-controls,
@@ -207,7 +176,8 @@ html, body {
   transform: scale(1);
 }
 
-.island-hover-top {
+/* Top Navigation Bar Inside Island */
+.island-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -223,8 +193,8 @@ html, body {
 }
 
 #island-hover-cover {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
@@ -237,7 +207,7 @@ html, body {
 }
 
 #island-hover-title {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -245,34 +215,170 @@ html, body {
 }
 
 #island-hover-artist {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   opacity: 0.7;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.island-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.island-icon-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.island-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+.island-icon-btn.active {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.island-icon-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: #ffffff;
+}
+
+/* Drawers inside Dynamic Island (Search, Playlist, Info, Lyrics) */
+.island-drawer {
+  position: absolute;
+  top: 56px;
+  left: 12px;
+  right: 12px;
+  bottom: 60px;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  z-index: 10;
+  overflow-y: auto;
+  transition: opacity 0.3s ease, transform 0.3s var(--ios-spring);
+  display: flex;
+  flex-direction: column;
+}
+
+.island-drawer.collapsed {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.95);
+  pointer-events: none;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-exit-drawer {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+/* Search Component */
+.search-bar {
+  display: flex;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 2px 6px;
+  margin-bottom: 6px;
+}
+
+#search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  color: #fff;
+  font-size: 0.75rem;
+  outline: none;
+}
+
+.search-results ul, .search-predictions ul, #playlist-ul {
+  list-style: none;
+}
+
+.playlist-item-ios {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.playlist-item-ios:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.playlist-item-ios.active {
+  background: rgba(255, 255, 255, 0.25);
+  font-weight: 600;
+}
+
+/* Info Details */
+.info-details p {
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.story-box {
+  max-height: 60px;
+  overflow-y: auto;
+  font-style: italic;
+  font-size: 0.68rem;
+}
+
+/* Marquee / Lyrics Section */
 .island-marquee-container {
   width: 100%;
   overflow: hidden;
-  margin: 6px 0;
+  margin: 4px 0;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   position: relative;
 }
 
 .island-marquee-inner {
   display: inline-block;
   white-space: nowrap;
-  will-change: transform;
 }
 
-#island-lyric-text {
-  font-size: 0.75rem;
+#island-lyric-text, #lyric-text {
+  font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.9);
-  display: inline-block;
-  white-space: nowrap;
 }
 
 .animate-island-lyric {
@@ -286,17 +392,38 @@ html, body {
   100% { transform: translateX(var(--island-scroll-distance, -50%)); }
 }
 
-.island-controls {
+/* Progress Section */
+.island-progress-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 4px 0;
+}
+
+.progress-bar-bg {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 2px;
+}
+
+/* Action Controls Bar */
+.island-action-buttons {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-}
-
-.island-action-buttons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 
 .island-ctrl-btn {
@@ -309,732 +436,52 @@ html, body {
   justify-content: center;
   width: 26px;
   height: 26px;
-}
-
-.island-ctrl-btn svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-}
-
-.island-volume-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* =========================================
-   Player Card Styling (Auto-Fill Full Screen)
-   ========================================= */
-.player-card {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  max-width: 100vw;
-  max-height: 100vh;
-  background: rgba(20, 20, 20, var(--glass-tint-opacity));
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.4s var(--ios-spring), opacity 0.3s ease, background 0.4s ease;
-}
-
-.player-card.morphed-hidden {
-  opacity: 0;
-  transform: scale(0.9) translateY(20px);
-  pointer-events: none;
-}
-
-.backdrop {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-
-#backdrop-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(50px) brightness(0.6);
-  transform: scale(1.2);
-  transition: opacity 0.5s ease;
-}
-
-.backdrop-tint {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-}
-
-.player-content {
-  padding: 24px 28px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  width: 100%;
-  position: relative;
-  z-index: 2;
-}
-
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.top-actions-right {
-  display: flex;
-  gap: 8px;
-}
-
-.btn-top {
-  background: rgba(255, 255, 255, 0.12);
-  border: none;
-  width: 34px;
-  height: 34px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s var(--ios-spring);
-}
-
-.btn-top:hover {
-  background: rgba(255, 255, 255, 0.28);
-  transform: scale(1.05);
-}
-
-.btn-top.active {
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.btn-top svg {
-  width: 16px;
-  height: 16px;
-  fill: #fff;
-}
-
-/* =========================================
-   Search Section & Results
-   ========================================= */
-.search-section {
-  position: absolute;
-  top: 60px;
-  left: 18px;
-  right: 18px;
-  z-index: 30;
-  transition: all 0.35s var(--ios-spring);
-}
-
-.search-section.collapsed {
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-}
-
-.search-bar-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.search-bar {
-  display: flex;
-  background: rgba(30, 30, 30, 0.92);
-  backdrop-filter: blur(20px);
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 4px;
-}
-
-#search-input {
-  flex: 1;
-  background: none;
-  border: none;
-  padding: 8px 12px;
-  color: #fff;
-  font-size: 0.82rem;
-  outline: none;
-}
-
-#search-input::placeholder {
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.btn-search-ios {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-search-ios:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.btn-search-ios svg {
-  width: 14px;
-  height: 14px;
-  fill: #fff;
-}
-
-.search-predictions, .search-results {
-  position: absolute;
-  top: 48px;
-  left: 0;
-  right: 0;
-  background: rgba(20, 20, 20, 0.95);
-  backdrop-filter: blur(25px);
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-  overflow-y: auto;
-  max-height: 280px;
-  z-index: 35;
-  padding: 6px;
-}
-
-.search-predictions.hidden, .search-results.hidden {
-  display: none !important;
-}
-
-.search-predictions ul, .search-results ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.playlist-item-ios {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  margin-bottom: 4px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.playlist-item-ios:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.playlist-item-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow: hidden;
-  flex: 1;
-}
-
-.playlist-item-cover {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.playlist-item-meta {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.playlist-item-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.playlist-item-sub {
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.6);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* =========================================
-   Cover & Standby Mode
-   ========================================= */
-.cover-wrapper {
-  position: relative;
-  width: min(65vw, 260px);
-  height: min(65vw, 260px);
-  margin: 12px auto 18px auto;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  transition: all 0.4s var(--ios-spring);
-  flex-shrink: 0;
-}
-
-#cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.standby-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.player-card.standby-mode .standby-overlay {
-  opacity: 1;
-}
-
-.player-card.standby-mode .cover-wrapper {
-  border-radius: 50%;
-  width: min(50vw, 200px);
-  height: min(50vw, 200px);
-  margin: 14px auto;
-}
-
-#standby-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-#standby-sub {
-  font-size: 0.75rem;
-  opacity: 0.6;
-}
-
-.track-info {
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.title-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-#title {
-  font-size: 1rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 220px;
-}
-
-#artist {
-  font-size: 0.78rem;
-  opacity: 0.7;
-  margin-top: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Lyrics */
-.lyrics-container {
-  height: 24px;
-  margin: 6px 0 12px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  transition: all 0.25s ease;
-}
-
-.lyrics-container.collapsed {
-  height: 0;
-  margin: 0;
-  opacity: 0;
-}
-
-.marquee-wrapper {
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#lyric-text {
-  display: inline-block;
-  font-size: 0.73rem;
-  color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
-  will-change: transform;
-}
-
-@keyframes lyric-scroll {
-  0% { transform: translateX(0%); }
-  10% { transform: translateX(0%); }
-  90% { transform: translateX(var(--scroll-distance, -50%)); }
-  100% { transform: translateX(var(--scroll-distance, -50%)); }
-}
-
-.animate-lyric {
-  animation: lyric-scroll var(--scroll-duration, 5s) linear infinite alternate;
-}
-
-/* Progress Section */
-.progress-section {
-  margin-bottom: 16px;
-}
-
-.progress-bar-bg {
-  width: 100%;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  width: 0%;
-  height: 100%;
-  background: #ffffff;
-  border-radius: 3px;
-  transition: width 0.1s linear;
-}
-
-.time-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.68rem;
-  opacity: 0.6;
-  margin-top: 6px;
-}
-
-/* Playback Controls */
-.controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.btn-ctrl {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  transition: background 0.2s, transform 0.25s var(--ios-spring);
-}
-
-.btn-ctrl:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.btn-ctrl svg {
-  width: 18px;
-  height: 18px;
-  fill: #ffffff;
-}
-
-.btn-play-main {
-  background: #ffffff !important;
-  width: 44px;
-  height: 44px;
-}
-
-.btn-play-main svg {
-  fill: #000000 !important;
-  width: 20px;
-  height: 20px;
-}
-
-/* Bottom Action Bar */
-.bottom-action-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 12px;
-  margin-top: auto;
-}
-
-.volume-box, .glass-box {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  position: relative;
-}
-
-.volume-box button, .glass-box button, .bottom-action-bar > button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.bottom-action-bar svg {
-  width: 16px;
-  height: 16px;
-  fill: rgba(255, 255, 255, 0.8);
-}
-
-/* Range Inputs */
-input[type="range"] {
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-  width: 100%;
-  height: 5px !important;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  outline: none;
-  border: none;
-  cursor: pointer;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  z-index: 10;
-  pointer-events: auto !important;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 5px;
-  background: transparent;
-  border-radius: 10px;
-  border: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  margin-top: -4.5px;
   transition: transform 0.15s ease;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+.island-ctrl-btn:hover {
+  transform: scale(1.1);
 }
 
-input[type="range"]::-moz-range-track {
-  width: 100%;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  border: none;
+.island-ctrl-btn.play-main {
+  background: #ffffff;
+  color: #000000;
+  width: 32px;
+  height: 32px;
 }
 
-input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+.island-ctrl-btn.play-main svg {
+  fill: #000000;
+}
+
+.island-ctrl-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+
+/* Volume & Glass Range Controls */
+.island-volume-container, .island-glass-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 45px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #ffffff;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
   cursor: pointer;
-}
-
-#volume-slider, #opacity-slider, #island-volume-slider {
-  width: 0;
-  opacity: 0;
-  pointer-events: none;
-  transition: width 0.3s var(--ios-spring), opacity 0.25s ease, margin 0.25s ease;
-  margin-left: 0;
-}
-
-.volume-box:hover #volume-slider {
-  width: 55px;
-  opacity: 1;
-  pointer-events: auto;
-  margin-left: 6px;
-}
-
-.glass-box:hover #opacity-slider {
-  width: 55px;
-  opacity: 1;
-  pointer-events: auto;
-  margin-left: 6px;
-}
-
-.island-volume-container:hover #island-volume-slider {
-  width: 50px;
-  opacity: 1;
-  pointer-events: auto;
-  margin-left: 4px;
-}
-
-/* =========================================
-   Playlist & Info Drawers
-   ========================================= */
-.playlist-drawer, .info-drawer {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(20, 20, 20, 0.96);
-  backdrop-filter: blur(35px);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.35s var(--ios-spring);
-  z-index: 40;
-}
-
-.playlist-drawer.collapsed {
-  transform: translateY(100%);
-}
-
-.info-drawer.collapsed {
-  transform: translateX(100%);
-}
-
-.playlist-items-container {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0 0 0;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.btn-delete-track {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  margin-left: 8px;
-}
-
-.btn-delete-track:hover {
-  background: #ff3b30;
-  color: #ffffff;
-  transform: scale(1.1);
-}
-
-.btn-add-track {
-  background: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s ease;
-  flex-shrink: 0;
-  margin-left: 8px;
-}
-
-.btn-add-track:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.1);
-}
-
-.ios-settings-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-
-.ios-settings-header h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  flex: 1;
-  text-align: center;
-  margin-right: 28px;
-}
-
-.ios-settings-group {
-  margin-bottom: 16px;
-}
-
-.ios-settings-title {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 6px;
-}
-
-.ios-settings-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.ios-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  font-size: 0.8rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.ios-row:last-child {
-  border-bottom: none;
-}
-
-.ios-row-label {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.ios-row-value {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.hidden {
-  display: none !important;
 }
