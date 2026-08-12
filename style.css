@@ -1,4 +1,4 @@
-=* {
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -62,13 +62,13 @@ html, body {
   fill: #fff;
 }
 
+/* Dynamic Island Adjustments: Automatically Stretches Wider to fit all components fully */
 .dynamic-island {
   position: absolute;
   top: 12px;
   z-index: 10;
-  height: 36px;
-  min-width: 170px;
-  max-width: 540px;
+  height: 40px;
+  min-width: 180px;
   width: auto;
   padding: 0 14px;
   background: #000000;
@@ -96,34 +96,33 @@ html, body {
 }
 
 #island-cover {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   object-fit: cover;
 }
 
 #island-title {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 500;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 240px;
 }
 
 .island-hover-controls {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.92);
+  background: rgba(0,0,0,0.95);
   backdrop-filter: blur(25px);
-  padding: 0 14px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 14px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
+  white-space: nowrap;
+  width: max-content;
+  min-width: 100%;
 }
 
 .dynamic-island:hover .island-hover-controls {
@@ -134,13 +133,13 @@ html, body {
 .island-track-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 #island-hover-cover {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   object-fit: cover;
 }
@@ -151,46 +150,36 @@ html, body {
 }
 
 #island-hover-title {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  max-width: 90px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 #island-hover-artist {
-  font-size: 0.58rem;
+  font-size: 0.6rem;
   opacity: 0.7;
-  max-width: 90px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .island-marquee-container {
-  flex: 1;
   overflow: hidden;
-  margin: 0 6px;
+  max-width: 220px;
+  margin: 0 4px;
+  flex-shrink: 1;
 }
 
-.island-marquee-wrapper {
+.island-marquee-inner {
   white-space: nowrap;
-  width: 100%;
+  display: inline-block;
 }
 
 #island-lyric-text {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   color: rgba(255,255,255,0.85);
-  display: inline-block;
-  text-align: center;
-  width: 100%;
 }
 
 .island-action-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -202,13 +191,13 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
 }
 
 .island-ctrl-btn svg {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   fill: currentColor;
 }
 
@@ -219,7 +208,7 @@ html, body {
 }
 
 #island-volume-slider {
-  width: 50px;
+  width: 55px;
   accent-color: #fff;
   height: 3px;
 }
@@ -281,7 +270,7 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .top-actions-right {
@@ -481,9 +470,9 @@ html, body {
 
 .cover-wrapper {
   position: relative;
-  width: 200px;
-  height: 200px;
-  margin: 0 auto 16px auto;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 12px auto;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
@@ -519,9 +508,9 @@ html, body {
 
 .player-card.standby-mode .cover-wrapper {
   border-radius: 50%;
-  width: 140px;
-  height: 140px;
-  margin: 20px auto;
+  width: 130px;
+  height: 130px;
+  margin: 16px auto;
 }
 
 #standby-title {
@@ -537,7 +526,7 @@ html, body {
 
 .track-info {
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .title-row {
@@ -580,12 +569,13 @@ html, body {
   transition: height 0.1s ease;
 }
 
+/* Lyrics Container & Static First, Then Scroll Behavior */
 .lyrics-container {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  padding: 4px 6px;
-  margin-bottom: 12px;
+  padding: 2px 4px;
+  margin-bottom: 10px;
   text-align: center;
   overflow: hidden;
   transition: all 0.4s ease;
@@ -603,6 +593,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   width: 100%;
+  display: inline-block;
 }
 
 #lyric-text {
@@ -612,26 +603,22 @@ html, body {
   text-shadow: 0 2px 12px rgba(0,0,0,0.6);
   letter-spacing: 0.3px;
   display: inline-block;
-  text-align: center;
-  width: 100%;
 }
 
 .marquee-active {
-  animation: marquee 8s linear infinite;
-  display: inline-block;
-  padding-left: 100%;
+  animation: staticToScroll 9s linear infinite;
 }
 
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+@keyframes staticToScroll {
+  0%, 25% { transform: translateX(0); }
+  75%, 100% { transform: translateX(calc(-100% + 270px)); }
 }
 
 .progress-container {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .time-label {
@@ -661,7 +648,7 @@ html, body {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .btn-ctrl {
@@ -690,8 +677,8 @@ html, body {
 
 .btn-play-main {
   background: #ffffff !important;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
 }
 
 .btn-play-main svg {
@@ -705,7 +692,8 @@ html, body {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 10px;
+  padding-top: 8px;
+  margin-top: auto;
 }
 
 .volume-box, .glass-box {

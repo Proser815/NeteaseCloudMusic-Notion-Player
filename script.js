@@ -59,8 +59,8 @@ const metaStory = document.getElementById("meta-story");
 
 const lyricsContainer = document.getElementById("lyrics-container");
 const lyricText = document.getElementById("lyric-text");
-const marqueeWrapper = document.querySelector(".marquee-wrapper");
-const islandMarqueeWrapper = document.querySelector(".island-marquee-wrapper");
+const marqueeWrapper = document.getElementById("marquee-wrapper");
+const islandMarqueeInner = document.getElementById("island-marquee-inner");
 
 const progressBarBg = document.getElementById("progress-bar-bg");
 const progressBarFill = document.getElementById("progress-bar-fill");
@@ -593,16 +593,16 @@ function setLyricText(text) {
   islandLyricText.innerText = text;
 
   marqueeWrapper.classList.remove("marquee-active");
-  islandMarqueeWrapper.classList.remove("marquee-active");
+  islandMarqueeInner.classList.remove("marquee-active");
 
   setTimeout(() => {
     if (lyricText.scrollWidth > marqueeWrapper.clientWidth) {
       marqueeWrapper.classList.add("marquee-active");
     }
-    if (islandLyricText.scrollWidth > islandMarqueeWrapper.clientWidth) {
-      islandMarqueeWrapper.classList.add("marquee-active");
+    if (islandLyricText.scrollWidth > islandMarqueeInner.clientWidth) {
+      islandMarqueeInner.classList.add("marquee-active");
     }
-  }, 400);
+  }, 300);
 }
 
 async function fetchLyrics(lrcUrl) {
