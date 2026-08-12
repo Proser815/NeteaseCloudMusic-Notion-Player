@@ -75,7 +75,6 @@ html, body {
   object-fit: cover;
   filter: blur(55px) brightness(0.65) saturate(1.4);
   transform: translate(-10%, -10%);
-  transition: src 0.5s ease;
 }
 
 .glass-overlay {
@@ -86,7 +85,7 @@ html, body {
   transition: background 0.2s ease;
 }
 
-/* Dynamic Island */
+/* Dynamic Island (Fixed Hover Alignment & Overflow) */
 .dynamic-island {
   position: absolute;
   top: 20px;
@@ -105,10 +104,10 @@ html, body {
 }
 
 .dynamic-island:hover {
-  width: 320px;
-  height: 72px;
-  border-radius: 28px;
-  padding: 0 16px;
+  width: 330px;
+  height: 68px;
+  border-radius: 26px;
+  padding: 0 14px;
 }
 
 .island-collapsed-content {
@@ -164,7 +163,7 @@ html, body {
   transition: height 0.1s ease;
 }
 
-/* Island Hover Overlay Controls */
+/* Island Hover Controls (Clean Flex layout) */
 .island-hover-controls {
   display: none;
   width: 100%;
@@ -179,15 +178,16 @@ html, body {
 .island-track-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
-  max-width: 130px;
+  gap: 8px;
+  max-width: 120px;
 }
 
 #island-hover-cover {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .island-hover-text {
@@ -197,7 +197,7 @@ html, body {
 }
 
 .island-hover-title {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -205,7 +205,7 @@ html, body {
 }
 
 .island-hover-artist {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   opacity: 0.6;
   white-space: nowrap;
   overflow: hidden;
@@ -215,7 +215,7 @@ html, body {
 .island-btn-group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .island-ctrl-btn {
@@ -223,20 +223,19 @@ html, body {
   border: none;
   color: white;
   cursor: pointer;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .island-ctrl-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
-/* Island Volume Popover */
 .island-volume-popover {
   position: relative;
   display: flex;
@@ -261,7 +260,7 @@ html, body {
 }
 
 #island-volume-slider {
-  width: 80px;
+  width: 70px;
   accent-color: #ffffff;
   cursor: pointer;
 }
@@ -289,7 +288,7 @@ html, body {
   cursor: pointer;
   padding: 6px;
   border-radius: 50%;
-  transition: opacity 0.2s, background 0.2s, transform 0.2s;
+  transition: opacity 0.2s, background 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -318,7 +317,6 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: all 0.3s ease;
   z-index: 25;
 }
 
@@ -353,7 +351,6 @@ html, body {
   cursor: pointer;
 }
 
-/* Search Predictions Dropdown */
 .search-predictions {
   position: absolute;
   top: 100%;
@@ -501,7 +498,7 @@ html, body {
   85%, 100% { transform: translateX(var(--scroll-distance, -50px)); }
 }
 
-/* Timeline Progress Bar */
+/* Timeline Progress Bar (Fixed layout alignment) */
 .progress-section {
   z-index: 2;
 }

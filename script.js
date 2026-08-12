@@ -33,7 +33,6 @@ const islandArtist = document.getElementById("island-artist");
 const islandHoverCover = document.getElementById("island-hover-cover");
 const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
-const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
 
 const islandBtnMode = document.getElementById("island-btn-mode");
@@ -102,7 +101,7 @@ const searchResultsUl = document.getElementById("search-results-ul");
 const searchPredictionsContainer = document.getElementById("search-predictions");
 const predictionsUl = document.getElementById("predictions-ul");
 
-// Web Audio API Visualizer Setup
+// Web Audio Visualizer Setup
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -264,7 +263,6 @@ function syncPlayModeUI() {
   islandModeShuffle.classList.toggle("hidden", playMode !== 2);
 }
 
-// Cover Standby Toggle
 coverWrapper.addEventListener("click", () => {
   playerCard.classList.toggle("standby-mode");
 });
@@ -304,7 +302,6 @@ function updateTransparencyIcons(val) {
   }
 }
 
-// Search Drawer Toggle
 btnToggleSearch.addEventListener("click", () => {
   const isCollapsed = searchSection.classList.contains("collapsed");
   searchSection.classList.toggle("collapsed");
@@ -508,10 +505,6 @@ function setLyricText(text) {
   lyricText.style.transform = "translateX(0)";
   lyricText.innerText = text;
 
-  if (islandLyricText) {
-    islandLyricText.innerText = text;
-  }
-
   requestAnimationFrame(() => {
     const containerWidth = lyricsContainer.clientWidth;
     const textWidth = lyricText.scrollWidth;
@@ -588,32 +581,29 @@ audio.addEventListener("ended", () => {
   }
 });
 
-// ACCURATE NETEASE SEARCH ENGINE WITH FALLBACK
+// Fixed Search API Engine with robust fallbacks
 async function queryNetEaseAPI(query) {
   const clean = query.trim().replace(/[^\w\s\u4e00-\u9fa5]/gi, ' ');
   
-  // Primary Endpoint: Meting API using &keyword=
   try {
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&keyword=${encodeURIComponent(clean)}`);
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) return data;
   } catch (err) {
-    console.warn("Primary endpoint warning, trying secondary...", err);
+    console.warn("Primary search warning, trying fallback...", err);
   }
 
-  // Secondary Endpoint Fallback
   try {
     const fallbackRes = await fetch(`https://api.injahow.cn/meting/?type=search&id=${encodeURIComponent(clean)}`);
     const fallbackData = await fallbackRes.json();
     if (Array.isArray(fallbackData) && fallbackData.length > 0) return fallbackData;
   } catch (err) {
-    console.warn("Secondary search failed:", err);
+    console.warn("Fallback search failed:", err);
   }
 
   return [];
 }
 
-// Prediction & Key Nav Logic
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
   activePredictionIndex = -1;
