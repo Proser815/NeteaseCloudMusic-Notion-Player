@@ -8,19 +8,10 @@ let playMode = 0; // 0: Loop, 1: Repeat One, 2: Shuffle
 let isDraggingProgress = false;
 let previousVolume = 0.8;
 let previousOpacity = 0.5;
-let debounceTimer = null;
 
-let audioCtx;
-let analyser;
-let source;
-let dataArray;
-let animationFrameId;
-
-// DOM Elements
 const playerCard = document.getElementById("player-card");
 const audio = document.getElementById("audio-player");
 const cover = document.getElementById("cover");
-const coverWrapper = document.getElementById("cover-wrapper");
 const backdropImg = document.getElementById("backdrop-img");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
@@ -28,529 +19,170 @@ const artist = document.getElementById("artist");
 const dynamicIsland = document.getElementById("dynamic-island");
 const islandCover = document.getElementById("island-cover");
 const islandTitle = document.getElementById("island-title");
-const islandArtist = document.getElementById("island-artist");
 const islandHoverCover = document.getElementById("island-hover-cover");
 const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
 const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
 
-const islandBtnMode = document.getElementById("island-btn-mode");
-const islandModeLoop = document.getElementById("island-mode-loop");
-const islandModeOne = document.getElementById("island-mode-one");
-const islandModeShuffle = document.getElementById("island-mode-shuffle");
-const islandBtnPrev = document.getElementById("island-btn-prev");
-const islandBtnPlay = document.getElementById("island-btn-play");
-const islandPlayIcon = document.getElementById("island-play-icon");
-const islandPauseIcon = document.getElementById("island-pause-icon");
-const islandBtnNext = document.getElementById("island-btn-next");
-const islandBtnVolume = document.getElementById("island-btn-volume");
-const islandVolLowIcon = document.getElementById("island-vol-low-icon");
-const islandVolHighIcon = document.getElementById("island-vol-high-icon");
-const islandMuteIcon = document.getElementById("island-mute-icon");
-const islandVolumeSlider = document.getElementById("island-volume-slider");
-
-const btnInfo = document.getElementById("btn-info");
-const infoDrawer = document.getElementById("info-drawer");
-const btnCloseInfo = document.getElementById("btn-close-info");
-const metaAlbum = document.getElementById("meta-album");
-const metaBpm = document.getElementById("meta-bpm");
-const metaYear = document.getElementById("meta-year");
-const metaGenre = document.getElementById("meta-genre");
-const metaStory = document.getElementById("meta-story");
-
-const lyricsContainer = document.getElementById("lyrics-container");
-const lyricText = document.getElementById("lyric-text");
+const btnPlay = document.getElementById("btn-play");
+const playIcon = document.getElementById("play-icon");
+const btnPrev = document.getElementById("btn-prev");
+const btnNext = document.getElementById("btn-next");
+const btnMode = document.getElementById("btn-mode");
+const modeIcon = document.getElementById("mode-icon");
 
 const progressBarBg = document.getElementById("progress-bar-bg");
 const progressBarFill = document.getElementById("progress-bar-fill");
 const currentTimeEl = document.getElementById("current-time");
-const durationTimeEl = document.getElementById("duration-time");
+const durationTimeEl = document.getElementById("duration");
+const lyricText = document.getElementById("lyric-text");
 
-const btnPlay = document.getElementById("btn-play");
-const playIcon = document.getElementById("play-icon");
-const pauseIcon = document.getElementById("pause-icon");
-const btnPrev = document.getElementById("btn-prev");
-const btnNext = document.getElementById("btn-next");
-const btnLyrics = document.getElementById("btn-lyrics");
-const btnList = document.getElementById("btn-list");
-const btnMode = document.getElementById("btn-mode");
-
-const btnVolume = document.getElementById("btn-volume");
-const volLowIcon = document.getElementById("vol-low-icon");
-const volHighIcon = document.getElementById("vol-high-icon");
-const muteIcon = document.getElementById("mute-icon");
 const volumeSlider = document.getElementById("volume-slider");
-
-const btnGlass = document.getElementById("btn-glass");
-const glassIcon = document.getElementById("glass-icon");
-const glassOffIcon = document.getElementById("glass-off-icon");
+const btnMute = document.getElementById("btn-mute");
 const opacitySlider = document.getElementById("opacity-slider");
-
-const playlistDrawer = document.getElementById("playlist-drawer");
-const btnClosePlaylist = document.getElementById("btn-close-playlist");
-const playlistUl = document.getElementById("playlist-ul");
 
 const btnToggleSearch = document.getElementById("btn-toggle-search");
 const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
-const btnSearch = document.getElementById("btn-search");
-const searchResultsContainer = document.getElementById("search-results");
+const searchBtn = document.getElementById("search-btn");
+const searchResultsContainer = document.getElementById("search-results-container");
 const searchResultsUl = document.getElementById("search-results-ul");
 
-const searchPredictionsContainer = document.getElementById("search-predictions");
-const predictionsUl = document.getElementById("predictions-ul");
+const btnPlaylist = document.getElementById("btn-playlist");
+const playlistDrawer = document.getElementById("playlist-drawer");
+const btnExitPlaylist = document.getElementById("btn-exit-playlist");
+const playlistUl = document.getElementById("playlist-ul");
 
-// Web Audio API Frequency Equalizer Setup
-function initAudioContext() {
-  if (audioCtx) return;
-  try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    audioCtx = new AudioContext();
+const islandBtnPlay = document.getElementById("island-btn-play");
+const islandPlayIcon = document.getElementById("island-play-icon");
+const islandBtnPrev = document.getElementById("island-btn-prev");
+const islandBtnNext = document.getElementById("island-btn-next");
 
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 64;
-
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-  } catch (e) {
-    console.warn("Web Audio API hook note:", e);
-  }
-}
-
-function animateBars() {
-  if (!analyser || audio.paused) return;
-
-  analyser.getByteFrequencyData(dataArray);
-
-  const low = dataArray[2] || 0;
-  const mid = dataArray[8] || 0;
-  const high = dataArray[15] || 0;
-
-  const bar1Height = Math.max(3, (low / 255) * 14);
-  const bar2Height = Math.max(3, (mid / 255) * 14);
-  const bar3Height = Math.max(3, (high / 255) * 14);
-
-  const allBars = document.querySelectorAll(".eq-bars span");
-  allBars.forEach((_, idx) => {
-    const mod = idx % 3;
-    let h = 3;
-    if (mod === 0) h = bar1Height;
-    if (mod === 1) h = bar2Height;
-    if (mod === 2) h = bar3Height;
-    allBars[idx].style.height = `${h}px`;
-  });
-
-  animationFrameId = requestAnimationFrame(animateBars);
-}
-
-async function initPlayer() {
-  audio.volume = 0.8;
-  updateVolumeIcons(0.8);
-  try {
-    const res = await fetch(API_BASE);
-    playlist = await res.json();
-    renderPlaylist();
-    if (playlist.length > 0) loadTrack(0);
-  } catch (err) {
-    title.innerText = "Error Loading Playlist";
-  }
-}
-
-// Drawer Closures & Navigation
-btnCloseInfo.addEventListener("click", () => {
-  infoDrawer.classList.add("collapsed");
-  btnInfo.classList.remove("active");
-});
-
-btnClosePlaylist.addEventListener("click", () => {
-  playlistDrawer.classList.add("collapsed");
-});
-
-btnInfo.addEventListener("click", () => {
-  infoDrawer.classList.toggle("collapsed");
-  btnInfo.classList.toggle("active");
-});
-
-// Dynamic Island Morphing
-btnIsland.addEventListener("click", () => {
-  playerCard.classList.add("morphed-hidden");
-  dynamicIsland.classList.remove("hidden");
-});
-
-dynamicIsland.addEventListener("click", (e) => {
-  if (e.target.closest('.island-ctrl-btn') || e.target.closest('#island-volume-slider')) {
-    return;
-  }
-  playerCard.classList.remove("morphed-hidden");
-  dynamicIsland.classList.add("hidden");
-});
-
-islandBtnPlay.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnPlay.click();
-});
-
-islandBtnPrev.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnPrev.click();
-});
-
-islandBtnNext.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnNext.click();
-});
-
-islandBtnMode.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnMode.click();
-  syncPlayModeUI();
-});
-
-islandVolumeSlider.addEventListener("input", (e) => {
-  e.stopPropagation();
-  const val = parseFloat(e.target.value);
-  audio.volume = val;
-  volumeSlider.value = val;
-  updateVolumeIcons(val);
-});
-
-islandBtnVolume.addEventListener("click", (e) => {
-  e.stopPropagation();
-  if (audio.volume > 0) {
-    previousVolume = audio.volume;
-    audio.volume = 0;
-    volumeSlider.value = 0;
-    islandVolumeSlider.value = 0;
-  } else {
-    audio.volume = previousVolume || 0.8;
-    volumeSlider.value = audio.volume;
-    islandVolumeSlider.value = audio.volume;
-  }
-  updateVolumeIcons(audio.volume);
-});
-
-function updateVolumeIcons(val) {
-  if (val === 0) {
-    volLowIcon.classList.add("hidden");
-    volHighIcon.classList.add("hidden");
-    muteIcon.classList.remove("hidden");
-    islandVolLowIcon.classList.add("hidden");
-    islandVolHighIcon.classList.add("hidden");
-    islandMuteIcon.classList.remove("hidden");
-  } else if (val <= 0.5) {
-    volLowIcon.classList.remove("hidden");
-    volHighIcon.classList.add("hidden");
-    muteIcon.classList.add("hidden");
-    islandVolLowIcon.classList.remove("hidden");
-    islandVolHighIcon.classList.add("hidden");
-    islandMuteIcon.classList.add("hidden");
-  } else {
-    volLowIcon.classList.add("hidden");
-    volHighIcon.classList.remove("hidden");
-    muteIcon.classList.add("hidden");
-    islandVolLowIcon.classList.add("hidden");
-    islandVolHighIcon.classList.remove("hidden");
-    islandMuteIcon.classList.add("hidden");
-  }
-}
-
-function syncPlayModeUI() {
-  islandModeLoop.classList.toggle("hidden", playMode !== 0);
-  islandModeOne.classList.toggle("hidden", playMode !== 1);
-  islandModeShuffle.classList.toggle("hidden", playMode !== 2);
-}
-
-// Standby Display Toggle
-coverWrapper.addEventListener("click", () => {
-  playerCard.classList.toggle("standby-mode");
-});
-
-btnLyrics.addEventListener("click", () => {
-  lyricsContainer.classList.toggle("collapsed");
-  btnLyrics.classList.toggle("active");
-});
-
-// Glass Tint Opacity Controller
-opacitySlider.addEventListener("input", (e) => {
-  const val = parseFloat(e.target.value);
-  document.documentElement.style.setProperty("--glass-tint-opacity", val);
-  updateTransparencyIcons(val);
-});
-
-btnGlass.addEventListener("click", () => {
-  const currentVal = parseFloat(opacitySlider.value);
-  if (currentVal >= 0.15) {
-    previousOpacity = currentVal;
-    opacitySlider.value = 0;
-    document.documentElement.style.setProperty("--glass-tint-opacity", 0);
-  } else {
-    opacitySlider.value = previousOpacity || 0.5;
-    document.documentElement.style.setProperty("--glass-tint-opacity", opacitySlider.value);
-  }
-  updateTransparencyIcons(parseFloat(opacitySlider.value));
-});
-
-function updateTransparencyIcons(val) {
-  if (val < 0.15) {
-    glassIcon.classList.add("hidden");
-    glassOffIcon.classList.remove("hidden");
-  } else {
-    glassIcon.classList.remove("hidden");
-    glassOffIcon.classList.add("hidden");
-  }
-}
-
-// Search Toggle
-btnToggleSearch.addEventListener("click", () => {
-  const isCollapsed = searchSection.classList.contains("collapsed");
-  searchSection.classList.toggle("collapsed");
-  btnToggleSearch.classList.toggle("active", isCollapsed);
-  if (isCollapsed) {
-    searchInput.focus();
-  } else {
-    hidePredictions();
-  }
-});
-
-function renderPlaylist() {
-  playlistUl.innerHTML = "";
-  playlist.forEach((song, index) => {
-    const li = document.createElement("li");
-    const isActive = index === currentIndex;
-    if (isActive) li.classList.add("active");
-    li.style.cssText = `
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px;
-      margin-bottom: 6px;
-      border-radius: 10px;
-      cursor: pointer;
-      background: ${isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)'};
-      transition: background 0.2s;
-    `;
-    li.innerHTML = `
-      <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
-        <img src="${song.pic}" style="width:32px; height:32px; border-radius:6px; object-fit:cover; flex-shrink:0;">
-        <div style="overflow:hidden;">
-          <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.8rem; font-weight:600;">${song.title}</div>
-          <div style="font-size:0.7rem; opacity:0.6; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${song.author}</div>
-        </div>
-      </div>
-    `;
-    li.addEventListener("click", () => {
-      loadTrack(index);
-      playTrack();
-      playlistDrawer.classList.add("collapsed");
-    });
-    playlistUl.appendChild(li);
-  });
-}
+// Fetch initial playlist
+fetch(API_BASE)
+  .then(res => res.json())
+  .then(data => {
+    if (Array.isArray(data) && data.length > 0) {
+      playlist = data;
+      renderPlaylist();
+      loadTrack(currentIndex);
+    }
+  })
+  .catch(err => console.error("Failed to load playlist:", err));
 
 function loadTrack(index) {
-  if (!playlist[index]) return;
+  if (playlist.length === 0) return;
   currentIndex = index;
-  const track = playlist[currentIndex];
+  const song = playlist[currentIndex];
 
-  audio.src = track.url;
-  cover.src = track.pic;
-  backdropImg.src = track.pic;
-  title.innerText = track.title;
-  artist.innerText = track.author;
+  audio.src = song.url;
+  title.innerText = song.title;
+  artist.innerText = song.author;
+  cover.src = song.pic;
+  backdropImg.src = song.pic;
 
-  // Sync Collapsed Island (Horizontal View)
-  islandCover.src = track.pic;
-  islandTitle.innerText = track.title;
-  if (islandArtist) islandArtist.innerText = track.author;
+  islandCover.src = song.pic;
+  islandTitle.innerText = song.title;
+  islandHoverCover.src = song.pic;
+  islandHoverTitle.innerText = song.title;
+  islandHoverArtist.innerText = song.author;
 
-  // Sync Expanded Island
-  islandHoverCover.src = track.pic;
-  islandHoverTitle.innerText = track.title;
-  islandHoverArtist.innerText = track.author;
-
-  document.getElementById("standby-title").innerText = track.title;
-  document.getElementById("standby-artist").innerText = track.author;
-
-  metaAlbum.innerText = track.album || track.title;
-  metaBpm.innerText = track.bpm || "~120 BPM";
-  metaYear.innerText = track.year || "2026";
-  metaGenre.innerText = track.genre || "Pop / Acoustic";
-  metaStory.innerText = track.story || `Enjoying "${track.title}" by ${track.author}. Streamed directly with custom dynamic glass styling.`;
-
-  extractDominantColor(track.pic);
-  fetchLyrics(track.lrc);
+  extractDominantColor(song.pic);
+  fetchLyrics(song.lrc);
   renderPlaylist();
 }
 
 function playTrack() {
-  initAudioContext();
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
   audio.play().then(() => {
-    playIcon.classList.add("hidden");
-    pauseIcon.classList.remove("hidden");
-    islandPlayIcon.classList.add("hidden");
-    islandPauseIcon.classList.remove("hidden");
-    animateBars();
-  }).catch(e => console.log("Playback error:", e));
+    playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    islandPlayIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    dynamicIsland.classList.remove("hidden");
+  }).catch(e => console.log("Playback prevented:", e));
 }
 
 function pauseTrack() {
   audio.pause();
-  playIcon.classList.remove("hidden");
-  pauseIcon.classList.add("hidden");
-  islandPlayIcon.classList.remove("hidden");
-  islandPauseIcon.classList.add("hidden");
-  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  islandPlayIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
 }
 
 btnPlay.addEventListener("click", () => {
-  if (audio.paused) {
-    playTrack();
+  if (audio.paused) playTrack();
+  else pauseTrack();
+});
+
+islandBtnPlay.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (audio.paused) playTrack();
+  else pauseTrack();
+});
+
+btnPrev.addEventListener("click", prevTrack);
+islandBtnPrev.addEventListener("click", (e) => {
+  e.stopPropagation();
+  prevTrack();
+});
+
+btnNext.addEventListener("click", nextTrack);
+islandBtnNext.addEventListener("click", (e) => {
+  e.stopPropagation();
+  nextTrack();
+});
+
+function prevTrack() {
+  currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+  loadTrack(currentIndex);
+  playTrack();
+}
+
+function nextTrack() {
+  if (playMode === 2) {
+    currentIndex = Math.floor(Math.random() * playlist.length);
   } else {
-    pauseTrack();
+    currentIndex = (currentIndex + 1) % playlist.length;
   }
-});
-
-btnNext.addEventListener("click", () => {
-  if (playlist.length === 0) return;
-  let next = playMode === 2 ? Math.floor(Math.random() * playlist.length) : (currentIndex + 1) % playlist.length;
-  loadTrack(next);
+  loadTrack(currentIndex);
   playTrack();
-});
+}
 
-btnPrev.addEventListener("click", () => {
-  if (playlist.length === 0) return;
-  let prev = (currentIndex - 1 + playlist.length) % playlist.length;
-  loadTrack(prev);
-  playTrack();
-});
-
-btnList.addEventListener("click", () => {
-  playlistDrawer.classList.toggle("collapsed");
-});
-
+// Play Mode
 btnMode.addEventListener("click", () => {
   playMode = (playMode + 1) % 3;
-  if (playMode === 0) btnMode.title = "Loop Playlist";
-  if (playMode === 1) btnMode.title = "Repeat One";
-  if (playMode === 2) btnMode.title = "Shuffle";
-  syncPlayModeUI();
-});
-
-volumeSlider.addEventListener("input", (e) => {
-  const val = parseFloat(e.target.value);
-  audio.volume = val;
-  islandVolumeSlider.value = val;
-  updateVolumeIcons(val);
-});
-
-btnVolume.addEventListener("click", () => {
-  if (audio.volume > 0) {
-    previousVolume = audio.volume;
-    audio.volume = 0;
-    volumeSlider.value = 0;
-    islandVolumeSlider.value = 0;
+  if (playMode === 0) {
+    modeIcon.innerHTML = '<path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>';
+    btnMode.title = "Loop Mode";
+  } else if (playMode === 1) {
+    modeIcon.innerHTML = '<path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/><text x="10" y="15" font-size="8" fill="currentColor">1</text>';
+    btnMode.title = "Repeat One";
   } else {
-    audio.volume = previousVolume || 0.8;
-    volumeSlider.value = audio.volume;
-    islandVolumeSlider.value = audio.volume;
+    modeIcon.innerHTML = '<path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/>';
+    btnMode.title = "Shuffle";
   }
-  updateVolumeIcons(audio.volume);
 });
 
-async function fetchLyrics(lrcUrl) {
-  lyrics = [];
-  setLyricText("Loading lyrics...");
-  if (!lrcUrl) {
-    setLyricText("No Lyrics Available");
-    return;
-  }
-  try {
-    const res = await fetch(lrcUrl);
-    const text = await res.text();
-    parseLrc(text);
-  } catch (err) {
-    setLyricText("Lyrics unavailable");
-  }
-}
-
-function parseLrc(lrcText) {
-  const lines = lrcText.split("\n");
-  const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
-  lyrics = [];
-
-  for (let line of lines) {
-    const match = timeExp.exec(line);
-    if (match) {
-      const minutes = parseInt(match[1]);
-      const seconds = parseInt(match[2]);
-      const time = minutes * 60 + seconds;
-      const text = line.replace(timeExp, "").trim();
-      if (text) lyrics.push({ time, text });
-    }
-  }
-
-  if (lyrics.length === 0) {
-    setLyricText("Instrumental or No Sync Lyrics");
+audio.addEventListener("ended", () => {
+  if (playMode === 1) {
+    audio.currentTime = 0;
+    playTrack();
   } else {
-    setLyricText(lyrics[0].text);
+    nextTrack();
   }
-}
+});
 
-function setLyricText(text) {
-  if (!lyricText) return;
-
-  // Reset animation state
-  lyricText.classList.remove("animate-lyric");
-  lyricText.style.transform = "translateX(0)";
-  lyricText.innerText = text;
-
-  if (islandLyricText) {
-    islandLyricText.innerText = text;
-  }
-
-  // Measure text width vs container width and scroll if needed
-  requestAnimationFrame(() => {
-    const containerWidth = lyricsContainer.clientWidth;
-    const textWidth = lyricText.scrollWidth;
-
-    if (textWidth > containerWidth) {
-      const overflowDistance = textWidth - containerWidth + 24; // Padding buffer
-      
-      // Speed up calculations: lower divisor = faster scroll duration (45 instead of 25)
-      const duration = Math.max(3.5, overflowDistance / 45);
-
-      lyricText.style.setProperty("--scroll-distance", `-${overflowDistance}px`);
-      lyricText.style.setProperty("--scroll-duration", `${duration}s`);
-      
-      // Force layout update & add animation class
-      void lyricText.offsetWidth;
-      lyricText.classList.add("animate-lyric");
-    }
-  });
-}
-
+// Progress Bar
 function formatTime(seconds) {
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-  return `${min}:${sec < 10 ? "0" : ""}${sec}`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
 function updateProgressFromEvent(e) {
-  if (!audio.duration) return;
   const rect = progressBarBg.getBoundingClientRect();
-  let clickX = e.clientX - rect.left;
-  clickX = Math.max(0, Math.min(clickX, rect.width));
-  const percent = clickX / rect.width;
-  progressBarFill.style.width = `${percent * 100}%`;
-  currentTimeEl.innerText = formatTime(percent * audio.duration);
-  return percent;
+  const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  progressBarFill.style.width = `${pos * 100}%`;
+  currentTimeEl.innerText = formatTime(pos * audio.duration);
+  return pos;
 }
 
 progressBarBg.addEventListener("mousedown", (e) => {
@@ -580,110 +212,106 @@ audio.addEventListener("timeupdate", () => {
 
   if (lyrics.length > 0) {
     let currentLine = lyrics.filter(l => l.time <= curTime).pop();
-    if (currentLine && lyricText.innerText !== currentLine.text) {
-      setLyricText(currentLine.text);
+    if (currentLine) {
+      lyricText.innerText = currentLine.text;
+      islandLyricText.innerText = currentLine.text;
     }
   }
 });
 
-audio.addEventListener("ended", () => {
-  if (playMode === 1) {
-    audio.currentTime = 0;
-    playTrack();
-  } else {
-    btnNext.click();
-  }
-});
-
-searchInput.addEventListener("input", () => {
-  clearTimeout(debounceTimer);
-  const query = searchInput.value.trim();
-  if (query.length < 2) {
-    hidePredictions();
+// Lyrics Parser
+function fetchLyrics(lrcUrl) {
+  if (!lrcUrl) {
+    lyrics = [];
+    lyricText.innerText = "No lyrics available";
+    islandLyricText.innerText = "No lyrics";
     return;
   }
-  debounceTimer = setTimeout(() => {
-    fetchSearchPredictions(query);
-  }, 250);
-});
-
-async function fetchSearchPredictions(query) {
-  try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
-    const results = await res.json();
-    renderPredictions(results.slice(0, 5));
-  } catch (err) {
-    hidePredictions();
-  }
-}
-
-function renderPredictions(predictions) {
-  predictionsUl.innerHTML = "";
-  if (!predictions || predictions.length === 0) {
-    hidePredictions();
-    return;
-  }
-  predictions.forEach(song => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${song.title} - ${song.author}</span>
-      <span style="font-size:0.65rem; opacity:0.5; flex-shrink:0; margin-left:8px;">Suggest</span>
-    `;
-    li.addEventListener("click", () => {
-      searchInput.value = `${song.title} - ${song.author}`;
-      hidePredictions();
-      performSearch();
+  fetch(lrcUrl)
+    .then(res => res.text())
+    .then(text => parseLRC(text))
+    .catch(() => {
+      lyrics = [];
+      lyricText.innerText = "Lyrics load failed";
     });
-    predictionsUl.appendChild(li);
+}
+
+function parseLRC(lrc) {
+  const lines = lrc.split("\n");
+  const result = [];
+  const regex = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\](.*)/;
+  lines.forEach(line => {
+    const match = regex.exec(line);
+    if (match) {
+      const minutes = parseInt(match[1], 10);
+      const seconds = parseInt(match[2], 10);
+      const milliseconds = match[3] ? parseInt(match[3].padEnd(3, '0'), 10) : 0;
+      const time = minutes * 60 + seconds + milliseconds / 1000;
+      const text = match[4].trim();
+      if (text) result.push({ time, text });
+    }
   });
-  searchPredictionsContainer.classList.remove("hidden");
+  lyrics = result;
 }
 
-function hidePredictions() {
-  searchPredictionsContainer.classList.add("hidden");
-}
-
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".search-bar-wrapper")) {
-    hidePredictions();
+// Volume & Opacity
+volumeSlider.addEventListener("input", (e) => {
+  audio.volume = e.target.value;
+});
+btnMute.addEventListener("click", () => {
+  if (audio.volume > 0) {
+    previousVolume = audio.volume;
+    audio.volume = 0;
+    volumeSlider.value = 0;
+  } else {
+    audio.volume = previousVolume;
+    volumeSlider.value = previousVolume;
   }
 });
 
-btnSearch.addEventListener("click", performSearch);
+opacitySlider.addEventListener("input", (e) => {
+  const val = e.target.value;
+  playerCard.style.setProperty("--glass-tint-opacity", val);
+});
+
+// Search Drawers
+btnToggleSearch.addEventListener("click", () => {
+  searchSection.classList.toggle("collapsed");
+  btnToggleSearch.classList.toggle("active");
+  if (!searchSection.classList.contains("collapsed")) {
+    searchInput.focus();
+  }
+});
+
+searchBtn.addEventListener("click", executeSearch);
 searchInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    hidePredictions();
-    performSearch();
-  }
+  if (e.key === "Enter") executeSearch();
 });
 
-async function performSearch() {
+function executeSearch() {
   const query = searchInput.value.trim();
   if (!query) return;
-  hidePredictions();
-  try {
-    const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
-    const results = await res.json();
-    renderSearchResults(results);
-  } catch (err) {
-    alert("Search failed.");
-  }
+  fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`)
+    .then(res => res.json())
+    .then(data => renderSearchResults(data))
+    .catch(err => console.error("Search failed:", err));
 }
 
 function renderSearchResults(results) {
   searchResultsUl.innerHTML = "";
-  if (!results || results.length === 0) {
-    searchResultsContainer.classList.add("hidden");
+  searchResultsContainer.classList.remove("hidden");
+  if (!Array.isArray(results) || results.length === 0) {
+    searchResultsUl.innerHTML = `<li style="justify-content:center; color:rgba(255,255,255,0.5);">No results found</li>`;
     return;
   }
-  searchResultsContainer.classList.remove("hidden");
   results.forEach(song => {
     const li = document.createElement("li");
+    // Point 5: Make sure the '+ Add' button when searching for songs is just a simple '+'
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
+      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width: 80%;">
         ${song.title} - ${song.author}
       </span>
-      <span class="add-btn" style="font-size:0.75rem; color:#fff; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:6px;">+ Add</span>
+      <span class="add-btn" style="font-size:0.9rem; font-weight:bold; color:#fff; background:rgba(255,255,255,0.2); width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">+</span>
     `;
     li.addEventListener("click", () => {
       playlist.push(song);
@@ -698,6 +326,91 @@ function renderSearchResults(results) {
   });
 }
 
+// Playlist Drawer
+btnPlaylist.addEventListener("click", () => {
+  playlistDrawer.classList.remove("collapsed");
+});
+btnExitPlaylist.addEventListener("click", () => {
+  playlistDrawer.classList.add("collapsed");
+});
+
+function renderPlaylist() {
+  playlistUl.innerHTML = "";
+  playlist.forEach((song, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "playlist-item-wrapper";
+
+    const deleteBg = document.createElement("div");
+    deleteBg.className = "playlist-item-delete-bg";
+    deleteBg.innerText = "Delete";
+    deleteBg.addEventListener("click", (e) => {
+      e.stopPropagation();
+      playlist.splice(index, 1);
+      if (playlist.length === 0) {
+        audio.pause();
+        audio.src = "";
+        title.innerText = "No Songs";
+        artist.innerText = "";
+        cover.src = "";
+        backdropImg.src = "";
+      } else if (currentIndex >= index) {
+        currentIndex = Math.max(0, currentIndex - 1);
+        loadTrack(currentIndex);
+        playTrack();
+      }
+      renderPlaylist();
+    });
+
+    const item = document.createElement("div");
+    item.className = `playlist-item ${index === currentIndex ? "active" : ""}`;
+    item.innerHTML = `
+      <div class="playlist-item-info">
+        <span class="playlist-item-title">${song.title}</span>
+        <span class="playlist-item-artist">${song.author}</span>
+      </div>
+    `;
+
+    // Point 2: iOS swipe-to-delete interaction
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+
+    item.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    });
+
+    item.addEventListener("touchmove", (e) => {
+      if (!isDragging) return;
+      currentX = e.touches[0].clientX - startX;
+      if (currentX < 0 && currentX > -80) {
+        item.style.transform = `translateX(${currentX}px)`;
+      }
+    });
+
+    item.addEventListener("touchend", () => {
+      isDragging = false;
+      if (currentX < -40) {
+        item.style.transform = `translateX(-80px)`;
+      } else {
+        item.style.transform = `translateX(0px)`;
+      }
+      currentX = 0;
+    });
+
+    item.addEventListener("click", () => {
+      loadTrack(index);
+      playTrack();
+      playlistDrawer.classList.add("collapsed");
+    });
+
+    wrapper.appendChild(deleteBg);
+    wrapper.appendChild(item);
+    playlistUl.appendChild(wrapper);
+  });
+}
+
+// Dominant Color Extraction
 function extractDominantColor(imageUrl) {
   const img = new Image();
   img.crossOrigin = "Anonymous";
@@ -719,10 +432,24 @@ function extractDominantColor(imageUrl) {
     r = Math.floor(r / count);
     g = Math.floor(g / count);
     b = Math.floor(b / count);
-
-    document.documentElement.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
-    document.documentElement.style.setProperty("--glow-color", `rgba(${r}, ${g}, ${b}, 0.5)`);
+    playerCard.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
   };
 }
 
-initPlayer();
+// Point 1: Dynamic Island Expansion Logic
+btnIsland.addEventListener("click", () => {
+  dynamicIsland.classList.toggle("hidden");
+});
+
+dynamicIsland.addEventListener("click", (e) => {
+  if (e.target.closest('.island-buttons') || e.target.closest('#island-btn-play')) return;
+  dynamicIsland.classList.toggle("expanded");
+});
+
+window.addEventListener("click", (e) => {
+  if (dynamicIsland.classList.contains("expanded") && 
+      !dynamicIsland.contains(e.target) && 
+      e.target !== btnIsland) {
+    dynamicIsland.classList.remove("expanded");
+  }
+});
