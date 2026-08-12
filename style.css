@@ -1,3 +1,169 @@
+/* Compact Dynamic Island Expanded Hover Layout */
+.dynamic-island.expanded {
+  width: 290px;
+  height: 96px;
+  border-radius: 28px;
+  padding: 12px 14px;
+}
+
+.island-hover-controls {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 12px 14px;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  border-radius: 28px;
+}
+
+.dynamic-island:hover .island-hover-controls,
+.dynamic-island.expanded .island-hover-controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Top Meta Row */
+.island-hover-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#island-hover-cover {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.island-hover-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#island-hover-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#island-hover-artist {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Middle Row */
+.island-hover-middle {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.65);
+  text-align: left;
+  padding-left: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bottom Controls Row */
+.island-hover-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.island-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.island-ctrl-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  opacity: 0.85;
+  border-radius: 50%;
+  transition: opacity 0.2s, transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.island-ctrl-btn:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.island-ctrl-btn:active {
+  transform: scale(0.92); /* iOS tactile press feedback */
+  opacity: 0.6;
+}
+
+.island-ctrl-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* Main Play Button (iOS Circular Pill Accent) */
+.island-play-main {
+  background: #ffffff !important;
+  color: #000000 !important;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.25);
+}
+
+.island-play-main svg {
+  fill: #000000 !important;
+  width: 14px;
+  height: 14px;
+}
+
+/* Volume Slider Group */
+.island-volume-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#island-volume-slider {
+  width: 55px;
+  height: 3px;
+  accent-color: #ffffff;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+#island-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+the css you told me to add
 * {
   box-sizing: border-box;
   margin: 0;
@@ -59,9 +225,7 @@ html, body {
   fill: #fff;
 }
 
-/* =========================================
-   Dynamic Island Base & Stretch Layout
-   ========================================= */
+/* Dynamic Island Base Styling */
 .dynamic-island {
   position: absolute;
   top: 12px;
@@ -77,11 +241,9 @@ html, body {
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  transition: all 0.4s var(--ios-spring);
   cursor: pointer;
   overflow: hidden;
-  transition: width 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
-              height 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
-              border-radius 0.5s ease;
 }
 
 .dynamic-island.hidden {
@@ -96,7 +258,6 @@ html, body {
   gap: 10px;
   width: 100%;
   overflow: hidden;
-  transition: all 0.3s ease;
 }
 
 #island-cover {
@@ -107,54 +268,190 @@ html, body {
   flex-shrink: 0;
 }
 
-/* Hide collapsed pill content smoothly on expand/hover */
+/* =========================================
+   iOS White Delete Button (Playlist)
+   ========================================= */
+.delete-btn-ios {
+  background: rgba(255, 255, 255, 0.9);
+  color: #1c1c1e;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8) translateX(10px);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth iOS Spring */
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+
+.track-item-row:hover .delete-btn-ios {
+  opacity: 1;
+  transform: scale(1) translateX(0);
+}
+
+.delete-btn-ios:hover {
+  background: #ff3b30; /* Snaps to iOS Red on hover */
+  color: white;
+  transform: scale(1.1);
+}
+
+/* =========================================
+   Compact Dynamic Island Hover Layout
+   ========================================= */
+.dynamic-island {
+  transition: width 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
+              height 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
+              border-radius 0.5s ease;
+  overflow: hidden;
+}
+
+.dynamic-island:hover,
+.dynamic-island.expanded {
+  width: 290px;
+  height: 96px;
+  border-radius: 26px;
+  padding: 10px 12px;
+}
+
+/* Hide collapsed pill content smoothly */
 .dynamic-island:hover .island-collapsed-content,
 .dynamic-island.expanded .island-collapsed-content {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.9);
+  transition: all 0.3s ease;
 }
 
-/* The Stretch */
-.dynamic-island:hover, 
-.dynamic-island.expanded {
-  width: 360px !important;
-  height: 140px !important;
-  border-radius: 40px;
-}
-
-/* Reveal all buttons inside the stretched island */
 .island-hover-controls {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.95);
-  backdrop-filter: blur(25px);
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.95);
-  transition: opacity 0.4s ease 0.1s, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s;
+  justify-content: space-between;
   width: 100%;
   height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(25px);
 }
 
 .dynamic-island:hover .island-hover-controls,
 .dynamic-island.expanded .island-hover-controls {
   opacity: 1;
   pointer-events: auto;
-  transform: scale(1);
 }
 
-.island-controls {
+.island-hover-top {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
-  width: 100%;
-  margin-top: 10px;
+  gap: 8px;
+}
+
+#island-hover-cover {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.island-hover-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#island-hover-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#island-hover-artist {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.island-hover-middle {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.island-hover-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.island-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.island-ctrl-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.island-ctrl-btn:hover {
+  opacity: 1;
+}
+
+.island-ctrl-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+
+.island-play-main {
+  background: #fff;
+  color: #000;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.island-play-main svg {
+  fill: #000;
+}
+
+.island-volume-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#island-volume-slider {
+  width: 50px;
+  height: 3px;
+  accent-color: #fff;
+  cursor: pointer;
 }
 
 /* Horizontal Song Name + Author Collapsed Layout */
@@ -192,136 +489,7 @@ html, body {
   text-overflow: ellipsis;
 }
 
-.island-track-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-#island-hover-cover {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.island-track-text {
-  display: flex;
-  flex-direction: column;
-}
-
-#island-hover-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-#island-hover-artist {
-  font-size: 0.6rem;
-  opacity: 0.7;
-}
-
-.island-marquee-container {
-  overflow: hidden;
-  max-width: 200px;
-  margin: 0 4px;
-  flex-shrink: 1;
-}
-
-.island-marquee-inner {
-  white-space: nowrap;
-  display: inline-block;
-}
-
-#island-lyric-text {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.85);
-}
-
-.island-action-buttons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.island-ctrl-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-}
-
-.island-ctrl-btn svg {
-  width: 15px;
-  height: 15px;
-  fill: currentColor;
-}
-
-/* Dynamic Island Volume Slider */
-.island-volume-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-#island-volume-slider {
-  width: 0;
-  opacity: 0;
-  pointer-events: none;
-  accent-color: #fff;
-  height: 3px;
-  transition: width 0.3s var(--ios-spring), opacity 0.25s ease, margin 0.25s ease;
-  margin-left: 0;
-}
-
-.island-volume-container:hover #island-volume-slider {
-  width: 50px;
-  opacity: 1;
-  pointer-events: auto;
-  margin-left: 4px;
-}
-
-/* =========================================
-   iOS White Delete Button (Playlist)
-   ========================================= */
-.delete-btn-ios {
-  background: rgba(255, 255, 255, 0.9);
-  color: #1c1c1e;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transform: scale(0.8) translateX(10px);
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  margin-left: 10px;
-  flex-shrink: 0;
-}
-
-.track-item-row:hover .delete-btn-ios {
-  opacity: 1;
-  transform: scale(1) translateX(0);
-}
-
-.delete-btn-ios:hover {
-  background: #ff3b30;
-  color: white;
-  transform: scale(1.1);
-}
-
-/* =========================================
-   Player Card Styling
-   ========================================= */
+/* Player Card Styling */
 .player-card {
   position: relative;
   width: 320px;
@@ -336,6 +504,39 @@ html, body {
   display: flex;
   flex-direction: column;
   transition: transform 0.4s var(--ios-spring), opacity 0.3s ease, background 0.4s ease;
+}
+
+.playlist-card-container {
+  max-height: 65vh;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.ios-playlist-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ios-add-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.08);
+}
+
+.ios-add-btn:active {
+  transform: scale(0.92);
+}
+
+.ios-playlist-item.active {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.ios-delete-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.08);
+}
+
+.ios-delete-btn:active {
+  transform: scale(0.92);
 }
 
 .player-card.morphed-hidden {
