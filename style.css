@@ -9,7 +9,8 @@
   --accent-rgb: 255, 255, 255;
   --glow-color: rgba(255, 255, 255, 0.6);
   --glass-tint-opacity: 0.5;
-  --ios-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Smoother, less intense animation curve */
+  --ios-spring: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 html, body {
@@ -34,9 +35,6 @@ html, body {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
 
 .btn-exit-drawer {
   background: rgba(255, 255, 255, 0.15);
@@ -48,12 +46,12 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s, transform 0.3s var(--ios-spring);
+  transition: background 0.2s, transform 0.25s var(--ios-spring);
 }
 
 .btn-exit-drawer:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .btn-exit-drawer svg {
@@ -62,29 +60,29 @@ html, body {
   fill: #fff;
 }
 
-/* Dynamic Island Adjustments: Automatically Stretches Wider to fit all components fully */
+/* Dynamic Island: Expands naturally on Hover */
 .dynamic-island {
   position: absolute;
   top: 12px;
-  z-index: 10;
+  z-index: 50;
   height: 40px;
   min-width: 180px;
   width: auto;
   padding: 0 14px;
   background: #000000;
-  border-radius: 20px;
+  border-radius: 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  transition: all 0.5s var(--ios-spring);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  transition: all 0.4s var(--ios-spring);
   cursor: pointer;
   overflow: hidden;
 }
 
 .dynamic-island.hidden {
   opacity: 0;
-  transform: translateY(-20px) scale(0.8);
+  transform: translateY(-20px) scale(0.85);
   pointer-events: none;
 }
 
@@ -116,13 +114,19 @@ html, body {
   padding: 0 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease;
   white-space: nowrap;
   width: max-content;
   min-width: 100%;
+}
+
+.dynamic-island:hover {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 24px;
 }
 
 .dynamic-island:hover .island-hover-controls {
@@ -161,7 +165,7 @@ html, body {
 
 .island-marquee-container {
   overflow: hidden;
-  max-width: 220px;
+  max-width: 200px;
   margin: 0 4px;
   flex-shrink: 1;
 }
@@ -179,7 +183,7 @@ html, body {
 .island-action-buttons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -226,12 +230,12 @@ html, body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.6s var(--ios-spring), opacity 0.5s ease, background 0.4s ease;
+  transition: transform 0.4s var(--ios-spring), opacity 0.3s ease, background 0.4s ease;
 }
 
 .player-card.morphed-hidden {
   opacity: 0;
-  transform: scale(0.85) translateY(30px);
+  transform: scale(0.9) translateY(20px);
   pointer-events: none;
 }
 
@@ -248,7 +252,7 @@ html, body {
   object-fit: cover;
   filter: blur(50px) brightness(0.6);
   transform: scale(1.2);
-  transition: opacity 0.6s ease;
+  transition: opacity 0.5s ease;
 }
 
 .backdrop-tint {
@@ -288,12 +292,12 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s var(--ios-spring);
+  transition: background 0.2s ease, transform 0.2s var(--ios-spring);
 }
 
 .btn-top:hover {
   background: rgba(255, 255, 255, 0.28);
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .btn-top.active {
@@ -306,19 +310,19 @@ html, body {
   fill: #fff;
 }
 
+/* Live Auto-Suggest Search Section */
 .search-section {
   position: absolute;
   top: 60px;
   left: 20px;
   right: 20px;
-  z-index: 25;
-  transition: all 0.4s var(--ios-spring);
-  overflow: hidden;
+  z-index: 30;
+  transition: all 0.35s var(--ios-spring);
 }
 
 .search-section.collapsed {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-8px);
   pointer-events: none;
 }
 
@@ -329,7 +333,7 @@ html, body {
 
 .search-bar {
   display: flex;
-  background: rgba(30, 30, 30, 0.88);
+  background: rgba(30, 30, 30, 0.92);
   backdrop-filter: blur(20px);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -374,6 +378,7 @@ html, body {
   fill: #fff;
 }
 
+/* Predictions Overlay Dropdown */
 .search-predictions {
   position: absolute;
   top: 48px;
@@ -384,8 +389,8 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 15px 35px rgba(0,0,0,0.6);
   overflow-y: auto;
-  max-height: 180px;
-  z-index: 30;
+  max-height: 190px;
+  z-index: 35;
 }
 
 .search-predictions.hidden {
@@ -434,7 +439,7 @@ html, body {
 
 .search-results {
   margin-top: 8px;
-  background: rgba(20, 20, 20, 0.92);
+  background: rgba(20, 20, 20, 0.94);
   backdrop-filter: blur(25px);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -453,9 +458,9 @@ html, body {
 }
 
 .search-results li {
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 8px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -468,19 +473,46 @@ html, body {
   background: rgba(255, 255, 255, 0.12);
 }
 
+.search-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-queue {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.85rem;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-add-queue:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.1);
+}
+
 .cover-wrapper {
   position: relative;
-  width: 180px;
-  height: 180px;
-  margin: 0 auto 12px auto;
+  width: 175px;
+  height: 175px;
+  margin: 0 auto 10px auto;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
-  transition: transform 0.5s var(--ios-spring), border-radius 0.5s ease;
+  transition: transform 0.4s var(--ios-spring), border-radius 0.4s ease;
 }
 
 .cover-wrapper:hover {
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
 #cover {
@@ -499,7 +531,7 @@ html, body {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.3s ease;
 }
 
 .player-card.standby-mode .standby-overlay {
@@ -510,7 +542,7 @@ html, body {
   border-radius: 50%;
   width: 130px;
   height: 130px;
-  margin: 16px auto;
+  margin: 14px auto;
 }
 
 #standby-title {
@@ -526,7 +558,7 @@ html, body {
 
 .track-info {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .title-row {
@@ -537,7 +569,7 @@ html, body {
 }
 
 #title {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -546,7 +578,7 @@ html, body {
 }
 
 #artist {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   opacity: 0.7;
   margin-top: 2px;
   white-space: nowrap;
@@ -569,49 +601,53 @@ html, body {
   transition: height 0.1s ease;
 }
 
-/* Lyrics Container & Static First, Then Scroll Behavior */
+/* Seamless Lyrics Overlay & Dynamic Horizontal Scroll starting in exact position */
 .lyrics-container {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 2px 4px;
-  margin-bottom: 10px;
+  height: 24px;
+  margin-bottom: 8px;
   text-align: center;
   overflow: hidden;
-  transition: all 0.4s ease;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease, height 0.3s ease;
 }
 
 .lyrics-container.collapsed {
   opacity: 0;
-  max-height: 0;
-  padding: 0;
+  height: 0;
   margin-bottom: 0;
+  pointer-events: none;
 }
 
 .marquee-wrapper {
   white-space: nowrap;
   overflow: hidden;
   width: 100%;
-  display: inline-block;
+  text-align: center;
 }
 
 #lyric-text {
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.95);
-  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
-  letter-spacing: 0.3px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  letter-spacing: 0.2px;
   display: inline-block;
+  transform: translateX(0);
 }
 
 .marquee-active {
-  animation: staticToScroll 9s linear infinite;
+  animation: scrollFromExactPosition 8s linear infinite;
 }
 
-@keyframes staticToScroll {
-  0%, 25% { transform: translateX(0); }
-  75%, 100% { transform: translateX(calc(-100% + 270px)); }
+@keyframes scrollFromExactPosition {
+  0%, 20% {
+    transform: translateX(0);
+  }
+  80%, 100% {
+    transform: translateX(var(--scroll-distance, -100px));
+  }
 }
 
 .progress-container {
@@ -661,12 +697,12 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s var(--ios-spring), background 0.2s;
+  transition: transform 0.2s var(--ios-spring), background 0.2s;
 }
 
 .btn-ctrl:hover {
   background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .btn-ctrl svg {
@@ -692,7 +728,7 @@ html, body {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 8px;
+  padding-top: 10px;
   margin-top: auto;
 }
 
@@ -724,6 +760,7 @@ html, body {
   height: 3px;
 }
 
+/* Up Next Queue Drawer with Smooth Reduced Spring */
 .playlist-drawer {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -732,8 +769,8 @@ html, body {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.5s var(--ios-spring);
-  z-index: 35;
+  transition: transform 0.35s var(--ios-spring);
+  z-index: 40;
   overflow-y: auto;
 }
 
@@ -767,7 +804,7 @@ html, body {
   cursor: pointer;
   margin-bottom: 6px;
   background: rgba(255, 255, 255, 0.05);
-  transition: background 0.2s, transform 0.3s;
+  transition: background 0.2s;
 }
 
 .playlist-drawer li.active {
@@ -805,8 +842,8 @@ html, body {
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.5s var(--ios-spring);
-  z-index: 40;
+  transition: transform 0.35s var(--ios-spring);
+  z-index: 45;
   overflow-y: auto;
 }
 

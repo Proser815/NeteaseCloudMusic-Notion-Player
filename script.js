@@ -342,28 +342,25 @@ function renderPlaylist() {
     const btnDelete = li.querySelector(".btn-delete-song");
     btnDelete.addEventListener("click", (e) => {
       e.stopPropagation();
-      li.classList.add("removing");
-      
-      setTimeout(() => {
-        playlist.splice(index, 1);
-        if (playlist.length === 0) {
-          title.innerText = "No Songs";
-          artist.innerText = "";
-          audio.pause();
-        } else if (index === currentIndex) {
-          loadTrack(currentIndex % playlist.length);
-          playTrack();
-        } else if (index < currentIndex) {
-          currentIndex--;
-        }
-        renderPlaylist();
-      }, 300);
+      playlist.splice(index, 1);
+      if (playlist.length === 0) {
+        title.innerText = "No Songs";
+        artist.innerText = "";
+        audio.pause();
+      } else if (index === currentIndex) {
+        loadTrack(currentIndex % playlist.length);
+        playTrack();
+      } else if (index < currentIndex) {
+        currentIndex--;
+      }
+      renderPlaylist();
     });
 
     playlistUl.appendChild(li);
   });
 }
 
+// Live auto-suggest while typing before pressing enter
 searchInput.addEventListener("input", () => {
   clearTimeout(debounceTimer);
   const query = searchInput.value.trim();
@@ -375,7 +372,7 @@ searchInput.addEventListener("input", () => {
 
   debounceTimer = setTimeout(() => {
     fetchPredictions(query);
-  }, 280);
+  }, 200);
 });
 
 async function fetchPredictions(query) {
@@ -460,12 +457,25 @@ function renderSearchResults(results) {
   results.forEach(song => {
     const li = document.createElement("li");
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:100%;">
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 80%;">
         ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
       </span>
+      <div class="search-actions-row">
+        <button class="btn-add-queue" title="Add to Up Next">+</button>
+      </div>
     `;
 
-    li.addEventListener("click", () => {
+    const btnAdd = li.querySelector(".btn-add-queue");
+    btnAdd.addEventListener("click", (e) => {
+      e.stopPropagation();
+      playlist.push(song);
+      renderPlaylist();
+      btnAdd.innerText = "✓";
+      btnAdd.style.background = "rgba(52, 199, 89, 0.6)";
+    });
+
+    li.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-add-queue")) return;
       searchResultsContainer.classList.add("hidden");
       searchSection.classList.add("collapsed");
       btnToggleSearch.classList.remove("active");
@@ -515,15 +525,12 @@ function applyTrackData(song) {
 
 function updateSongMetadata(song) {
   metaAlbum.innerText = song.album || "Single / Netease Release";
-  
   const pseudoBpm = 90 + (song.title.length * 7) % 50;
   metaBpm.innerText = `~${pseudoBpm} BPM`;
-  
   const currentYear = new Date().getFullYear();
   metaYear.innerText = song.year || `${currentYear - (song.title.length % 5)}`;
   metaGenre.innerText = song.genre || "Pop / Acoustic";
-  
-  metaStory.innerText = `"${song.title}" by ${song.author} is streamed directly from Netease Cloud servers. This track features high-fidelity CDN audio syncing directly with the player equalizer.`;
+  metaStory.innerText = `"${song.title}" by ${song.author} is streamed directly from Netease Cloud servers.`;
 }
 
 function updateMediaSession(song) {
@@ -532,9 +539,7 @@ function updateMediaSession(song) {
       title: song.title,
       artist: song.author,
       album: 'Notion Player',
-      artwork: [
-        { src: song.pic, sizes: '512x512', type: 'image/jpeg' }
-      ]
+      artwork: [{ src: song.pic, sizes: '512x512', type: 'image/jpeg' }]
     });
 
     navigator.mediaSession.setActionHandler('play', () => playTrack());
@@ -588,21 +593,27 @@ function extractDominantColor(imageUrl) {
   };
 }
 
+// Precise dynamic scrolling starting in original position without cut-off
 function setLyricText(text) {
   lyricText.innerText = text;
   islandLyricText.innerText = text;
 
-  marqueeWrapper.classList.remove("marquee-active");
-  islandMarqueeInner.classList.remove("marquee-active");
+  lyricText.classList.remove("marquee-active");
+  islandLyricText.classList.remove("marquee-active");
 
   setTimeout(() => {
-    if (lyricText.scrollWidth > marqueeWrapper.clientWidth) {
-      marqueeWrapper.classList.add("marquee-active");
+    const overflowDistance = lyricText.scrollWidth - marqueeWrapper.clientWidth;
+    if (overflowDistance > 4) {
+      lyricText.style.setProperty('--scroll-distance', `-${overflowDistance + 12}px`);
+      lyricText.classList.add("marquee-active");
     }
-    if (islandLyricText.scrollWidth > islandMarqueeInner.clientWidth) {
-      islandMarqueeInner.classList.add("marquee-active");
+
+    const islandOverflow = islandLyricText.scrollWidth - islandMarqueeInner.clientWidth;
+    if (islandOverflow > 4) {
+      islandLyricText.style.setProperty('--scroll-distance', `-${islandOverflow + 10}px`);
+      islandLyricText.classList.add("marquee-active");
     }
-  }, 300);
+  }, 100);
 }
 
 async function fetchLyrics(lrcUrl) {
