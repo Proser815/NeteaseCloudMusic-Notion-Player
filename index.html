@@ -28,43 +28,30 @@
       <div class="island-hover-top">
         <img id="island-hover-cover" src="" alt="Cover">
         <div class="island-hover-meta">
-          <span id="island-hover-title">Title</span>
-          <span id="island-hover-artist">Artist</span>
+          <span id="island-hover-title">Song Title</span>
+          <span id="island-hover-artist">Artist Name</span>
         </div>
       </div>
 
       <div class="island-hover-middle">
-        <span id="island-lyric-text">Lyrics</span>
+        <span id="island-hover-lyric">Playing audio...</span>
       </div>
 
       <div class="island-hover-bottom">
         <div class="island-controls-group">
-          <button id="island-btn-mode" class="island-ctrl-btn" title="Play Mode">
-            <svg id="island-mode-loop" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-            <svg id="island-mode-one" class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><text x="10" y="15" font-size="9" fill="currentColor" stroke="none">1</text></svg>
-            <svg id="island-mode-shuffle" class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          <button class="island-ctrl-btn" id="island-prev" title="Previous">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
           </button>
-
-          <button id="island-btn-prev" class="island-ctrl-btn" title="Previous">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="4" x2="5" y2="20"></line></svg>
+          <button class="island-ctrl-btn island-play-main" id="island-play" title="Play/Pause">
+            <svg id="island-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           </button>
-
-          <button id="island-btn-play" class="island-ctrl-btn island-play-main" title="Play/Pause">
-            <svg id="island-play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            <svg id="island-pause-icon" class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-          </button>
-
-          <button id="island-btn-next" class="island-ctrl-btn" title="Next">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20"></line></svg>
+          <button class="island-ctrl-btn" id="island-next" title="Next">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
           </button>
         </div>
 
         <div class="island-volume-group">
-          <button id="island-btn-volume" class="island-ctrl-btn">
-            <svg id="island-vol-low-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-            <svg id="island-vol-high-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-            <svg id="island-mute-icon" class="hidden" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-          </button>
+          <svg class="island-vol-icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:#fff;opacity:0.7;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
           <input type="range" id="island-volume-slider" min="0" max="1" step="0.01" value="0.8">
         </div>
       </div>

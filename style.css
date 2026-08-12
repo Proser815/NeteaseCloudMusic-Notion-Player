@@ -1,3 +1,7 @@
+/* ==========================================================
+   Notion Glass Music Player - Complete Consolidated Stylesheet
+   ================================================---------- */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -118,7 +122,7 @@ html, body {
   cursor: pointer;
   opacity: 0;
   transform: scale(0.8) translateX(10px);
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth iOS Spring */
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   margin-left: 10px;
   flex-shrink: 0;
 }
@@ -129,13 +133,13 @@ html, body {
 }
 
 .delete-btn-ios:hover {
-  background: #ff3b30; /* Snaps to iOS Red on hover */
+  background: #ff3b30;
   color: white;
   transform: scale(1.1);
 }
 
 /* =========================================
-   Compact Dynamic Island Hover Layout
+   Compact Dynamic Island Expanded Hover Layout
    ========================================= */
 .dynamic-island {
   transition: width 0.5s cubic-bezier(0.25, 1, 0.4, 1.2), 
@@ -148,8 +152,8 @@ html, body {
 .dynamic-island.expanded {
   width: 290px;
   height: 96px;
-  border-radius: 26px;
-  padding: 10px 12px;
+  border-radius: 28px;
+  padding: 12px 14px;
 }
 
 /* Hide collapsed pill content smoothly */
@@ -162,19 +166,21 @@ html, body {
 }
 
 .island-hover-controls {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
   height: 100%;
+  padding: 12px 14px;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  padding: 10px 12px;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(25px);
+  transition: opacity 0.25s ease;
+  border-radius: 28px;
 }
 
 .dynamic-island:hover .island-hover-controls,
@@ -183,17 +189,19 @@ html, body {
   pointer-events: auto;
 }
 
+/* Top Meta Row */
 .island-hover-top {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 #island-hover-cover {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .island-hover-meta {
@@ -219,15 +227,18 @@ html, body {
   text-overflow: ellipsis;
 }
 
+/* Middle Row */
 .island-hover-middle {
-  font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.7);
-  text-align: center;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.65);
+  text-align: left;
+  padding-left: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Bottom Controls Row */
 .island-hover-bottom {
   display: flex;
   align-items: center;
@@ -237,7 +248,7 @@ html, body {
 .island-controls-group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
 }
 
 .island-ctrl-btn {
@@ -248,44 +259,68 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
-  opacity: 0.8;
-  transition: opacity 0.2s;
+  padding: 4px;
+  opacity: 0.85;
+  border-radius: 50%;
+  transition: opacity 0.2s, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .island-ctrl-btn:hover {
   opacity: 1;
+  transform: scale(1.08);
+}
+
+.island-ctrl-btn:active {
+  transform: scale(0.92);
+  opacity: 0.6;
 }
 
 .island-ctrl-btn svg {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
 }
 
+/* Main Play Button (iOS Circular Pill Accent) */
 .island-play-main {
-  background: #fff;
-  color: #000;
-  width: 24px;
-  height: 24px;
+  background: #ffffff !important;
+  color: #000000 !important;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.25);
 }
 
 .island-play-main svg {
-  fill: #000;
+  fill: #000000 !important;
+  width: 14px;
+  height: 14px;
 }
 
+/* Volume Slider Group */
 .island-volume-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 #island-volume-slider {
-  width: 50px;
+  width: 55px;
   height: 3px;
-  accent-color: #fff;
+  accent-color: #ffffff;
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+#island-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
 }
 
 /* Horizontal Song Name + Author Collapsed Layout */
