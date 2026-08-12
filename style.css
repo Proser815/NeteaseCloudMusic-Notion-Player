@@ -1,3 +1,6 @@
+/* =========================================
+   iOS Typography & Global Font Refining
+   ========================================= */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -100,6 +103,8 @@ html, body {
   color: #ffffff;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+  letter-spacing: -0.22px;
 }
 
 .island-meta-separator {
@@ -113,6 +118,8 @@ html, body {
   color: rgba(255, 255, 255, 0.65);
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+  letter-spacing: -0.1px;
 }
 
 .eq-bars {
@@ -218,6 +225,8 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+  letter-spacing: -0.22px;
 }
 
 #island-hover-artist {
@@ -226,6 +235,8 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+  letter-spacing: -0.1px;
 }
 
 .island-top-actions {
@@ -359,12 +370,15 @@ html, body {
   font-weight: 600;
 }
 
-/* Smooth Lyric Expansion Animation */
+/* Marquee Long Lyric Styling & Overflow Handling */
 .island-marquee-container {
   width: 100%;
   overflow: hidden;
+  margin: 6px 0;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  position: relative;
   max-height: 20px;
   opacity: 1;
   transform: translateY(0);
@@ -372,7 +386,6 @@ html, body {
               opacity 0.2s ease, 
               margin 0.3s ease, 
               transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin: 3px 0;
 }
 
 .island-marquee-container.collapsed-lyric {
@@ -386,11 +399,48 @@ html, body {
 .island-marquee-inner {
   display: inline-block;
   white-space: nowrap;
+  will-change: transform;
 }
 
 #island-lyric-text {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.75rem;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+  color: rgba(255, 255, 255, 0.92);
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.animate-island-lyric {
+  animation: island-lyric-scroll var(--island-scroll-duration, 6s) linear infinite alternate;
+}
+
+@keyframes island-lyric-scroll {
+  0% { transform: translateX(0%); }
+  20% { transform: translateX(0%); }
+  80% { transform: translateX(var(--island-scroll-distance, -50%)); }
+  100% { transform: translateX(var(--island-scroll-distance, -50%)); }
+}
+
+/* Search Add Button styling */
+.btn-add-track {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.btn-add-track:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.1);
 }
 
 /* Progress Section */

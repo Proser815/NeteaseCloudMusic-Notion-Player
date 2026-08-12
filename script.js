@@ -270,10 +270,10 @@ function formatTime(sec) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-// Lyrics Parser
+// Lyrics Parser & Scrolling Marquee Logic
 async function fetchLyrics(lrcUrl) {
   lyrics = [];
-  islandLyricText.innerText = "No lyrics found";
+  updateIslandLyric("No lyrics found");
   if (!lrcUrl) return;
 
   try {
@@ -281,7 +281,7 @@ async function fetchLyrics(lrcUrl) {
     const text = await res.text();
     parseLrc(text);
   } catch (err) {
-    islandLyricText.innerText = "Lyrics unavailable";
+    updateIslandLyric("Lyrics unavailable");
   }
 }
 
@@ -311,7 +311,31 @@ function updateCurrentLyric(currentTime) {
     if (currentTime >= lyrics[i].time) activeLyric = lyrics[i].text;
     else break;
   }
-  if (activeLyric) islandLyricText.innerText = activeLyric;
+  if (activeLyric) {
+    updateIslandLyric(activeLyric);
+  }
+}
+
+function updateIslandLyric(text) {
+  if (!islandLyricText || !islandMarqueeContainer) return;
+  islandLyricText.innerText = text;
+  
+  // Clear previous animation state to recalculate width
+  islandLyricText.classList.remove("animate-island-lyric");
+  
+  setTimeout(() => {
+    const containerWidth = islandMarqueeContainer.clientWidth;
+    const textWidth = islandLyricText.scrollWidth;
+    
+    if (textWidth > containerWidth) {
+      const overflowDiff = textWidth - containerWidth + 15;
+      const duration = Math.max(4, overflowDiff * 0.05);
+      
+      islandMarqueeContainer.style.setProperty("--island-scroll-distance", `-${overflowDiff}px`);
+      islandMarqueeContainer.style.setProperty("--island-scroll-duration", `${duration}s`);
+      islandLyricText.classList.add("animate-island-lyric");
+    }
+  }, 50);
 }
 
 // Volume Controls
@@ -431,7 +455,6 @@ searchInput.addEventListener("input", (e) => {
 
 async function fetchSearchPredictions(query) {
   try {
-    // Meting API requires type=search and id=QUERY
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(query)}`);
     const data = await res.json();
     
@@ -488,7 +511,6 @@ async function performSearch() {
   searchResultsContainer.classList.remove("hidden");
 
   try {
-    // Meting API requires type=search and id=QUERY
     const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(q)}`);
     const results = await res.json();
 
@@ -503,12 +525,49 @@ async function performSearch() {
       li.className = "playlist-item-ios";
       const title = song.title || song.name || "Unknown";
       const artist = song.author || song.artist || "Unknown";
-      li.innerText = `${title} - ${artist}`;
       
+      li.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1;">
+          <img src="${song.pic || song.cover || ''}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover;" alt="">
+          <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.7rem;">
+            <span>${title} - ${artist}</span>
+          </div>
+        </div>
+        <button class="btn-add-track" title="Add track">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      `;
+      
+      // Clicking row plays song immediately
       li.addEventListener("click", (e) => {
-        e.stopPropagation();
-        addSongToPlaylist(song);
+        if (e.target.closest(".btn-add-track")) return;
+        playlist.push(song);
+        renderPlaylist();
+        loadTrack(playlist.length - 1);
+        playTrack();
+        closeAllDrawers();
+        searchResultsContainer.classList.add("hidden");
+        searchInput.value = "";
       });
+
+      // Clicking '+' button adds track to playlist only without playing immediately
+      const addBtn = li.querySelector(".btn-add-track");
+      addBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        playlist.push(song);
+        renderPlaylist();
+        
+        // Visual feedback for successful addition
+        addBtn.style.background = "#34c759";
+        addBtn.style.color = "#ffffff";
+        setTimeout(() => {
+          addBtn.style.background = "";
+        }, 600);
+      });
+
       searchResultsUl.appendChild(li);
     });
   } catch (err) {
