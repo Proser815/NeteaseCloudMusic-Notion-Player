@@ -317,57 +317,61 @@ btnToggleSearch.addEventListener("click", () => {
 });
 
 function renderPlaylist() {
+  const playlistUl = document.getElementById("playlist-ul");
+  if (!playlistUl) return;
   playlistUl.innerHTML = "";
+
   playlist.forEach((song, index) => {
     const li = document.createElement("li");
-    li.className = "track-item-row" + (index === currentIndex ? " active" : "");
-    
-    // Inject the track info AND the new white iOS delete button
+    li.className = `ios-playlist-item ${index === currentIndex ? "active" : ""}`;
+    li.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; cursor: pointer; transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1); border: 1px solid rgba(255, 255, 255, 0.04); margin-bottom: 8px;";
+
     li.innerHTML = `
-      <div class="item-left">
-        <img src="${song.pic}" alt="Cover" class="item-cover">
-        <div class="item-meta">
-          <span class="item-title">${song.title}</span>
-          <span class="item-artist">${song.author}</span>
+      <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1;">
+        <img src="${song.pic || song.cover || ''}" alt="Cover" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        <div style="display: flex; flex-direction: column; overflow: hidden; gap: 2px;">
+          <span style="font-size: 0.9rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${song.title || 'Unknown Title'}</span>
+          <span style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${song.author || song.artist || 'Unknown Artist'}</span>
         </div>
       </div>
-      <button class="delete-btn-ios" title="Remove track">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <button class="ios-delete-btn" title="Remove song" style="background: rgba(255, 255, 255, 0.12); color: #ffffff; border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; flex-shrink: 0; margin-left: 10px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
     `;
 
-    // 1. Handle Play on Click
-    li.addEventListener("click", () => {
-      loadTrack(index);
+    // Click row to play track
+    li.addEventListener("click", (e) => {
+      if (e.target.closest(".ios-delete-btn")) return;
+      currentIndex = index;
+      loadTrack(currentIndex);
       playTrack();
+      renderPlaylist();
     });
 
-    // 2. Handle Delete on Click
-    const deleteBtn = li.querySelector('.delete-btn-ios');
+    // Smooth animated delete action
+    const deleteBtn = li.querySelector(".ios-delete-btn");
     deleteBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevents the song from playing when you hit delete
+      e.stopPropagation();
+      li.style.transform = "translateX(30px)";
+      li.style.opacity = "0";
+      li.style.transition = "all 0.3s ease";
       
-      // Remove from array
-      playlist.splice(index, 1);
-      
-      // Logic to keep the player running smoothly if you delete the current song
-      if (currentIndex === index) {
+      setTimeout(() => {
+        playlist.splice(index, 1);
         if (playlist.length === 0) {
           audio.pause();
-          // Optional: clear UI text here if playlist is completely empty
-        } else {
-          if (currentIndex >= playlist.length) currentIndex = 0;
-          loadTrack(currentIndex);
-          playTrack();
+          currentIndex = 0;
+        } else if (currentIndex >= playlist.length) {
+          currentIndex = playlist.length - 1;
         }
-      } else if (currentIndex > index) {
-        currentIndex--; // Fix the index offset
-      }
-      
-      renderPlaylist(); // Re-render the updated list
+        renderPlaylist();
+        if (playlist.length > 0) {
+          loadTrack(currentIndex);
+        }
+      }, 300);
     });
 
     playlistUl.appendChild(li);
