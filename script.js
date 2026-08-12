@@ -32,7 +32,6 @@ const islandHoverTitle = document.getElementById("island-hover-title");
 const islandHoverArtist = document.getElementById("island-hover-artist");
 const islandLyricText = document.getElementById("island-lyric-text");
 const btnIsland = document.getElementById("btn-island");
-const islandBtnExit = document.getElementById("island-btn-exit");
 
 const islandBtnMode = document.getElementById("island-btn-mode");
 const islandModeLoop = document.getElementById("island-mode-loop");
@@ -44,7 +43,8 @@ const islandPlayIcon = document.getElementById("island-play-icon");
 const islandPauseIcon = document.getElementById("island-pause-icon");
 const islandBtnNext = document.getElementById("island-btn-next");
 const islandBtnVolume = document.getElementById("island-btn-volume");
-const islandVolIcon = document.getElementById("island-vol-icon");
+const islandVolLowIcon = document.getElementById("island-vol-low-icon");
+const islandVolHighIcon = document.getElementById("island-vol-high-icon");
 const islandMuteIcon = document.getElementById("island-mute-icon");
 const islandVolumeSlider = document.getElementById("island-volume-slider");
 
@@ -77,7 +77,8 @@ const btnList = document.getElementById("btn-list");
 const btnMode = document.getElementById("btn-mode");
 
 const btnVolume = document.getElementById("btn-volume");
-const volIcon = document.getElementById("vol-icon");
+const volLowIcon = document.getElementById("vol-low-icon");
+const volHighIcon = document.getElementById("vol-high-icon");
 const muteIcon = document.getElementById("mute-icon");
 const volumeSlider = document.getElementById("volume-slider");
 
@@ -91,7 +92,6 @@ const btnClosePlaylist = document.getElementById("btn-close-playlist");
 const playlistUl = document.getElementById("playlist-ul");
 
 const btnToggleSearch = document.getElementById("btn-toggle-search");
-const btnCloseSearch = document.getElementById("btn-close-search");
 const searchSection = document.getElementById("search-section");
 const searchInput = document.getElementById("search-input");
 const btnSearch = document.getElementById("btn-search");
@@ -148,6 +148,7 @@ function animateBars() {
 
 async function initPlayer() {
   audio.volume = 0.8;
+  updateVolumeIcons(0.8);
   try {
     const res = await fetch(API_BASE);
     playlist = await res.json();
@@ -165,17 +166,6 @@ btnCloseInfo.addEventListener("click", () => {
 
 btnClosePlaylist.addEventListener("click", () => {
   playlistDrawer.classList.add("collapsed");
-});
-
-btnCloseSearch.addEventListener("click", () => {
-  searchSection.classList.add("collapsed");
-  hidePredictions();
-});
-
-islandBtnExit.addEventListener("click", (e) => {
-  e.stopPropagation();
-  playerCard.classList.remove("morphed-hidden");
-  dynamicIsland.classList.add("hidden");
 });
 
 btnInfo.addEventListener("click", () => {
@@ -241,16 +231,27 @@ islandBtnVolume.addEventListener("click", (e) => {
 });
 
 function updateVolumeIcons(val) {
-  if (val > 0) {
-    volIcon.classList.remove("hidden");
+  if (val === 0) {
+    volLowIcon.classList.add("hidden");
+    volHighIcon.classList.add("hidden");
+    muteIcon.classList.remove("hidden");
+    islandVolLowIcon.classList.add("hidden");
+    islandVolHighIcon.classList.add("hidden");
+    islandMuteIcon.classList.remove("hidden");
+  } else if (val <= 0.5) {
+    volLowIcon.classList.remove("hidden");
+    volHighIcon.classList.add("hidden");
     muteIcon.classList.add("hidden");
-    islandVolIcon.classList.remove("hidden");
+    islandVolLowIcon.classList.remove("hidden");
+    islandVolHighIcon.classList.add("hidden");
     islandMuteIcon.classList.add("hidden");
   } else {
-    volIcon.classList.add("hidden");
-    muteIcon.classList.remove("hidden");
-    islandVolIcon.classList.add("hidden");
-    islandMuteIcon.classList.remove("hidden");
+    volLowIcon.classList.add("hidden");
+    volHighIcon.classList.remove("hidden");
+    muteIcon.classList.add("hidden");
+    islandVolLowIcon.classList.add("hidden");
+    islandVolHighIcon.classList.remove("hidden");
+    islandMuteIcon.classList.add("hidden");
   }
 }
 
@@ -299,9 +300,14 @@ function updateTransparencyIcons(val) {
 }
 
 btnToggleSearch.addEventListener("click", () => {
+  const isCollapsed = searchSection.classList.contains("collapsed");
   searchSection.classList.toggle("collapsed");
-  if (!searchSection.classList.contains("collapsed")) searchInput.focus();
-  else hidePredictions();
+  btnToggleSearch.classList.toggle("active", isCollapsed);
+  if (isCollapsed) {
+    searchInput.focus();
+  } else {
+    hidePredictions();
+  }
 });
 
 function renderPlaylist() {
@@ -453,46 +459,18 @@ function renderSearchResults(results) {
   searchResultsContainer.classList.remove("hidden");
   results.forEach(song => {
     const li = document.createElement("li");
-    li.style.cursor = "pointer";
     li.innerHTML = `
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 55%;">
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:100%;">
         ${song.title} <small style="opacity:0.75;">- ${song.author}</small>
       </span>
-      <div class="search-action-group">
-        <button class="btn-play-next" title="Play Next in Sequence">+ Next</button>
-        <button class="btn-add-morph" title="Add to End of Queue">+</button>
-      </div>
     `;
 
-    li.addEventListener("click", (e) => {
-      if (e.target.closest(".search-action-group")) return;
+    li.addEventListener("click", () => {
+      searchResultsContainer.classList.add("hidden");
+      searchSection.classList.add("collapsed");
+      btnToggleSearch.classList.remove("active");
       loadPreviewTrack(song);
       playTrack();
-    });
-
-    const btnNextSeq = li.querySelector(".btn-play-next");
-    btnNextSeq.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (btnNextSeq.classList.contains("added")) return;
-
-      btnNextSeq.classList.add("added");
-      btnNextSeq.innerText = "Queued";
-
-      const insertAt = currentIndex < 0 ? 0 : currentIndex + 1;
-      playlist.splice(insertAt, 0, song);
-      renderPlaylist();
-    });
-
-    const btnAdd = li.querySelector(".btn-add-morph");
-    btnAdd.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (btnAdd.classList.contains("added")) return;
-
-      btnAdd.classList.add("added");
-      btnAdd.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-
-      playlist.push(song);
-      renderPlaylist();
     });
 
     searchResultsUl.appendChild(li);
@@ -617,12 +595,14 @@ function setLyricText(text) {
   marqueeWrapper.classList.remove("marquee-active");
   islandMarqueeWrapper.classList.remove("marquee-active");
 
-  if (lyricText.scrollWidth > marqueeWrapper.clientWidth) {
-    marqueeWrapper.classList.add("marquee-active");
-  }
-  if (islandLyricText.scrollWidth > islandMarqueeWrapper.clientWidth) {
-    islandMarqueeWrapper.classList.add("marquee-active");
-  }
+  setTimeout(() => {
+    if (lyricText.scrollWidth > marqueeWrapper.clientWidth) {
+      marqueeWrapper.classList.add("marquee-active");
+    }
+    if (islandLyricText.scrollWidth > islandMarqueeWrapper.clientWidth) {
+      islandMarqueeWrapper.classList.add("marquee-active");
+    }
+  }, 400);
 }
 
 async function fetchLyrics(lrcUrl) {
@@ -645,7 +625,8 @@ function parseLRC(lrcText) {
     if (match) {
       const minutes = parseInt(match[1]);
       const seconds = parseInt(match[2]);
-      let totalSec = minutes * 60 + seconds - 0.15; // Smooth timing offset buffer to sync naturally
+      const millis = parseInt(match[3].padEnd(3, '0'));
+      let totalSec = minutes * 60 + seconds + millis / 1000;
       lyrics.push({ time: Math.max(0, totalSec), text: line.replace(timeRegex, "").trim() });
     }
   });
