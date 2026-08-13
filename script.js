@@ -13,7 +13,7 @@ let source;
 let dataArray;
 let animationFrameId;
 
-const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
 
 // DOM Elements
 const audio = document.getElementById("audio-player");
@@ -43,7 +43,6 @@ const islandBtnSearch = document.getElementById("island-btn-search");
 const islandSearchDrawer = document.getElementById("island-search-drawer");
 const islandCloseSearch = document.getElementById("island-close-search");
 const islandSearchInput = document.getElementById("island-search-input");
-const islandSearchPredictions = document.getElementById("island-search-predictions");
 const islandSearchResultsUl = document.getElementById("island-search-results-ul");
 const islandSearchResults = document.getElementById("island-search-results");
 
@@ -52,11 +51,16 @@ const islandPlaylistDrawer = document.getElementById("island-playlist-drawer");
 const islandClosePlaylist = document.getElementById("island-close-playlist");
 const islandPlaylistUl = document.getElementById("island-playlist-ul");
 
-const islandBtnSettings = document.getElementById("island-btn-settings");
-const islandSettingsDrawer = document.getElementById("island-settings-drawer");
-const islandCloseSettings = document.getElementById("island-close-settings");
+// Top-Right Popover Elements
+const islandBtnVol = document.getElementById("island-btn-vol");
+const islandVolPopover = document.getElementById("island-vol-popover");
 const islandSettingsVol = document.getElementById("island-settings-vol");
+const islandVolVal = document.getElementById("island-vol-val");
+
+const islandBtnOpacity = document.getElementById("island-btn-opacity");
+const islandOpacityPopover = document.getElementById("island-opacity-popover");
 const islandSettingsOpacity = document.getElementById("island-settings-opacity");
+const islandOpacityVal = document.getElementById("island-opacity-val");
 
 const islandBtnLyricsToggle = document.getElementById("island-btn-lyrics");
 const islandCurrentTimeEl = document.getElementById("island-current-time");
@@ -64,19 +68,28 @@ const islandDurationTimeEl = document.getElementById("island-duration-time");
 const islandProgressBarBg = document.getElementById("island-progress-bar-bg");
 const islandProgressBarFill = document.getElementById("island-progress-bar-fill");
 
-function closeAllIslandDrawers() {
-  [islandSearchDrawer, islandPlaylistDrawer, islandSettingsDrawer].forEach(d => {
-    if (d) d.classList.add("collapsed");
+function closeAllIslandPopoversAndDrawers() {
+  [islandSearchDrawer, islandPlaylistDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
+    if (el) el.classList.add("collapsed");
   });
-  [islandBtnSearch, islandBtnPlaylist, islandBtnSettings].forEach(b => {
+  [islandBtnSearch, islandBtnPlaylist, islandBtnVol, islandBtnOpacity].forEach(b => {
     if (b) b.classList.remove("active");
   });
-  dynamicIsland.classList.remove("search-active", "playlist-active", "settings-active");
+  dynamicIsland.classList.remove("search-active", "playlist-active");
 }
 
-function toggleIslandDrawer(drawer, button, activeClass) {
+function togglePopover(popover, button) {
+  const isCollapsed = popover.classList.contains("collapsed");
+  closeAllIslandPopoversAndDrawers();
+  if (isCollapsed) {
+    popover.classList.remove("collapsed");
+    button.classList.add("active");
+  }
+}
+
+function toggleDrawer(drawer, button, activeClass) {
   const isCollapsed = drawer.classList.contains("collapsed");
-  closeAllIslandDrawers();
+  closeAllIslandPopoversAndDrawers();
   if (isCollapsed) {
     drawer.classList.remove("collapsed");
     button.classList.add("active");
@@ -85,7 +98,7 @@ function toggleIslandDrawer(drawer, button, activeClass) {
   }
 }
 
-// Extract dominant color from album artwork to tint Dynamic Island background glass
+// Extract dominant color from album artwork
 function extractDominantColor(imageUrl) {
   if (!imageUrl) return;
   const img = new Image();
@@ -107,18 +120,14 @@ function extractDominantColor(imageUrl) {
         b += data[i + 2];
         count++;
       }
-      r = Math.floor(r / count);
-      g = Math.floor(g / count);
-      b = Math.floor(b / count);
-
-      document.documentElement.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
+      document.documentElement.style.setProperty("--accent-rgb", `${Math.floor(r/count)}, ${Math.floor(g/count)}, ${Math.floor(b/count)}`);
     } catch (e) {
       document.documentElement.style.setProperty("--accent-rgb", "20, 20, 20");
     }
   };
 }
 
-// Smooth Lyric Expansion Toggle Fix
+// Ultra-Smooth Animated Lyric Toggle
 islandBtnLyricsToggle.addEventListener("click", (e) => {
   e.stopPropagation();
   const isActive = islandBtnLyricsToggle.classList.toggle("active");
@@ -148,14 +157,10 @@ function animateBars() {
   const mid = dataArray[8] || 0;
   const high = dataArray[15] || 0;
 
-  const bar1Height = Math.max(3, (low / 255) * 12);
-  const bar2Height = Math.max(3, (mid / 255) * 12);
-  const bar3Height = Math.max(3, (high / 255) * 12);
-
   const allBars = document.querySelectorAll(".eq-bars span");
-  if (allBars[0]) allBars[0].style.height = `${bar1Height}px`;
-  if (allBars[1]) allBars[1].style.height = `${bar2Height}px`;
-  if (allBars[2]) allBars[2].style.height = `${bar3Height}px`;
+  if (allBars[0]) allBars[0].style.height = `${Math.max(2, (low / 255) * 10)}px`;
+  if (allBars[1]) allBars[1].style.height = `${Math.max(2, (mid / 255) * 10)}px`;
+  if (allBars[2]) allBars[2].style.height = `${Math.max(2, (high / 255) * 10)}px`;
 
   animationFrameId = requestAnimationFrame(animateBars);
 }
@@ -163,8 +168,8 @@ function animateBars() {
 // Initialize Application
 async function initPlayer() {
   dynamicIsland.classList.remove("hidden");
-  handleVolumeChange(0.8);
-  handleOpacityChange(0.75);
+  handleVolumeChange(0.8, false);
+  handleOpacityChange(0.75, false);
   syncPlayModeUI();
 
   try {
@@ -177,19 +182,19 @@ async function initPlayer() {
   }
 }
 
-// Drawer Event Listeners
-islandBtnSearch.addEventListener("click", (e) => { e.stopPropagation(); toggleIslandDrawer(islandSearchDrawer, islandBtnSearch, "search-active"); });
-islandCloseSearch.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandDrawers(); });
+// Event Bindings for Top Buttons & Popovers
+islandBtnSearch.addEventListener("click", (e) => { e.stopPropagation(); toggleDrawer(islandSearchDrawer, islandBtnSearch, "search-active"); });
+islandCloseSearch.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
 
 islandBtnPlaylist.addEventListener("click", (e) => { 
   e.stopPropagation(); 
   renderIslandPlaylist();
-  toggleIslandDrawer(islandPlaylistDrawer, islandBtnPlaylist, "playlist-active"); 
+  toggleDrawer(islandPlaylistDrawer, islandBtnPlaylist, "playlist-active"); 
 });
-islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandDrawers(); });
+islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
 
-islandBtnSettings.addEventListener("click", (e) => { e.stopPropagation(); toggleIslandDrawer(islandSettingsDrawer, islandBtnSettings, "settings-active"); });
-islandCloseSettings.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandDrawers(); });
+islandBtnVol.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandVolPopover, islandBtnVol); });
+islandBtnOpacity.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandOpacityPopover, islandBtnOpacity); });
 
 // Track Player Control Logic
 function loadTrack(index) {
@@ -266,7 +271,7 @@ function syncPlayModeUI() {
   islandModeShuffle.classList.toggle("hidden", playMode !== 2);
 }
 
-// Track Progress & Timer Updates
+// Track Progress & Timers
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   const pct = (audio.currentTime / audio.duration) * 100;
@@ -304,7 +309,7 @@ function formatTime(sec) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-// Lyrics Parser Logic
+// Lyrics Parser
 async function fetchLyrics(lrcUrl) {
   lyrics = [];
   updateIslandLyric("No lyrics found");
@@ -345,19 +350,19 @@ function updateCurrentLyric(currentTime) {
     if (currentTime >= lyrics[i].time) activeLyric = lyrics[i].text;
     else break;
   }
-  if (activeLyric) {
-    updateIslandLyric(activeLyric);
-  }
+  if (activeLyric) updateIslandLyric(activeLyric);
 }
 
 function updateIslandLyric(text) {
-  if (!islandLyricText || !islandMarqueeContainer) return;
-  islandLyricText.innerText = text;
+  if (islandLyricText) islandLyricText.innerText = text;
 }
 
-// Settings Controls
-function handleVolumeChange(val) {
+// Live Volume & Glass Opacity Handlers with Label Updates
+function handleVolumeChange(val, updateDisplay = true) {
   audio.volume = parseFloat(val);
+  if (updateDisplay) {
+    islandVolVal.innerText = `${Math.round(val * 100)}%`;
+  }
 }
 
 islandSettingsVol.addEventListener("input", (e) => {
@@ -365,8 +370,11 @@ islandSettingsVol.addEventListener("input", (e) => {
   handleVolumeChange(e.target.value);
 });
 
-function handleOpacityChange(val) {
+function handleOpacityChange(val, updateDisplay = true) {
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
+  if (updateDisplay) {
+    islandOpacityVal.innerText = `${Math.round(val * 100)}%`;
+  }
 }
 
 islandSettingsOpacity.addEventListener("input", (e) => {
@@ -385,7 +393,7 @@ function renderIslandPlaylist() {
     const songArtist = song.author || song.artist || "Unknown";
 
     li.innerHTML = `
-      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 8px;">${songName} - ${songArtist}</span>
+      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 6px; font-size:0.65rem;">${songName} - ${songArtist}</span>
       <button class="btn-remove" title="Remove" style="background:none;border:none;color:#ff3b30;cursor:pointer; display:flex;">${TRASH_BIN_SVG}</button>
     `;
 
@@ -410,13 +418,12 @@ function renderIslandPlaylist() {
   });
 }
 
-// Live Search inside Island Drawer
+// Expanded Live Search (10-15 results) without exiting search drawer
 islandSearchInput.addEventListener("input", (e) => {
   const q = e.target.value.trim();
   clearTimeout(islandDebounce);
 
   if (!q) {
-    islandSearchPredictions.classList.add("hidden");
     islandSearchResults.classList.add("hidden");
     return;
   }
@@ -428,21 +435,22 @@ islandSearchInput.addEventListener("input", (e) => {
       
       if (Array.isArray(data)) {
         islandSearchResultsUl.innerHTML = "";
-        data.slice(0, 6).forEach((song) => {
+        // Display up to 15 search results
+        data.slice(0, 15).forEach((song) => {
           const li = document.createElement("li");
           li.className = "playlist-item-ios";
           const title = song.title || song.name || "Unknown";
           const artist = song.author || song.artist || "Unknown";
 
           li.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1;">
-              <img src="${song.pic || song.cover || ''}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover;" alt="">
-              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.7rem;">
+            <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; flex: 1;">
+              <img src="${song.pic || song.cover || ''}" style="width: 20px; height: 20px; border-radius: 4px; object-fit: cover;" alt="">
+              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.65rem;">
                 <span>${title} - ${artist}</span>
               </div>
             </div>
-            <button class="btn-add-track" title="Play Now" style="background:none;border:none;color:#fff;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button class="btn-add-track" title="Play Now" style="background:none;border:none;color:#fff;cursor:pointer; display:flex;">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
           `;
 
@@ -450,9 +458,7 @@ islandSearchInput.addEventListener("input", (e) => {
             playlist.push(song);
             loadTrack(playlist.length - 1);
             playTrack();
-            closeAllIslandDrawers();
-            islandSearchInput.value = "";
-            islandSearchResults.classList.add("hidden");
+            // Keeps search drawer open and active as requested
           });
 
           islandSearchResultsUl.appendChild(li);
@@ -460,7 +466,7 @@ islandSearchInput.addEventListener("input", (e) => {
         islandSearchResults.classList.remove("hidden");
       }
     } catch (err) {}
-  }, 250);
+  }, 200);
 });
 
 window.addEventListener("DOMContentLoaded", initPlayer);
