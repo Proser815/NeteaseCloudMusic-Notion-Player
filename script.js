@@ -98,7 +98,42 @@ function toggleDrawer(drawer, button) {
   }
 }
 
-// Smooth Lyric Expansion Toggle & Island Height Recalculation
+// Extract dominant color from album artwork to tint Dynamic Island background glass
+function extractDominantColor(imageUrl) {
+  if (!imageUrl) return;
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = imageUrl;
+  img.onload = () => {
+    try {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = 30;
+      canvas.height = 30;
+      ctx.drawImage(img, 0, 0, 30, 30);
+      const data = ctx.getImageData(0, 0, 30, 30).data;
+      
+      let r = 0, g = 0, b = 0, count = 0;
+      for (let i = 0; i < data.length; i += 16) {
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+        count++;
+      }
+      r = Math.floor(r / count);
+      g = Math.floor(g / count);
+      b = Math.floor(b / count);
+
+      // Apply dynamic accent color to root CSS variable
+      document.documentElement.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
+    } catch (e) {
+      // Fallback if cross-origin taint blocks canvas data reading
+      document.documentElement.style.setProperty("--accent-rgb", "20, 20, 20");
+    }
+  };
+}
+
+// Smooth Lyric Expansion Toggle
 btnLyrics.addEventListener("click", (e) => {
   e.stopPropagation();
   const isActive = btnLyrics.classList.toggle("active");
@@ -144,7 +179,7 @@ function animateBars() {
 // Initialize Application
 async function initPlayer() {
   handleVolumeChange(0.8);
-  handleOpacityChange(0.85);
+  handleOpacityChange(0.75);
   syncPlayModeUI();
 
   try {
@@ -168,9 +203,12 @@ function loadTrack(index) {
   const song = playlist[currentIndex];
 
   audio.src = song.url;
-  islandCover.src = song.pic || song.cover || "";
-  islandHoverCover.src = song.pic || song.cover || "";
+  const picUrl = song.pic || song.cover || "";
+  islandCover.src = picUrl;
+  islandHoverCover.src = picUrl;
   
+  extractDominantColor(picUrl);
+
   const title = song.title || song.name || "Unknown Title";
   const artist = song.author || song.artist || "Unknown Artist";
 
@@ -321,7 +359,6 @@ function updateCurrentLyric(currentTime) {
 function updateIslandLyric(text) {
   if (!islandLyricText || !islandMarqueeContainer) return;
   islandLyricText.innerText = text;
-  
   islandLyricText.classList.remove("animate-island-lyric");
   
   setTimeout(() => {
@@ -400,7 +437,7 @@ btnGlass.addEventListener("click", (e) => {
     previousOpacity = currentVal;
     handleOpacityChange(0);
   } else {
-    handleOpacityChange(previousOpacity || 0.85);
+    handleOpacityChange(previousOpacity || 0.75);
   }
 });
 
@@ -480,9 +517,8 @@ function renderSearchPredictions(suggestions) {
     
     li.addEventListener("click", (e) => {
       e.stopPropagation();
-      searchInput.value = title;
       searchPredictionsContainer.classList.add("hidden");
-      addSongToPlaylist(item);
+      addAndPlaySong(item);
     });
 
     predictionsUl.appendChild(li);
@@ -535,33 +571,26 @@ async function performSearch() {
           </div>
         </div>
         <button class="btn-add-track" title="Add track">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
         </button>
       `;
       
-      // Clicking row plays song immediately
+      // Clicking the row plays song immediately & closes drawer
       li.addEventListener("click", (e) => {
         if (e.target.closest(".btn-add-track")) return;
-        playlist.push(song);
-        renderPlaylist();
-        loadTrack(playlist.length - 1);
-        playTrack();
-        closeAllDrawers();
-        searchResultsContainer.classList.add("hidden");
-        searchInput.value = "";
+        addAndPlaySong(song);
       });
 
-      // Clicking '+' button adds track to playlist only without playing immediately
+      // Clicking '+' button adds track to playlist only without disrupting active play
       const addBtn = li.querySelector(".btn-add-track");
       addBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         playlist.push(song);
         renderPlaylist();
         
-        // Visual feedback for successful addition
         addBtn.style.background = "#34c759";
         addBtn.style.color = "#ffffff";
         setTimeout(() => {
@@ -572,11 +601,11 @@ async function performSearch() {
       searchResultsUl.appendChild(li);
     });
   } catch (err) {
-    searchResultsUl.innerHTML = "<li class='playlist-item-ios'>Error performing search/playlist drawer expansion</li>";
+    searchResultsUl.innerHTML = "<li class='playlist-item-ios'>Error performing search</li>";
   }
 }
 
-function addSongToPlaylist(song) {
+function addAndPlaySong(song) {
   playlist.push(song);
   renderPlaylist();
   loadTrack(playlist.length - 1);

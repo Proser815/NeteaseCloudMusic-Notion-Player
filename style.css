@@ -11,7 +11,8 @@
 }
 
 :root {
-  --glass-tint-opacity: 0.85;
+  --accent-rgb: 30, 30, 30;
+  --glass-tint-opacity: 0.75;
   --ios-spring: cubic-bezier(0.25, 1, 0.4, 1.1);
 }
 
@@ -51,7 +52,7 @@ html, body {
   max-width: 320px;
   width: auto;
   padding: 0 10px 0 6px;
-  background: rgba(0, 0, 0, var(--glass-tint-opacity));
+  background: rgba(var(--accent-rgb), var(--glass-tint-opacity));
   backdrop-filter: blur(25px) saturate(180%);
   -webkit-backdrop-filter: blur(25px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -62,7 +63,8 @@ html, body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: width 0.35s var(--ios-spring), 
               height 0.35s var(--ios-spring), 
-              border-radius 0.35s ease;
+              border-radius 0.35s ease,
+              background-color 0.5s ease;
   cursor: pointer;
   overflow: hidden;
   user-select: none;
@@ -103,7 +105,6 @@ html, body {
   color: #ffffff;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
   letter-spacing: -0.22px;
 }
 
@@ -118,7 +119,6 @@ html, body {
   color: rgba(255, 255, 255, 0.65);
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
   letter-spacing: -0.1px;
 }
 
@@ -146,13 +146,11 @@ html, body {
   padding: 0;
 }
 
-/* Compact height when lyrics are toggled OFF */
 .dynamic-island.lyrics-hidden:hover,
 .dynamic-island.lyrics-hidden.expanded {
   height: 130px !important;
 }
 
-/* Expanded height for Search or Playlist Drawers on Hover/Active */
 .dynamic-island:hover.search-active,
 .dynamic-island.expanded.search-active,
 .dynamic-island:hover.playlist-active,
@@ -229,7 +227,6 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
   letter-spacing: -0.22px;
 }
 
@@ -239,7 +236,6 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
   letter-spacing: -0.1px;
 }
 
@@ -408,7 +404,6 @@ html, body {
 
 #island-lyric-text {
   font-size: 0.75rem;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
   color: rgba(255, 255, 255, 0.92);
   display: inline-block;
   white-space: nowrap;
@@ -425,26 +420,30 @@ html, body {
   100% { transform: translateX(var(--island-scroll-distance, -50%)); }
 }
 
-/* Search Add Button styling */
+/* iOS Style Animated Plus Button */
 .btn-add-track {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
   border: none;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s ease;
+  transition: background 0.2s, transform 0.25s var(--ios-spring);
   flex-shrink: 0;
   margin-left: 8px;
 }
 
 .btn-add-track:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.1);
+  background: #34c759;
+  transform: scale(1.15);
+}
+
+.btn-add-track:active {
+  transform: scale(0.92);
 }
 
 /* Progress Section */
