@@ -13,7 +13,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f2f2f7; /* Clean, light system background */
+  background-color: #f2f2f7;
   color: var(--text-color);
   height: 100vh;
   display: flex;
@@ -36,22 +36,22 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(var(--text-rgb), 0.2);
+  background: rgba(var(--text-rgb), 0.25);
   border-radius: 10px;
 }
 
-/* Dynamic Island Styling (Shorter & True Frosted Glass) */
+/* Dynamic Island Styling */
 .dynamic-island {
   position: absolute;
   top: 24px;
-  width: 250px; /* Shortened width */
+  width: 250px;
   height: 32px;
   background: rgba(var(--accent-rgb), var(--glass-tint-opacity));
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border-radius: 16px;
-  border: 0.5px solid rgba(var(--text-rgb), 0.15);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+  border: 0.5px solid rgba(var(--text-rgb), 0.2);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
               height 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
@@ -66,7 +66,7 @@ body {
 }
 
 .dynamic-island:hover {
-  width: 295px; /* Shorter hover state */
+  width: 295px;
   height: 96px;
   border-radius: 18px;
 }
@@ -192,7 +192,7 @@ body {
 }
 
 #island-hover-artist {
-  opacity: 0.65;
+  opacity: 0.7;
   font-size: 0.5rem;
   white-space: nowrap;
   overflow: hidden;
@@ -224,7 +224,7 @@ body {
 
 .island-top-ctrl:hover, .btn-exit-drawer:hover {
   opacity: 1;
-  background: rgba(var(--text-rgb), 0.1);
+  background: rgba(var(--text-rgb), 0.12);
 }
 
 .island-top-ctrl svg {
@@ -266,7 +266,7 @@ body {
   overflow: hidden;
   width: 100%;
   font-size: 0.5rem;
-  opacity: 0.8;
+  opacity: 0.85;
   white-space: nowrap;
   text-overflow: ellipsis;
   max-height: 10px;
@@ -317,7 +317,7 @@ body {
 .progress-bar-bg {
   width: 100%;
   height: 2px;
-  background: rgba(var(--text-rgb), 0.2);
+  background: rgba(var(--text-rgb), 0.25);
   border-radius: 2px;
   cursor: pointer;
   position: relative;
@@ -334,11 +334,11 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 0.42rem;
-  opacity: 0.6;
+  opacity: 0.65;
   margin-top: 1px;
 }
 
-/* iOS Search & Playlist Drawer */
+/* iOS Search & Playlist Drawers */
 .playlist-drawer {
   position: absolute;
   top: 24px;
@@ -348,13 +348,13 @@ body {
   background: rgba(var(--accent-rgb), 0.88);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 0.5px solid rgba(var(--text-rgb), 0.15);
+  border: 0.5px solid rgba(var(--text-rgb), 0.2);
   border-radius: 12px;
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
   z-index: 10;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease;
 }
 
@@ -371,7 +371,7 @@ body {
   padding: 0 8px 0 26px;
   border-radius: 8px;
   border: none;
-  background-color: rgba(var(--text-rgb), 0.08);
+  background-color: rgba(var(--text-rgb), 0.1);
   color: currentColor;
   font-family: inherit;
   font-size: 0.6rem;
@@ -381,11 +381,11 @@ body {
 
 #island-search-input::placeholder {
   color: currentColor;
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 #island-search-input:focus {
-  background-color: rgba(var(--text-rgb), 0.14);
+  background-color: rgba(var(--text-rgb), 0.16);
 }
 
 /* Search Prediction Results List */
@@ -393,7 +393,7 @@ body {
   margin-top: 4px;
   border-radius: 8px;
   background: rgba(var(--accent-rgb), 0.6);
-  border: 0.5px solid rgba(var(--text-rgb), 0.08);
+  border: 0.5px solid rgba(var(--text-rgb), 0.1);
 }
 
 .ios-popover {
@@ -404,11 +404,11 @@ body {
   background: rgba(var(--accent-rgb), 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 0.5px solid rgba(var(--text-rgb), 0.15);
+  border: 0.5px solid rgba(var(--text-rgb), 0.2);
   border-radius: 10px;
   padding: 6px 8px;
   z-index: 20;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
 }
 
@@ -422,7 +422,7 @@ body {
   -webkit-appearance: none;
   width: 100%;
   height: 2px;
-  background: rgba(var(--text-rgb), 0.2);
+  background: rgba(var(--text-rgb), 0.25);
   border-radius: 2px;
   outline: none;
 }
@@ -449,11 +449,11 @@ body {
 }
 
 .playlist-item-ios:active {
-  background: rgba(var(--text-rgb), 0.08);
+  background: rgba(var(--text-rgb), 0.1);
 }
 
 .playlist-item-ios.active {
-  background: rgba(0, 122, 255, 0.15);
+  background: rgba(0, 122, 255, 0.18);
   color: #007aff;
   font-weight: 600;
 }

@@ -165,6 +165,28 @@ islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); clos
 islandBtnVol.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandVolPopover, islandBtnVol); });
 islandBtnOpacity.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandOpacityPopover, islandBtnOpacity); });
 
+// Dynamic Theme & Luminance Contrast Adjuster
+function updateDynamicTheme(rgbString) {
+  const parts = rgbString.split(',').map(num => parseInt(num.trim(), 10));
+  if (parts.length !== 3) return;
+  
+  const [r, g, b] = parts;
+
+  // Calculate standard relative luminance (W3C formula)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  const root = document.documentElement;
+
+  if (luminance < 0.5) {
+    // Background is dark -> Switch text & icons to white
+    root.style.setProperty('--text-color', '#ffffff');
+    root.style.setProperty('--text-rgb', '255, 255, 255');
+  } else {
+    // Background is bright -> Switch text & icons to dark
+    root.style.setProperty('--text-color', '#1d1d1f');
+    root.style.setProperty('--text-rgb', '29, 29, 31');
+  }
+}
+
 function extractDominantColor(imgElement, callback) {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -218,6 +240,7 @@ function loadTrack(index) {
 
   extractDominantColor(islandHoverCover, (rgbString) => {
     document.documentElement.style.setProperty("--accent-rgb", rgbString);
+    updateDynamicTheme(rgbString);
   });
 
   fetchLyrics(song.lrc);
@@ -456,7 +479,7 @@ islandSearchInput.addEventListener("input", (e) => {
                 <span>${title} - ${artist}</span>
               </div>
             </div>
-            <button class="btn-add-track" title="Play Now" style="background:none;border:none;color:#1d1d1f;cursor:pointer; display:flex;">
+            <button class="btn-add-track" title="Play Now" style="background:none;border:none;color:currentColor;cursor:pointer; display:flex;">
               <svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
           `;
