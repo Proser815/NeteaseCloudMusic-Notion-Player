@@ -165,6 +165,39 @@ islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); clos
 islandBtnVol.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandVolPopover, islandBtnVol); });
 islandBtnOpacity.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandOpacityPopover, islandBtnOpacity); });
 
+function extractDominantColor(imgElement, callback) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = imgElement.src;
+  
+  img.onload = () => {
+    canvas.width = 50;
+    canvas.height = 50;
+    ctx.drawImage(img, 0, 0, 50, 50);
+    try {
+      const data = ctx.getImageData(0, 0, 50, 50).data;
+      let r = 0, g = 0, b = 0, count = 0;
+      for (let i = 0; i < data.length; i += 16) {
+        r += data[i];
+        g += data[i+1];
+        b += data[i+2];
+        count++;
+      }
+      r = Math.floor(r / count);
+      g = Math.floor(g / count);
+      b = Math.floor(b / count);
+      callback(`${r}, ${g}, ${b}`);
+    } catch (e) {
+      callback("245, 245, 247");
+    }
+  };
+  img.onerror = () => {
+    callback("245, 245, 247");
+  };
+}
+
 function loadTrack(index) {
   if (index < 0 || index >= playlist.length) return;
   currentIndex = index;
@@ -182,6 +215,10 @@ function loadTrack(index) {
   islandHoverTitle.innerText = title;
   islandArtist.innerText = artist;
   islandHoverArtist.innerText = artist;
+
+  extractDominantColor(islandHoverCover, (rgbString) => {
+    document.documentElement.style.setProperty("--accent-rgb", rgbString);
+  });
 
   fetchLyrics(song.lrc);
   renderIslandPlaylist();
@@ -333,7 +370,7 @@ function handleVolumeChange(val, updateDisplay = true) {
     islandVolIconSvg.innerHTML = `<path d="M7 9v6h4l5 5V4L7 9zm10 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>`;
     volCrossStrike.classList.add("hidden");
   } else {
-    islandVolIconSvg.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
+    islandVolIconSvg.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02Z14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
     volCrossStrike.classList.add("hidden");
   }
 }
