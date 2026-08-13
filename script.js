@@ -15,7 +15,6 @@ let animationFrameId;
 
 const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
 
-// DOM Elements
 const audio = document.getElementById("audio-player");
 const dynamicIsland = document.getElementById("dynamic-island");
 
@@ -38,7 +37,6 @@ const islandPlayIcon = document.getElementById("island-play-icon");
 const islandPauseIcon = document.getElementById("island-pause-icon");
 const islandBtnNext = document.getElementById("island-btn-next");
 
-// Island Drawer Elements
 const islandBtnSearch = document.getElementById("island-btn-search");
 const islandSearchDrawer = document.getElementById("island-search-drawer");
 const islandCloseSearch = document.getElementById("island-close-search");
@@ -51,7 +49,6 @@ const islandPlaylistDrawer = document.getElementById("island-playlist-drawer");
 const islandClosePlaylist = document.getElementById("island-close-playlist");
 const islandPlaylistUl = document.getElementById("island-playlist-ul");
 
-// Top-Right Popover Elements
 const islandBtnVol = document.getElementById("island-btn-vol");
 const islandVolPopover = document.getElementById("island-vol-popover");
 const islandSettingsVol = document.getElementById("island-settings-vol");
@@ -99,7 +96,6 @@ function toggleDrawer(drawer, button, activeClass) {
   }
 }
 
-// Extract dominant color from album artwork
 function extractDominantColor(imageUrl) {
   if (!imageUrl) return;
   const img = new Image();
@@ -128,14 +124,12 @@ function extractDominantColor(imageUrl) {
   };
 }
 
-// Smooth Animated Lyric Toggle
 islandBtnLyricsToggle.addEventListener("click", (e) => {
   e.stopPropagation();
   const isActive = islandBtnLyricsToggle.classList.toggle("active");
   islandMarqueeContainer.classList.toggle("collapsed-lyric", !isActive);
 });
 
-// Equalizer Visualizer Setup
 function initAudioContext() {
   if (audioCtx) return;
   try {
@@ -166,7 +160,6 @@ function animateBars() {
   animationFrameId = requestAnimationFrame(animateBars);
 }
 
-// Initialize Application
 async function initPlayer() {
   dynamicIsland.classList.remove("hidden");
   handleVolumeChange(0.8, false);
@@ -183,7 +176,6 @@ async function initPlayer() {
   }
 }
 
-// Event Bindings for Top Buttons & Popovers
 islandBtnSearch.addEventListener("click", (e) => { e.stopPropagation(); toggleDrawer(islandSearchDrawer, islandBtnSearch, "search-active"); });
 islandCloseSearch.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
 
@@ -197,7 +189,6 @@ islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); clos
 islandBtnVol.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandVolPopover, islandBtnVol); });
 islandBtnOpacity.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandOpacityPopover, islandBtnOpacity); });
 
-// Track Player Control Logic
 function loadTrack(index) {
   if (index < 0 || index >= playlist.length) return;
   currentIndex = index;
@@ -259,7 +250,6 @@ islandBtnNext.addEventListener("click", (e) => {
   playTrack();
 });
 
-// Play Mode Controls
 islandBtnMode.addEventListener("click", (e) => {
   e.stopPropagation();
   playMode = (playMode + 1) % 3;
@@ -272,7 +262,6 @@ function syncPlayModeUI() {
   islandModeShuffle.classList.toggle("hidden", playMode !== 2);
 }
 
-// Track Progress & Timers
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   const pct = (audio.currentTime / audio.duration) * 100;
@@ -310,7 +299,6 @@ function formatTime(sec) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-// Lyrics Parser
 async function fetchLyrics(lrcUrl) {
   lyrics = [];
   updateIslandLyric("No lyrics found");
@@ -358,18 +346,17 @@ function updateIslandLyric(text) {
   if (islandLyricText) islandLyricText.innerText = text;
 }
 
-// Dynamic Volume Icon & Level updates
+// Volume levels with precise glyph switching (Muted with cross line, Low with 1 wave curve, High with dual waves)
 function handleVolumeChange(val, updateDisplay = true) {
   audio.volume = parseFloat(val);
   if (updateDisplay) {
     islandVolVal.innerText = `${Math.round(val * 100)}%`;
   }
   
-  // Update dynamic volume path based on current slider level
   if (val == 0) {
     islandVolIconSvg.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
   } else if (val < 0.5) {
-    islandVolIconSvg.innerHTML = `<path d="M7 9v6h4l5 5V4L7 9zm10 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>`;
+    islandVolIconSvg.innerHTML = `<path d="M7 9v6h4l5 5V4L7 9zm9.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>`;
   } else {
     islandVolIconSvg.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
   }
@@ -380,7 +367,6 @@ islandSettingsVol.addEventListener("input", (e) => {
   handleVolumeChange(e.target.value);
 });
 
-// Opacity Handler with Cross Strike Sync
 function handleOpacityChange(val, updateDisplay = true) {
   document.documentElement.style.setProperty("--glass-tint-opacity", val);
   if (updateDisplay) {
@@ -393,7 +379,6 @@ islandSettingsOpacity.addEventListener("input", (e) => {
   handleOpacityChange(e.target.value);
 });
 
-// Playlist Renderer inside Drawer
 function renderIslandPlaylist() {
   if (!islandPlaylistUl) return;
   islandPlaylistUl.innerHTML = "";
@@ -429,7 +414,6 @@ function renderIslandPlaylist() {
   });
 }
 
-// Expanded Live Search (10-15 results) without exiting search drawer
 islandSearchInput.addEventListener("input", (e) => {
   const q = e.target.value.trim();
   clearTimeout(islandDebounce);
