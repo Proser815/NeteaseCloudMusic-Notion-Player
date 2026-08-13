@@ -38,16 +38,16 @@ body {
   border-radius: 10px;
 }
 
-/* Dynamic Island Styling */
+/* Dynamic Island Styling with tighter height */
 .dynamic-island {
   position: absolute;
   top: 20px;
   width: 290px;
-  height: 36px;
+  height: 34px;
   background: rgba(var(--accent-rgb), var(--glass-tint-opacity));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 18px;
+  border-radius: 17px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   z-index: 1000;
@@ -61,23 +61,23 @@ body {
 }
 
 .dynamic-island:hover {
-  width: 350px;
-  height: 132px;
-  border-radius: 22px;
+  width: 340px;
+  height: 112px;
+  border-radius: 20px;
 }
 
 .dynamic-island.search-active,
 .dynamic-island.playlist-active {
-  width: 350px;
-  height: 210px;
-  border-radius: 22px;
+  width: 340px;
+  height: 175px;
+  border-radius: 20px;
 }
 
 .island-collapsed-content {
   display: flex;
   align-items: center;
   width: 100%;
-  height: 36px;
+  height: 34px;
   padding: 0 8px;
   gap: 6px;
   opacity: 1;
@@ -94,8 +94,8 @@ body {
 }
 
 #island-cover {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -103,7 +103,7 @@ body {
 .island-collapsed-meta {
   display: flex;
   align-items: center;
-  font-size: 0.65rem;
+  font-size: 0.63rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -120,7 +120,7 @@ body {
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: 9px;
+  height: 8px;
 }
 
 .eq-bars span {
@@ -137,7 +137,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 7px 10px 5px 10px;
+  padding: 5px 8px 4px 8px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -160,12 +160,12 @@ body {
 .island-track-meta-compact {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 #island-hover-cover {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 4px;
   object-fit: cover;
 }
@@ -173,9 +173,9 @@ body {
 .island-track-text {
   display: flex;
   flex-direction: column;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   overflow: hidden;
-  max-width: 150px;
+  max-width: 140px;
 }
 
 #island-hover-title {
@@ -187,7 +187,7 @@ body {
 
 #island-hover-artist {
   opacity: 0.6;
-  font-size: 0.52rem;
+  font-size: 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -195,7 +195,7 @@ body {
 
 .island-top-right-group {
   display: flex;
-  gap: 3px;
+  gap: 2px;
   align-items: center;
 }
 
@@ -208,8 +208,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   transition: opacity 0.2s, background 0.2s;
   position: relative;
@@ -221,16 +221,16 @@ body {
 }
 
 .island-top-ctrl svg {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   fill: currentColor;
 }
 
 /* Volume Cross Strike Container */
 .vol-icon-wrapper {
   position: relative;
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,11 +259,11 @@ body {
 .island-marquee-container {
   overflow: hidden;
   width: 100%;
-  font-size: 0.52rem;
+  font-size: 0.5rem;
   opacity: 0.8;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-height: 14px;
+  max-height: 12px;
   transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
               opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -285,8 +285,8 @@ body {
   border: none;
   color: #fff;
   cursor: pointer;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,8 +299,8 @@ body {
 }
 
 .island-ctrl-btn svg {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   fill: currentColor;
 }
 
@@ -327,21 +327,21 @@ body {
 .time-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.44rem;
+  font-size: 0.42rem;
   opacity: 0.5;
   margin-top: 1px;
 }
 
 .playlist-drawer {
   position: absolute;
-  top: 32px;
-  left: 6px;
-  right: 6px;
-  bottom: 6px;
-  background: rgba(20, 20, 20, 0.92);
+  top: 28px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  background: rgba(20, 20, 20, 0.94);
   backdrop-filter: blur(15px);
-  border-radius: 12px;
-  padding: 8px;
+  border-radius: 10px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   z-index: 10;
@@ -349,28 +349,28 @@ body {
 }
 
 .playlist-drawer.collapsed {
-  transform: translateY(10px);
+  transform: translateY(8px);
   opacity: 0;
   pointer-events: none;
 }
 
 .ios-popover {
   position: absolute;
-  top: 30px;
-  right: 8px;
-  width: 140px;
-  background: rgba(22, 22, 24, 0.94);
+  top: 26px;
+  right: 6px;
+  width: 130px;
+  background: rgba(22, 22, 24, 0.95);
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  padding: 6px 8px;
+  border-radius: 8px;
+  padding: 5px 7px;
   z-index: 20;
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
 }
 
 .ios-popover.collapsed {
-  transform: scale(0.9) translateY(-8px);
+  transform: scale(0.9) translateY(-6px);
   opacity: 0;
   pointer-events: none;
 }
@@ -378,7 +378,7 @@ body {
 .ios-range {
   -webkit-appearance: none;
   width: 100%;
-  height: 2.5px;
+  height: 2px;
   background: rgba(255, 255, 255, 0.25);
   border-radius: 2px;
   outline: none;
@@ -386,8 +386,8 @@ body {
 
 .ios-range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #ffffff;
   cursor: pointer;
@@ -395,9 +395,9 @@ body {
 }
 
 .playlist-item-ios {
-  padding: 4px 5px;
+  padding: 3px 4px;
   border-radius: 4px;
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   cursor: pointer;
   display: flex;
   justify-content: space-between;

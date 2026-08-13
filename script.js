@@ -13,7 +13,7 @@ let source;
 let dataArray;
 let animationFrameId;
 
-const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
 
 // DOM Elements
 const audio = document.getElementById("audio-player");
@@ -157,9 +157,9 @@ function animateBars() {
   const high = dataArray[15] || 0;
 
   const allBars = document.querySelectorAll(".eq-bars span");
-  if (allBars[0]) allBars[0].style.height = `${Math.max(2, (low / 255) * 9)}px`;
-  if (allBars[1]) allBars[1].style.height = `${Math.max(2, (mid / 255) * 9)}px`;
-  if (allBars[2]) allBars[2].style.height = `${Math.max(2, (high / 255) * 9)}px`;
+  if (allBars[0]) allBars[0].style.height = `${Math.max(2, (low / 255) * 8)}px`;
+  if (allBars[1]) allBars[1].style.height = `${Math.max(2, (mid / 255) * 8)}px`;
+  if (allBars[2]) allBars[2].style.height = `${Math.max(2, (high / 255) * 8)}px`;
 
   animationFrameId = requestAnimationFrame(animateBars);
 }
@@ -350,7 +350,6 @@ function updateIslandLyric(text) {
   if (islandLyricText) islandLyricText.innerText = text;
 }
 
-// Exact Volume Level Handling with One Curve for Low Volume and Cross Strike for Mute
 function handleVolumeChange(val, updateDisplay = true) {
   audio.volume = parseFloat(val);
   if (updateDisplay) {
@@ -358,15 +357,12 @@ function handleVolumeChange(val, updateDisplay = true) {
   }
   
   if (val == 0) {
-    // Mute: No curves + cross strike
     islandVolIconSvg.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3z"/>`;
     volCrossStrike.classList.remove("hidden");
   } else if (val < 0.5) {
-    // Low Volume: Exactly one curve + no cross strike
     islandVolIconSvg.innerHTML = `<path d="M7 9v6h4l5 5V4L7 9zm10 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>`;
     volCrossStrike.classList.add("hidden");
   } else {
-    // High Volume: Multiple curves + no cross strike
     islandVolIconSvg.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
     volCrossStrike.classList.add("hidden");
   }
@@ -399,7 +395,7 @@ function renderIslandPlaylist() {
     const songArtist = song.author || song.artist || "Unknown";
 
     li.innerHTML = `
-      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 6px; font-size:0.6rem;">${songName} - ${songArtist}</span>
+      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 5px;">${songName} - ${songArtist}</span>
       <button class="btn-remove" title="Remove" style="background:none;border:none;color:#ff3b30;cursor:pointer; display:flex;">${TRASH_BIN_SVG}</button>
     `;
 
@@ -447,14 +443,14 @@ islandSearchInput.addEventListener("input", (e) => {
           const artist = song.author || song.artist || "Unknown";
 
           li.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 5px; overflow: hidden; flex: 1;">
-              <img src="${song.pic || song.cover || ''}" style="width: 18px; height: 18px; border-radius: 3px; object-fit: cover;" alt="">
-              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; flex: 1;">
+              <img src="${song.pic || song.cover || ''}" style="width: 16px; height: 16px; border-radius: 3px; object-fit: cover;" alt="">
+              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <span>${title} - ${artist}</span>
               </div>
             </div>
             <button class="btn-add-track" title="Play Now" style="background:none;border:none;color:#fff;cursor:pointer; display:flex;">
-              <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
           `;
 
