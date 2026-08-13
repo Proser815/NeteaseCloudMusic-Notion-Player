@@ -70,6 +70,13 @@ const islandDurationTimeEl = document.getElementById("island-duration-time");
 const islandProgressBarBg = document.getElementById("island-progress-bar-bg");
 const islandProgressBarFill = document.getElementById("island-progress-bar-fill");
 
+function isAnyDrawerOrPopoverOpen() {
+  return !islandSearchDrawer.classList.contains("collapsed") ||
+         !islandPlaylistDrawer.classList.contains("collapsed") ||
+         !islandVolPopover.classList.contains("collapsed") ||
+         !islandOpacityPopover.classList.contains("collapsed");
+}
+
 function closeAllIslandPopoversAndDrawers() {
   [islandSearchDrawer, islandPlaylistDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
     if (el) el.classList.add("collapsed");
@@ -100,6 +107,20 @@ function toggleDrawer(drawer, button, activeClass) {
   }
 }
 
+// Fix Hover Bug: Prevent collapse when cursor leaves if a drawer/popover is active
+dynamicIsland.addEventListener("mouseleave", () => {
+  if (isAnyDrawerOrPopoverOpen()) {
+    // Keep expanded state locked while sub-menus are open
+    dynamicIsland.style.width = "295px";
+    dynamicIsland.style.height = dynamicIsland.classList.contains("search-active") || dynamicIsland.classList.contains("playlist-active") ? "145px" : "88px";
+  }
+});
+
+dynamicIsland.addEventListener("mouseenter", () => {
+  dynamicIsland.style.width = "";
+  dynamicIsland.style.height = "";
+});
+
 islandBtnLyricsToggle.addEventListener("click", (e) => {
   e.stopPropagation();
   const isActive = islandBtnLyricsToggle.classList.toggle("active");
@@ -129,9 +150,9 @@ function animateBars() {
   const high = dataArray[15] || 0;
 
   const allBars = document.querySelectorAll(".eq-bars span");
-  if (allBars[0]) allBars[0].style.height = `${Math.max(2, (low / 255) * 8)}px`;
-  if (allBars[1]) allBars[1].style.height = `${Math.max(2, (mid / 255) * 8)}px`;
-  if (allBars[2]) allBars[2].style.height = `${Math.max(2, (high / 255) * 8)}px`;
+  if (allBars[0]) allBars[0].style.height = `${Math.max(2, (low / 255) * 7)}px`;
+  if (allBars[1]) allBars[1].style.height = `${Math.max(2, (mid / 255) * 7)}px`;
+  if (allBars[2]) allBars[2].style.height = `${Math.max(2, (high / 255) * 7)}px`;
 
   animationFrameId = requestAnimationFrame(animateBars);
 }
@@ -474,7 +495,7 @@ islandSearchInput.addEventListener("input", (e) => {
 
           li.innerHTML = `
             <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; flex: 1;">
-              <img src="${song.pic || song.cover || ''}" style="width: 16px; height: 16px; border-radius: 3px; object-fit: cover;" alt="">
+              <img src="${song.pic || song.cover || ''}" style="width: 14px; height: 14px; border-radius: 2px; object-fit: cover;" alt="">
               <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <span>${title} - ${artist}</span>
               </div>
