@@ -118,7 +118,7 @@ function extractDominantColor(imageUrl) {
   };
 }
 
-// Smooth Lyric Expansion Toggle
+// Smooth Lyric Expansion Toggle Fix
 islandBtnLyricsToggle.addEventListener("click", (e) => {
   e.stopPropagation();
   const isActive = islandBtnLyricsToggle.classList.toggle("active");
@@ -385,8 +385,8 @@ function renderIslandPlaylist() {
     const songArtist = song.author || song.artist || "Unknown";
 
     li.innerHTML = `
-      <span>${songName} - ${songArtist}</span>
-      <button class="btn-remove" title="Remove" style="background:none;border:none;color:#ff3b30;cursor:pointer;">${TRASH_BIN_SVG}</button>
+      <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 8px;">${songName} - ${songArtist}</span>
+      <button class="btn-remove" title="Remove" style="background:none;border:none;color:#ff3b30;cursor:pointer; display:flex;">${TRASH_BIN_SVG}</button>
     `;
 
     li.addEventListener("click", (e) => {
@@ -441,7 +441,7 @@ islandSearchInput.addEventListener("input", (e) => {
                 <span>${title} - ${artist}</span>
               </div>
             </div>
-            <button class="btn-add-track" title="Play Now">
+            <button class="btn-add-track" title="Play Now" style="background:none;border:none;color:#fff;cursor:pointer;">
               <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
           `;
