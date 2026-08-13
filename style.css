@@ -263,14 +263,16 @@ body {
   opacity: 1;
 }
 
+/* Lyrics given a bit more breathing room */
 .island-marquee-container {
   overflow: hidden;
   width: 100%;
-  font-size: 0.48rem;
-  opacity: 0.85;
+  font-size: 0.52rem;
+  opacity: 0.88;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-height: 9px;
+  max-height: 12px;
+  margin: 1px 0;
   transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
               opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -279,12 +281,15 @@ body {
   max-height: 0;
   opacity: 0;
   pointer-events: none;
+  margin: 0;
 }
 
+/* Compacted bottom action buttons container */
 .island-action-buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 4px;
 }
 
 .island-ctrl-btn {
@@ -292,22 +297,26 @@ body {
   border: none;
   color: currentColor;
   cursor: pointer;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0.8;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.15s;
 }
 
 .island-ctrl-btn:hover, .island-ctrl-btn.active {
   opacity: 1;
 }
 
+.island-ctrl-btn:active {
+  transform: scale(0.9);
+}
+
 .island-ctrl-btn svg {
-  width: 10px;
-  height: 10px;
+  width: 9.5px;
+  height: 9.5px;
   fill: currentColor;
 }
 
@@ -334,7 +343,7 @@ body {
 .time-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.4rem;
+  font-size: 0.38rem;
   opacity: 0.65;
   margin-top: 1px;
 }
@@ -461,4 +470,16 @@ body {
   background: rgba(0, 122, 255, 0.2);
   color: currentColor;
   font-weight: 600;
+}
+
+/* Smooth iOS-style Checkmark Animation */
+@keyframes popCheck {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.btn-add-track.added svg {
+  animation: popCheck 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  stroke: #34c759; /* iOS green tick */
 }

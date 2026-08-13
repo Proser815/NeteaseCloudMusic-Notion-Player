@@ -107,12 +107,10 @@ function toggleDrawer(drawer, button, activeClass) {
   }
 }
 
-// Fix Hover Bug: Prevent collapse when cursor leaves if a drawer/popover is active
 dynamicIsland.addEventListener("mouseleave", () => {
   if (isAnyDrawerOrPopoverOpen()) {
-    // Keep expanded state locked while sub-menus are open
-    dynamicIsland.style.width = "295px";
-    dynamicIsland.style.height = dynamicIsland.classList.contains("search-active") || dynamicIsland.classList.contains("playlist-active") ? "145px" : "88px";
+    dynamicIsland.style.width = "275px";
+    dynamicIsland.style.height = dynamicIsland.classList.contains("search-active") || dynamicIsland.classList.contains("playlist-active") ? "135px" : "86px";
   }
 });
 
@@ -186,23 +184,18 @@ islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); clos
 islandBtnVol.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandVolPopover, islandBtnVol); });
 islandBtnOpacity.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandOpacityPopover, islandBtnOpacity); });
 
-// Dynamic Theme & Luminance Contrast Adjuster
 function updateDynamicTheme(rgbString) {
   const parts = rgbString.split(',').map(num => parseInt(num.trim(), 10));
   if (parts.length !== 3) return;
   
   const [r, g, b] = parts;
-
-  // Calculate standard relative luminance (W3C formula)
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   const root = document.documentElement;
 
   if (luminance < 0.5) {
-    // Background is dark -> Switch text & icons to white
     root.style.setProperty('--text-color', '#ffffff');
     root.style.setProperty('--text-rgb', '255, 255, 255');
   } else {
-    // Background is bright -> Switch text & icons to dark
     root.style.setProperty('--text-color', '#1d1d1f');
     root.style.setProperty('--text-rgb', '29, 29, 31');
   }
@@ -500,10 +493,24 @@ islandSearchInput.addEventListener("input", (e) => {
                 <span>${title} - ${artist}</span>
               </div>
             </div>
-            <button class="btn-add-track" title="Play Now" style="background:none;border:none;color:currentColor;cursor:pointer; display:flex;">
-              <svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button class="btn-add-track" title="Add to Playlist" style="background:none;border:none;color:currentColor;cursor:pointer; display:flex; padding: 2px;">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
           `;
+
+          const addBtn = li.querySelector(".btn-add-track");
+          addBtn.addEventListener("click", (evt) => {
+            evt.stopPropagation();
+            if (addBtn.classList.contains("added")) return;
+
+            playlist.push(song);
+            
+            // Switch plus icon to an iOS-style checkmark with animation
+            addBtn.classList.add("added");
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#34c759" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            
+            renderIslandPlaylist();
+          });
 
           li.addEventListener("click", () => {
             playlist.push(song);
