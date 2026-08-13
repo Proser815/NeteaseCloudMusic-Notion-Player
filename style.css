@@ -13,7 +13,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f2f2f7;
+  background-color: transparent;
   color: var(--text-color);
   height: 100vh;
   display: flex;
@@ -263,7 +263,6 @@ body {
   opacity: 1;
 }
 
-/* Lyrics given a bit more breathing room */
 .island-marquee-container {
   overflow: hidden;
   width: 100%;
@@ -284,7 +283,6 @@ body {
   margin: 0;
 }
 
-/* Compacted bottom action buttons container */
 .island-action-buttons {
   display: flex;
   justify-content: space-between;
@@ -481,5 +479,5 @@ body {
 
 .btn-add-track.added svg {
   animation: popCheck 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  stroke: #34c759; /* iOS green tick */
+  stroke: #34c759;
 }
