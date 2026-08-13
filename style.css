@@ -1,487 +1,230 @@
-/* =========================================
-   iOS Typography & Global Font Refining
-   ========================================= */
+:root {
+  --accent-rgb: 20, 20, 20;
+  --glass-tint-opacity: 0.75;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-:root {
-  --accent-rgb: 30, 30, 30;
-  --glass-tint-opacity: 0.75;
-  --ios-spring: cubic-bezier(0.25, 1, 0.4, 1.1);
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  background: transparent !important;
-  overflow: hidden;
-  color: #ffffff;
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0f0f11;
+  color: #fff;
+  height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  align-items: center;
+  overflow: hidden;
 }
 
 .hidden {
   display: none !important;
 }
 
-/* Dynamic Island Base Container (Collapsed Pill State) */
+/* Dynamic Island Styling */
 .dynamic-island {
   position: absolute;
-  top: 10px;
-  z-index: 100;
-  height: 37px;
-  min-width: 210px;
-  max-width: 300px;
-  width: auto;
-  padding: 0 10px 0 6px;
+  top: 20px;
+  width: 320px;
+  height: 44px;
   background: rgba(var(--accent-rgb), var(--glass-tint-opacity));
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              height 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  transition: width 0.35s var(--ios-spring), 
-              height 0.35s var(--ios-spring), 
-              border-radius 0.35s ease,
-              background-color 0.5s ease;
-  cursor: pointer;
+  flex-direction: column;
   overflow: hidden;
-  user-select: none;
+  cursor: pointer;
 }
 
-/* Collapsed Content */
+.dynamic-island:hover {
+  width: 380px;
+  height: 180px;
+  border-radius: 28px;
+}
+
+.dynamic-island.search-active,
+.dynamic-island.playlist-active,
+.dynamic-island.settings-active {
+  width: 380px;
+  height: 280px;
+  border-radius: 28px;
+}
+
 .island-collapsed-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
-  transition: opacity 0.2s ease;
+  height: 44px;
+  padding: 0 12px;
+  gap: 10px;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.dynamic-island:hover .island-collapsed-content,
+.dynamic-island.search-active .island-collapsed-content,
+.dynamic-island.playlist-active .island-collapsed-content,
+.dynamic-island.settings-active .island-collapsed-content {
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  padding: 0;
 }
 
 #island-cover {
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
 .island-collapsed-meta {
   display: flex;
   align-items: center;
-  gap: 5px;
-  flex: 1;
-  overflow: hidden;
+  font-size: 0.75rem;
+  font-weight: 500;
   white-space: nowrap;
-}
-
-#island-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #ffffff;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.22px;
+  flex: 1;
+  gap: 6px;
 }
 
 .island-meta-separator {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.45);
+  opacity: 0.5;
 }
 
-#island-artist {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.65);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: -0.1px;
-}
-
+/* Equalizer Bars */
 .eq-bars {
   display: flex;
   align-items: flex-end;
   gap: 2px;
   height: 12px;
-  flex-shrink: 0;
 }
 
 .eq-bars span {
-  width: 2px;
-  height: 3px;
-  background: #34c759;
+  width: 2.5px;
+  background: #fff;
   border-radius: 1px;
+  height: 3px;
+  transition: height 0.1s ease;
 }
 
-/* Streamlined Hover Heights (Compact & Space Saving) */
-.dynamic-island:hover, 
-.dynamic-island.expanded {
-  width: 320px !important;
-  height: 115px !important;
-  border-radius: 28px;
-  padding: 0;
-}
-
-/* When lyrics are hidden */
-.dynamic-island.lyrics-hidden:hover,
-.dynamic-island.lyrics-hidden.expanded {
-  height: 95px !important;
-}
-
-/* Expanded Heights for Search / Playlist / Adjust Sliders Drawers */
-.dynamic-island:hover.search-active,
-.dynamic-island.expanded.search-active,
-.dynamic-island:hover.playlist-active,
-.dynamic-island.expanded.playlist-active,
-.dynamic-island:hover.settings-active,
-.dynamic-island.expanded.settings-active {
-  height: 205px !important;
-}
-
-.dynamic-island:hover .island-collapsed-content,
-.dynamic-island.expanded .island-collapsed-content {
-  opacity: 0;
-  pointer-events: none;
-  display: none;
-}
-
-/* Hover Controls Container */
+/* Hover controls layout */
 .island-hover-controls {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  padding: 8px 12px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-  box-sizing: border-box;
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.96);
-  transition: opacity 0.25s ease 0.05s, transform 0.25s var(--ios-spring) 0.05s;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.dynamic-island:hover .island-hover-controls,
-.dynamic-island.expanded .island-hover-controls {
+.dynamic-island:hover .island-hover-controls {
   opacity: 1;
   pointer-events: auto;
-  transform: scale(1);
 }
 
-/* Top Navigation Bar Inside Hover */
 .island-top-bar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  width: 100%;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.island-top-right-group {
+  display: flex;
+  gap: 6px;
+}
+
+.island-top-ctrl, .btn-exit-drawer {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.island-top-ctrl:hover, .btn-exit-drawer:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.1);
+}
+
+.island-top-ctrl svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
 }
 
 .island-track-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  overflow: hidden;
-  flex: 1;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 #island-hover-cover {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
 .island-track-text {
   display: flex;
   flex-direction: column;
+  font-size: 0.75rem;
   overflow: hidden;
 }
 
 #island-hover-title {
-  font-size: 0.76rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.22px;
 }
 
 #island-hover-artist {
-  font-size: 0.64rem;
-  opacity: 0.7;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: -0.1px;
+  opacity: 0.6;
+  font-size: 0.65rem;
 }
 
-.island-top-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.island-icon-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.island-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.island-icon-btn.active {
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.island-icon-btn svg {
-  width: 12px;
-  height: 12px;
-  fill: #ffffff;
-}
-
-/* Drawers Inside Island */
-.island-drawer {
-  position: absolute;
-  top: 42px;
-  left: 8px;
-  right: 8px;
-  height: 150px;
-  background: rgba(15, 15, 15, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 8px;
-  z-index: 20;
-  overflow-y: auto;
-  transition: opacity 0.25s ease, transform 0.25s var(--ios-spring);
-  display: flex;
-  flex-direction: column;
-}
-
-.island-drawer.collapsed {
-  opacity: 0;
-  transform: translateY(-8px) scale(0.95);
-  pointer-events: none;
-}
-
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.7rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  padding-bottom: 2px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-exit-drawer {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  color: #fff;
-  font-size: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Expanded Search Styling */
-.search-bar {
-  display: flex;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  padding: 3px 6px;
-  flex-shrink: 0;
-}
-
-#island-search-input {
-  flex: 1;
-  background: none;
-  border: none;
-  padding: 2px 4px;
-  color: #fff;
-  font-size: 0.7rem;
-  outline: none;
-}
-
-.search-predictions, .search-results {
-  margin-top: 5px;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.search-predictions ul, .search-results ul, #island-playlist-ul {
-  list-style: none;
-}
-
-.playlist-item-ios {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 6px;
-  margin-bottom: 3px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 0.66rem;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.playlist-item-ios:hover {
-  background: rgba(255, 255, 255, 0.18);
-}
-
-.playlist-item-ios.active {
-  background: rgba(255, 255, 255, 0.25);
-  font-weight: 600;
-}
-
-/* Marquee Lyric Styling */
 .island-marquee-container {
-  width: 100%;
   overflow: hidden;
-  margin: 3px 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  max-height: 18px;
-  opacity: 1;
-  transform: translateY(0);
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              opacity 0.2s ease, 
-              margin 0.3s ease, 
-              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.island-marquee-container.collapsed-lyric {
-  max-height: 0px;
-  opacity: 0;
-  margin: 0;
-  transform: translateY(-3px);
-  pointer-events: none;
-}
-
-.island-marquee-inner {
-  display: inline-block;
-  white-space: nowrap;
-  will-change: transform;
-}
-
-#island-lyric-text {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.92);
-  display: inline-block;
+  width: 100%;
+  margin-bottom: 8px;
+  font-size: 0.65rem;
+  opacity: 0.75;
   white-space: nowrap;
 }
 
-.animate-island-lyric {
-  animation: island-lyric-scroll var(--island-scroll-duration, 6s) linear infinite alternate;
-}
-
-@keyframes island-lyric-scroll {
-  0% { transform: translateX(0%); }
-  20% { transform: translateX(0%); }
-  80% { transform: translateX(var(--island-scroll-distance, -50%)); }
-  100% { transform: translateX(var(--island-scroll-distance, -50%)); }
-}
-
-/* iOS Style Animated Plus Button */
-.btn-add-track {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  border: none;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.25s var(--ios-spring);
-  flex-shrink: 0;
-  margin-left: 6px;
-}
-
-.btn-add-track:hover {
-  background: #34c759;
-  transform: scale(1.15);
-}
-
-.btn-add-track:active {
-  transform: scale(0.92);
-}
-
-/* Progress Section */
-.island-progress-section {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.58rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 2px 0;
-}
-
-.progress-bar-bg {
-  flex: 1;
-  height: 2.5px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-  cursor: pointer;
-  position: relative;
-}
-
-.progress-bar-fill {
-  width: 0%;
-  height: 100%;
-  background: #ffffff;
-  border-radius: 2px;
-}
-
-/* Bottom Action Bar */
 .island-action-buttons {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  width: 100%;
+  align-items: center;
+  margin-top: auto;
 }
 
 .island-ctrl-btn {
@@ -489,64 +232,103 @@ html, body {
   border: none;
   color: #fff;
   cursor: pointer;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
 
-.island-ctrl-btn.play-main {
-  background: #ffffff;
-  color: #000000;
-  width: 26px;
-  height: 26px;
-}
-
-.island-ctrl-btn.play-main svg {
-  fill: #000000;
+.island-ctrl-btn:hover {
+  opacity: 1;
 }
 
 .island-ctrl-btn svg {
-  width: 13px;
-  height: 13px;
+  width: 15px;
+  height: 15px;
   fill: currentColor;
 }
 
-/* Sliders inside Settings Drawer */
-.island-settings-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 4px 2px;
+/* Progress bar styling */
+.island-progress-section {
+  margin-bottom: 8px;
 }
 
-.island-setting-group {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.island-setting-label {
-  font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.island-setting-group input[type="range"] {
-  -webkit-appearance: none;
+.progress-bar-bg {
   width: 100%;
   height: 3px;
+  background: rgba(255,255,255,0.2);
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.3);
-  outline: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-.island-setting-group input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #ffffff;
+.progress-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: #fff;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.55rem;
+  opacity: 0.5;
+  margin-top: 3px;
+}
+
+/* Drawers inside Island */
+.playlist-drawer {
+  position: absolute;
+  top: 45px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.playlist-drawer.collapsed {
+  transform: translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.playlist-item-ios {
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.playlist-item-ios:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.playlist-item-ios.active {
+  background: rgba(255,255,255,0.18);
+  font-weight: 600;
+}
+
+/* Background fallback card */
+.player-card {
+  width: 320px;
+  background: rgba(20, 20, 20, 0.6);
+  border-radius: 24px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: none;
 }
