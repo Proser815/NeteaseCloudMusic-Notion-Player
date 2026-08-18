@@ -3,825 +3,131 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Pixel Plant</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&family=Noto+Sans+KR:wght@500;700&family=Noto+Sans+SC:wght@500;700&family=Press+Start+2P&family=Vazirmatn:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      /* Palette based on Notion UI image */
-      --notion-cream: #fbf7ee;
-      --notion-blue: #2383e2;
-      --notion-purple: #9065b0;
-      --notion-purple-bg: #f3eafd;
-      --notion-yellow: #d9931e;
-      --notion-yellow-bg: #fdf5e6;
-      --notion-red: #e03e3e;
-      --notion-red-bg: #fbebe8;
-      --notion-orange: #d9730d;
-      --notion-orange-bg: #fbf3db;
-      --notion-green: #448361;
-      --notion-green-bg: #edf6f0;
-      --notion-pink: #d15796;
-      --notion-pink-bg: #fdebec;
-      --notion-blue-bg: #e8f3fe;
-
-      /* Adaptive Notion-themed light mode (Default: Yellow Accent) */
-      --bg: transparent;
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --text-sub: #787774;
-      --border: #e9e9e7;
-      --accent: var(--notion-yellow);
-      --dialogue-bg: var(--notion-yellow-bg);
-      
-      /* Typography Fallbacks */
-      --font-pixel: 'Press Start 2P', monospace;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-cjk: 'Noto Sans SC', 'Noto Sans JP', 'Noto Sans KR', 'Vazirmatn', sans-serif;
-      
-      /* Active font variable */
-      --font-family: var(--font-pixel);
-
-      /* Dynamic Sizing Variables (Default: Responsive Small) */
-      --radius: 12px;
-      --card-width: 100%;
-      --card-max-width: 320px;
-      --card-padding: 12px;
-      --canvas-size: clamp(80px, 25vw, 112px);
-      --title-size: 8px;
-      --dialogue-size: 7px;
-      --ui-size: 7px;
-      --btn-padding: 6px;
-      --emoji-size: 13px;
-    }
-
-    /* Color Themes */
-    body.theme-yellow {
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --text-sub: #787774;
-      --border: #f1e0c6;
-      --accent: var(--notion-yellow);
-      --dialogue-bg: var(--notion-yellow-bg);
-    }
-
-    body.theme-orange {
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --text-sub: #787774;
-      --border: #f7dfc6;
-      --accent: var(--notion-orange);
-      --dialogue-bg: var(--notion-orange-bg);
-    }
-
-    body.theme-green {
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --text-sub: #787774;
-      --border: #d4ebd9;
-      --accent: var(--notion-green);
-      --dialogue-bg: var(--notion-green-bg);
-    }
-
-    body.theme-blue {
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --text-sub: #787774;
-      --border: #d3e5f8;
-      --accent: var(--notion-blue);
-      --dialogue-bg: var(--notion-blue-bg);
-    }
-
-    body.theme-purple {
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --text-sub: #787774;
-      --border: #e4d7f5;
-      --accent: var(--notion-purple);
-      --dialogue-bg: var(--notion-purple-bg);
-    }
-
-    body.theme-pink {
-      --card-bg: #ffffff;
-      --text: #37352f;
-      --text-sub: #787774;
-      --border: #f8d7e3;
-      --accent: var(--notion-pink);
-      --dialogue-bg: var(--notion-pink-bg);
-    }
-
-    body.theme-dark {
-      --bg: transparent;
-      --card-bg: #1e1e1e;
-      --text: #ffffff;
-      --text-sub: #a0a0a0;
-      --border: #333333;
-      --accent: var(--notion-green);
-      --dialogue-bg: #2d2d2d;
-    }
-
-    /* Style: Retro Font Handling */
-    body.style-retro {
-      --font-family: var(--font-pixel);
-    }
-    body.style-retro.size-small { --title-size: 7px; --dialogue-size: 6px; --ui-size: 6px; }
-    body.style-retro.size-medium { --title-size: 8px; --dialogue-size: 7px; --ui-size: 7px; }
-    body.style-retro.size-large { --title-size: 9px; --dialogue-size: 8px; --ui-size: 8px; }
-
-    /* Style: Modern Font Handling */
-    body.style-modern {
-      --font-family: var(--font-sans);
-    }
-    body.style-modern.size-small { --title-size: 8px; --dialogue-size: 9px; --ui-size: 8px; }
-    body.style-modern.size-medium { --title-size: 9px; --dialogue-size: 10px; --ui-size: 9px; }
-    body.style-modern.size-large { --title-size: 10px; --dialogue-size: 11px; --ui-size: 10px; }
-
-    /* Language specific font fallbacks */
-    body.lang-cjk,
-    body.lang-rtl {
-      --font-family: var(--font-cjk);
-    }
-
-    /* Sizing adjustments */
-    body.size-small {
-      --card-max-width: 260px;
-      --card-padding: 10px;
-      --btn-padding: 4px;
-      --emoji-size: 11px;
-    }
-
-    body.size-medium {
-      --card-max-width: 320px;
-      --card-padding: 14px;
-      --btn-padding: 6px;
-      --emoji-size: 13px;
-    }
-
-    body.size-large {
-      --card-max-width: 380px;
-      --card-padding: 18px;
-      --btn-padding: 8px;
-      --emoji-size: 15px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    /* Custom iOS-style Scrollbar */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; margin: 2px 0; }
-    ::-webkit-scrollbar-thumb { background: rgba(120, 119, 116, 0.3); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(120, 119, 116, 0.5); }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-    }
-
-    body {
-      font-family: var(--font-family);
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 8px;
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    .app-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      width: var(--card-width);
-      max-width: var(--card-max-width);
-      padding: var(--card-padding);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      transition: max-width 0.2s, padding 0.2s, border-color 0.2s;
-    }
-
-    .top-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .top-title {
-      font-size: var(--title-size);
-      font-weight: bold;
-      letter-spacing: 0.5px;
-      color: var(--accent);
-      font-family: var(--font-family);
-      transition: color 0.2s;
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      font-size: calc(var(--ui-size) + 3px);
-      padding: 2px;
-    }
-
-    .plant-canvas {
-      width: var(--canvas-size);
-      height: var(--canvas-size);
-      image-rendering: pixelated;
-      margin: 4px 0;
-      cursor: pointer;
-      transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), width 0.2s, height 0.2s;
-    }
-
-    .plant-canvas.morphing {
-      opacity: 0.3;
-      transform: scale(0.85);
-    }
-
-    .dialogue {
-      font-size: var(--dialogue-size);
-      font-family: var(--font-family);
-      text-align: center;
-      color: var(--text-sub);
-      min-height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 4px;
-      line-height: 1.4;
-      font-weight: 500;
-      padding: 4px 8px;
-      background: var(--dialogue-bg);
-      border-radius: calc(var(--radius) / 2);
-      border: 1px solid rgba(0,0,0,0.04);
-      width: 100%;
-      transition: background-color 0.2s;
-    }
-
-    .status-tracker {
-      font-size: calc(var(--ui-size) - 1px);
-      font-family: var(--font-family);
-      color: var(--accent);
-      margin-top: 6px;
-      display: flex;
-      gap: 6px;
-      font-weight: bold;
-      transition: color 0.2s;
-    }
-
-    .mood-bar {
-      display: flex;
-      gap: 4px;
-      margin-top: 8px;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .mood-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) / 2);
-      padding: var(--btn-padding);
-      font-size: var(--emoji-size);
-      cursor: pointer;
-      transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #mbtn-happy { border-color: var(--notion-yellow); }
-    #mbtn-calm { border-color: var(--notion-green); }
-    #mbtn-tired { border-color: var(--notion-purple); }
-    #mbtn-sad { border-color: var(--notion-blue); }
-
-    .mood-btn:active { transform: scale(0.9); }
-    .mood-btn.selected#mbtn-happy { background-color: var(--notion-yellow-bg); }
-    .mood-btn.selected#mbtn-calm { background-color: var(--notion-green-bg); }
-    .mood-btn.selected#mbtn-tired { background-color: var(--notion-purple-bg); }
-    .mood-btn.selected#mbtn-sad { background-color: var(--notion-red-bg); }
-    
-    .mood-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    .overlay-panel {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 10;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(120, 119, 116, 0.3) transparent;
-    }
-
-    .hidden { display: none !important; }
-
-    .setting-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .setting-label {
-      font-size: var(--ui-size);
-      font-family: var(--font-family);
-      color: var(--accent);
-      font-weight: bold;
-      transition: color 0.2s;
-    }
-
-    input[type="text"], select {
-      background: var(--card-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 4px 6px;
-      font-family: var(--font-family);
-      font-size: var(--ui-size);
-      border-radius: calc(var(--radius) / 2);
-      width: 100%;
-    }
-
-    .btn-primary {
-      background-color: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 6px;
-      font-family: var(--font-family);
-      font-size: var(--ui-size);
-      border-radius: calc(var(--radius) / 2);
-      cursor: pointer;
-      margin-top: 4px;
-      transition: background-color 0.2s, opacity 0.2s;
-      width: 100%;
-    }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-    }
-
-    .instructions-box {
-      background: var(--dialogue-bg);
-      border: 1px solid var(--border);
-      padding: 6px;
-      border-radius: calc(var(--radius) / 2);
-      font-size: calc(var(--ui-size) - 1px);
-      font-family: var(--font-family);
-      line-height: 1.4;
-      color: var(--text-sub);
-    }
-  </style>
+  <title>Notion Glass Music Player</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-yellow size-medium style-retro lang-latin">
+<body>
 
-  <div class="app-card">
-    <div id="naming-screen" class="overlay-panel">
-      <div class="top-bar">
-        <span class="top-title" id="welcome-title">WELCOME</span>
-      </div>
-      <div class="setting-item" style="margin-top: 6px;">
-        <label class="setting-label" id="label-name-plant">NAME YOUR PLANT</label>
-        <input type="text" id="initial-name-input" placeholder="Sprout" maxlength="12">
-      </div>
-      <button class="btn-primary" onclick="saveInitialName()" id="btn-start">START</button>
-    </div>
-
-    <div id="main-screen" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-      <div class="top-bar">
-        <span class="top-title" id="plant-display-name">PLANT</span>
-        <button class="icon-btn" onclick="toggleSettings()">⚙️</button>
+  <div id="dynamic-island" class="dynamic-island hidden">
+    
+    <div id="island-collapsed-content" class="island-collapsed-content">
+      <img id="island-cover" src="" alt="Island Cover">
+      
+      <div class="island-collapsed-meta">
+        <span id="island-title">Loading...</span>
+        <span class="island-meta-separator">•</span>
+        <span id="island-artist">...</span>
       </div>
 
-      <canvas id="plantCanvas" class="plant-canvas" width="16" height="16" onclick="petPlant()"></canvas>
-
-      <div class="dialogue" id="dialogue-text">...</div>
-
-      <div class="status-tracker">
-        <span id="stage-text">STAGE 1</span> | 
-        <span id="chances-text">CHANCES: 4/4</span>
-      </div>
-
-      <div class="mood-bar">
-        <button class="mood-btn" id="mbtn-happy" onclick="logMood('happy', 3)" title="Happy">😊</button>
-        <button class="mood-btn" id="mbtn-calm" onclick="logMood('calm', 2)" title="Calm">😌</button>
-        <button class="mood-btn" id="mbtn-tired" onclick="logMood('tired', 1)" title="Tired">😴</button>
-        <button class="mood-btn" id="mbtn-sad" onclick="logMood('sad', 0)" title="Sad">🌧️</button>
+      <div id="island-eq" class="eq-bars">
+        <span></span><span></span><span></span>
       </div>
     </div>
 
-    <div id="settings-screen" class="overlay-panel hidden">
-      <div class="top-bar">
-        <span class="top-title" id="settings-title">SETTINGS</span>
-        <button class="icon-btn" onclick="toggleSettings()">✖</button>
+    <div class="island-hover-controls">
+      
+      <div class="island-top-bar">
+        <div class="island-track-meta-compact">
+          <img id="island-hover-cover" src="" alt="Cover">
+          <div class="island-track-text">
+            <span id="island-hover-title">Loading...</span>
+            <span id="island-hover-artist">...</span>
+          </div>
+        </div>
+
+        <div class="island-top-right-group">
+          <button id="island-btn-search" class="island-top-ctrl" title="Search">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </button>
+          <button id="island-btn-playlist" class="island-top-ctrl" title="Playlist">
+            <svg viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg>
+          </button>
+          <button id="island-btn-vol" class="island-top-ctrl" title="Volume Adjustment">
+            <div class="vol-icon-wrapper">
+              <svg id="island-vol-icon-svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+              <div id="vol-cross-strike" class="cross-strike hidden"></div>
+            </div>
+          </button>
+          <button id="island-btn-opacity" class="island-top-ctrl" title="Glass Opacity">
+            <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-1.09 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+          </button>
+        </div>
       </div>
 
-      <div class="setting-item">
-        <label class="setting-label" id="label-edit-name">PLANT NAME</label>
-        <input type="text" id="edit-name-input" maxlength="12" onchange="updatePlantName(this.value)">
+      <div id="island-marquee-container" class="island-marquee-container">
+        <div id="island-marquee-inner" class="island-marquee-inner">
+          <span id="island-lyric-text">Lyrics will scroll here...</span>
+        </div>
       </div>
 
-      <div class="setting-item">
-        <label class="setting-label" id="label-size">UI SIZE</label>
-        <select id="select-size" onchange="updateSize(this.value)">
-          <option value="size-small">Small</option>
-          <option value="size-medium" selected>Medium</option>
-          <option value="size-large">Large</option>
-        </select>
+      <div class="island-progress-section">
+        <div id="island-progress-bar-bg" class="progress-bar-bg">
+          <div id="island-progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <div class="time-row">
+          <span id="island-current-time">0:00</span>
+          <span id="island-duration-time">0:00</span>
+        </div>
       </div>
 
-      <div class="setting-item">
-        <label class="setting-label" id="label-lang">LANGUAGE</label>
-        <select id="select-lang" onchange="updateLanguage(this.value)">
-          <option value="en">English</option>
-          <option value="zh">中文</option>
-          <option value="ja">日本語</option>
-          <option value="ko">한국어</option>
-          <option value="fa">فارسی</option>
-          <option value="it">Italiano</option>
-          <option value="de">Deutsch</option>
-          <option value="es">Español</option>
-          <option value="fr">Français</option>
-        </select>
+      <div class="island-action-buttons">
+        <button id="island-btn-mode" class="island-ctrl-btn" title="Toggle Play Mode">
+          <svg id="island-mode-loop" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          <svg id="island-mode-one" class="hidden" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zM12 10v4h1v-4h-1z"/></svg>
+          <svg id="island-mode-shuffle" class="hidden" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+        </button>
+        <button id="island-btn-prev" class="island-ctrl-btn" title="Previous Track">
+          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+        <button id="island-btn-play" class="island-ctrl-btn" title="Play/Pause">
+          <svg id="island-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="island-pause-icon" class="hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <button id="island-btn-next" class="island-ctrl-btn" title="Next Track">
+          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+        <button id="island-btn-lyrics" class="island-ctrl-btn active" title="Toggle Lyrics">
+          <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </button>
       </div>
-
-      <div class="setting-item">
-        <label class="setting-label" id="label-ui">UI STYLE</label>
-        <select id="select-ui" onchange="updateStyle(this.value)">
-          <option value="style-retro" selected>Retro (Pixel)</option>
-          <option value="style-modern">Modern</option>
-        </select>
-      </div>
-
-      <div class="setting-item">
-        <label class="setting-label" id="label-theme">THEME</label>
-        <select id="select-theme" onchange="updateTheme(this.value)">
-          <option value="theme-yellow" selected>Notion Yellow</option>
-          <option value="theme-orange">Notion Orange</option>
-          <option value="theme-green">Notion Green</option>
-          <option value="theme-blue">Notion Blue</option>
-          <option value="theme-purple">Notion Purple</option>
-          <option value="theme-pink">Notion Pink</option>
-          <option value="theme-dark">Dark Mode</option>
-        </select>
-      </div>
-
-      <button class="btn-primary" onclick="toggleInstructions()" id="btn-how-to">HOW IT WORKS</button>
-      <div id="instructions-box" class="instructions-box hidden"></div>
     </div>
+
+    <div id="island-search-drawer" class="playlist-drawer collapsed">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+        <h3 style="font-size: 0.65rem; font-weight:600;">Search Track</h3>
+        <button id="island-close-search" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <input type="text" id="island-search-input" placeholder="Type artist or song..." autocomplete="off" style="width:100%; padding:2px 5px; border-radius:4px; border:1px solid rgba(0,0,0,0.15); background:rgba(0,0,0,0.03); color:inherit; font-size:0.6rem;">
+      <div id="island-search-results" class="search-predictions hidden" style="position:relative; margin-top:2px; overflow-y:auto; max-height:130px;"><ul id="island-search-results-ul" style="list-style:none;"></ul></div>
+    </div>
+
+    <div id="island-playlist-drawer" class="playlist-drawer collapsed">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+        <h3 style="font-size: 0.65rem; font-weight:600;">Playlist</h3>
+        <button id="island-close-playlist" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <ul id="island-playlist-ul" style="list-style:none; overflow-y:auto; flex:1;"></ul>
+    </div>
+
+    <div id="island-vol-popover" class="ios-popover collapsed">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1px; font-size:0.58rem;">
+        <span style="font-weight:600;">Volume</span>
+        <span id="island-vol-val" style="opacity:0.7;">80%</span>
+      </div>
+      <input type="range" id="island-settings-vol" class="ios-range" min="0" max="1" step="0.01" value="0.8">
+    </div>
+
+    <div id="island-opacity-popover" class="ios-popover collapsed">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1px; font-size:0.58rem;">
+        <span style="font-weight:600;">Glass Opacity</span>
+        <span id="island-opacity-val" style="opacity:0.7;">85%</span>
+      </div>
+      <input type="range" id="island-settings-opacity" class="ios-range" min="0" max="1" step="0.01" value="0.85">
+    </div>
+
   </div>
 
-  <script>
-    const i18n = {
-      en: { 
-        welcome: "WELCOME", start: "START", namePlant: "NAME YOUR PLANT", editName: "PLANT NAME", size: "UI SIZE",
-        settings: "SETTINGS", lang: "LANGUAGE", ui: "UI STYLE", theme: "THEME",
-        stage: "STAGE", chances: "CHANCES", howTo: "HOW IT WORKS",
-        instructions: "Log your mood up to 4 times a day. Your plant reflects your mood with smooth state transitions. At the end of the day, your average score is tallied—positive vibes will help your plant bloom!",
-        summary: "Daily summary logged! Average mood: ",
-        noChances: "No check-ins left today. See you tomorrow!",
-        moods: {
-          happy: "blooming bright with your happiness! ✨",
-          calm: "swaying gently in peaceful thoughts. 🌿",
-          tired: "drooping softly... let's rest together. 🌙",
-          sad: "holding space for you. it's okay to feel rainy. 🌧️"
-        }
-      },
-      zh: { 
-        welcome: "欢迎", start: "开始", namePlant: "给小植物取名", editName: "植物名字", size: "界面尺寸",
-        settings: "设置", lang: "语言", ui: "UI 风格", theme: "主题",
-        stage: "阶段", chances: "剩余次数", howTo: "使用说明",
-        instructions: "每天可记录最多 4 次心情。植物会根据你的心情平滑变幻形态。一天结束时计算平均值—保持积极情绪可让植物开出鲜花！",
-        summary: "今日记录完成！平均心情：",
-        noChances: "今天次数已用完，明天见！",
-        moods: {
-          happy: "因你的快乐而明亮绽放！✨",
-          calm: "在平淡的思想中微微摇曳。🌿",
-          tired: "轻轻垂下... 一起休息吧。🌙",
-          sad: "静静陪伴着你，下雨也没关系。🌧️"
-        }
-      },
-      ja: { 
-        welcome: "ようこそ", start: "スタート", namePlant: "名前をつけてね", editName: "植物の名前", size: "UIサイズ",
-        settings: "設定", lang: "言語", ui: "UIスタイル", theme: "テーマ",
-        stage: "ステージ", chances: "残り回数", howTo: "遊び方",
-        instructions: "1日最大4回まで気分を記録できます。植物は現在の気分に応じてスムーズに変化します。1日の終わりに平均気分が計算され、ポジティブな気分で綺麗な花が咲きます！",
-        summary: "今日の記録が完了しました！平均気分：",
-        noChances: "今日のチェックインは終了しました。また明日！",
-        moods: {
-          happy: "あなたの嬉しさに合わせて咲いています！✨",
-          calm: "穏やかな心で静かにゆれています。🌿",
-          tired: "すこし垂れています... 一緒に休みましょう。🌙",
-          sad: "静かに寄り添っています。雨の日があってもいいんだよ。🌧️"
-        }
-      },
-      ko: { 
-        welcome: "환영합니다", start: "시작하기", namePlant: "식물 이름 짓기", editName: "식물 이름", size: "UI 크기",
-        settings: "설정", lang: "언어", ui: "UI 스타일", theme: "테마",
-        stage: "단계", chances: "기회", howTo: "사용 방법",
-        instructions: "하루에 최대 4번 기분을 기록할 수 있습니다. 식물은 현재 기분에 따라 유연하게 변합니다. 하루 평균 점수가 집계되며 긍정적인 마음이 예쁜 꽃을 피워냅니다!",
-        summary: "오늘의 요약 완료! 평균 기분: ",
-        noChances: "오늘의 체크인이 끝났습니다. 내일 봐요!",
-        moods: {
-          happy: "당신의 행복으로 밝게 피어납니다! ✨",
-          calm: "평온한 마음 속에서 잔잔히 흔들립니다. 🌿",
-          tired: "살포시 고개를 숙입니다... 같이 쉬어요. 🌙",
-          sad: "조용히 곁을 지킵니다. 비가 와도 괜찮아요. 🌧️"
-        }
-      },
-      fa: { 
-        welcome: "خوش آمدید", start: "شروع", namePlant: "نام‌گذاری گیاه", editName: "نام گیاه", size: "اندازه رابط",
-        settings: "تنظیمات", lang: "زبان", ui: "سبک رابط", theme: "تم",
-        stage: "مرحله", chances: "فرصت‌ها", howTo: "راهنما",
-        instructions: "روزانه تا ۴ بار حال خود را ثبت کنید. گیاه شما با انیمیشن نرم تغییر شکل می‌دهد. احساسات مثبت باعث رشد و شکفتن گل‌های زیبا می‌شود!",
-        summary: "خلاصه امروز ثبت شد! میانگین احساس: ",
-        noChances: "فرصت‌های امروز تمام شد. فردا می‌بینمت!",
-        moods: {
-          happy: "با شادی شما روشن می‌شوم! ✨",
-          calm: "آرام در افکار خنک می‌رقصم. 🌿",
-          tired: "کمی خسته‌ام... بیا با هم استراحت کنیم. 🌙",
-          sad: "کنارت هستم. بارانی بودن اشکالی ندارد. 🌧️"
-        }
-      },
-      it: { 
-        welcome: "BENVENUTO", start: "INIZIA", namePlant: "NOME PIANTA", editName: "NOME PIANTA", size: "DIMENSIONE UI",
-        settings: "IMPOSTAZIONI", lang: "LINGUA", ui: "STILE UI", theme: "TEMA",
-        stage: "STADIO", chances: "TENTATIVI", howTo: "COME FUNZIONA",
-        instructions: "Registra il tuo umore fino a 4 volte al giorno. La tua pianta cambierà in modo fluido. A fine giornata verrà calcolata la media: i pensieri positivi faranno sbocciare un bel fiore!",
-        summary: "Riepilogo giornaliero registrato! Umore medio: ",
-        noChances: "Nessun tentativo rimasto per oggi. A domani!",
-        moods: {
-          happy: "fiorisce felicemente con te! ✨",
-          calm: "dondola dolcemente in pace. 🌿",
-          tired: "si riposa dolcemente insieme a te. 🌙",
-          sad: "ti è vicino. va bene anche quando piove. 🌧️"
-        }
-      },
-      de: { 
-        welcome: "WILLKOMMEN", start: "START", namePlant: "PFLANZE BENENNEN", editName: "PFLANZENNAME", size: "UI GRÖSSE",
-        settings: "EINSTELLUNGEN", lang: "SPRACHE", ui: "UI STIL", theme: "THEMA",
-        stage: "STUFE", chances: "CHANCEN", howTo: "ANLEITUNG",
-        instructions: "Trage deine Stimmung bis zu 4 Mal am Tag ein. Deine Pflanze verwandelt sich fließend. Positive Energie lässt wunderschöne Blüten erblühen!",
-        summary: "Tageszusammenfassung gespeichert! Durchschnitt: ",
-        noChances: "Keine Versuche mehr für heute. Bis morgen!",
-        moods: {
-          happy: "blüht hell mit deiner Freude! ✨",
-          calm: "wiegt sanft in stillen Gedanken. 🌿",
-          tired: "lässt den Kopf hängen... ruhen wir aus. 🌙",
-          sad: "ist für dich da. Regen gehört dazu. 🌧️"
-        }
-      },
-      es: { 
-        welcome: "BIENVENIDO", start: "EMPEZAR", namePlant: "NOMBRA TU PLANTA", editName: "NOMBRE PLANTA", size: "TAMAÑO UI",
-        settings: "AJUSTES", lang: "IDIOMA", ui: "ESTILO UI", theme: "TEMA",
-        stage: "ETAPA", chances: "INTENTOS", howTo: "CÓMO FUNCIONA",
-        instructions: "Registra tu estado de ánimo hasta 4 veces al día. Tu planta cambia con animaciones suaves. ¡Las buenas vibras harán florecer hermosas pétalos!",
-        summary: "¡Resumen diario guardado! Promedio: ",
-        noChances: "No quedan intentos hoy. ¡Hasta mañana!",
-        moods: {
-          happy: "¡florece brillante con tu alegría! ✨",
-          calm: "se mece suavemente en calma. 🌿",
-          tired: "se inclina despacio... descansemos juntos. 🌙",
-          sad: "está contigo. Está bien estar triste a veces. 🌧️"
-        }
-      },
-      fr: { 
-        welcome: "BIENVENUE", start: "COMMENCER", namePlant: "NOMME TA PLANTE", editName: "NOM PLANTE", size: "TAILLE UI",
-        settings: "RÉGLAGES", lang: "LANGUE", ui: "STYLE UI", theme: "THÈME",
-        stage: "ÉTAPE", chances: "ESSAIS", howTo: "COMMENT ÇA MARCHE",
-        instructions: "Enregistre ton humeur jusqu'à 4 fois par jour. Ta plante se métamorphose en douceur. Les bonnes ondes feront éclore une magnifique fleur !",
-        summary: "Résumé quotidien enregistré ! Moyenne : ",
-        noChances: "Plus d'essais aujourd'hui. À demain !",
-        moods: {
-          happy: "fleurit joyeusement avec toi ! ✨",
-          calm: "balance doucement dans le calme. 🌿",
-          tired: "se repose doucement... à plus tard. 🌙",
-          sad: "est là pour toi. Il peut pleuvoir parfois. 🌧️"
-        }
-      }
-    };
-
-    let currentLang = 'en';
-    let plantName = 'Sprout';
-    let currentMood = 'happy';
-    let chancesLeft = 4;
-    let moodScores = [];
-    let growthStage = 1;
-
-    function saveInitialName() {
-      const input = document.getElementById('initial-name-input').value.trim();
-      if (input) plantName = input;
-      document.getElementById('edit-name-input').value = plantName;
-      document.getElementById('plant-display-name').textContent = plantName;
-      document.getElementById('naming-screen').classList.add('hidden');
-      updateDialogue();
-      updateTrackerUI();
-    }
-
-    function updatePlantName(newName) {
-      if (newName.trim()) {
-        plantName = newName.trim();
-        document.getElementById('plant-display-name').textContent = plantName;
-        updateDialogue();
-      }
-    }
-
-    function toggleSettings() {
-      document.getElementById('settings-screen').classList.toggle('hidden');
-    }
-
-    function toggleInstructions() {
-      document.getElementById('instructions-box').classList.toggle('hidden');
-    }
-
-    function logMood(mood, score) {
-      if (chancesLeft <= 0) return;
-
-      currentMood = mood;
-      chancesLeft--;
-      moodScores.push(score);
-
-      const canvas = document.getElementById('plantCanvas');
-      canvas.classList.add('morphing');
-      
-      setTimeout(() => {
-        drawPixelPlant();
-        canvas.classList.remove('morphing');
-      }, 200);
-
-      document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
-      document.getElementById(`mbtn-${mood}`).classList.add('selected');
-
-      if (chancesLeft === 0) {
-        summarizeDailyMood();
-      } else {
-        updateDialogue();
-      }
-
-      updateTrackerUI();
-    }
-
-    function summarizeDailyMood() {
-      const avg = moodScores.reduce((a, b) => a + b, 0) / moodScores.length;
-      if (avg >= 2 && growthStage < 3) {
-        growthStage++;
-      }
-      
-      const t = i18n[currentLang] || i18n.en;
-      let summaryLabel = avg >= 2.25 ? "😊" : avg >= 1.5 ? "😌" : avg >= 0.75 ? "😴" : "🌧️";
-      document.getElementById('dialogue-text').textContent = `${t.summary} ${summaryLabel}. ${t.noChances}`;
-      
-      document.querySelectorAll('.mood-btn').forEach(btn => btn.disabled = true);
-      drawPixelPlant();
-    }
-
-    function updateTrackerUI() {
-      const t = i18n[currentLang] || i18n.en;
-      document.getElementById('stage-text').textContent = `${t.stage} ${growthStage}`;
-      document.getElementById('chances-text').textContent = `${t.chances}: ${chancesLeft}/4`;
-    }
-
-    function updateDialogue() {
-      const t = i18n[currentLang] || i18n.en;
-      const moodText = t.moods[currentMood];
-      document.getElementById('dialogue-text').textContent = `${plantName} ${moodText}`;
-    }
-
-    function updateLanguage(lang) {
-      currentLang = lang;
-      const t = i18n[lang] || i18n.en;
-
-      document.body.classList.remove('lang-cjk', 'lang-rtl', 'lang-latin');
-      if (['zh', 'ja', 'ko'].includes(lang)) {
-        document.body.classList.add('lang-cjk');
-      } else if (lang === 'fa') {
-        document.body.classList.add('lang-rtl');
-      } else {
-        document.body.classList.add('lang-latin');
-      }
-
-      document.getElementById('welcome-title').textContent = t.welcome;
-      document.getElementById('btn-start').textContent = t.start;
-      document.getElementById('label-name-plant').textContent = t.namePlant;
-      document.getElementById('label-edit-name').textContent = t.editName;
-      if (document.getElementById('label-size')) document.getElementById('label-size').textContent = t.size || "UI SIZE";
-      document.getElementById('settings-title').textContent = t.settings;
-      document.getElementById('label-lang').textContent = t.lang;
-      document.getElementById('label-ui').textContent = t.ui;
-      document.getElementById('label-theme').textContent = t.theme;
-      document.getElementById('btn-how-to').textContent = t.howTo;
-      document.getElementById('instructions-box').textContent = t.instructions;
-
-      document.body.dir = lang === 'fa' ? 'rtl' : 'ltr';
-      
-      if (chancesLeft > 0) updateDialogue();
-      updateTrackerUI();
-    }
-
-    function updateSize(sizeClass) {
-      document.body.classList.remove('size-small', 'size-medium', 'size-large');
-      document.body.classList.add(sizeClass);
-    }
-
-    function updateStyle(styleClass) {
-      document.body.classList.remove('style-retro', 'style-modern');
-      document.body.classList.add(styleClass);
-    }
-
-    function updateTheme(themeClass) {
-      document.body.classList.remove(
-        'theme-yellow', 
-        'theme-orange', 
-        'theme-green', 
-        'theme-blue', 
-        'theme-purple', 
-        'theme-pink', 
-        'theme-dark'
-      );
-      document.body.classList.add(themeClass);
-    }
-
-    function petPlant() {
-      const canvas = document.getElementById('plantCanvas');
-      canvas.style.transform = 'scale(1.15)';
-      setTimeout(() => canvas.style.transform = 'scale(1)', 150);
-    }
-
-    function drawPixelPlant() {
-      const canvas = document.getElementById('plantCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, 16, 16);
-
-      // Pot Base & Rim
-      ctx.fillStyle = '#d9730d';
-      ctx.fillRect(5, 12, 6, 3);
-      ctx.fillStyle = '#b35c05';
-      ctx.fillRect(4, 11, 8, 1);
-
-      // Main Stem
-      ctx.fillStyle = currentMood === 'sad' ? '#448361' : '#2e7d32';
-      const stemHeight = growthStage === 1 ? 3 : growthStage === 2 ? 5 : 6;
-      const startY = 11 - stemHeight;
-
-      if (currentMood === 'tired' || currentMood === 'sad') {
-        ctx.fillRect(7, startY + 2, 2, stemHeight - 1);
-        ctx.fillRect(6, startY, 2, 2);
-      } else {
-        ctx.fillRect(7, startY, 2, stemHeight);
-      }
-
-      // Leaves
-      const leafColors = { happy: '#448361', calm: '#5ca278', tired: '#7cbfa1', sad: '#5c8a67' };
-      ctx.fillStyle = leafColors[currentMood];
-
-      if (currentMood === 'happy' || currentMood === 'calm') {
-        ctx.fillRect(5, startY + 2, 2, 2);
-        ctx.fillRect(9, startY + 3, 2, 2);
-        if (growthStage >= 2) {
-          ctx.fillRect(4, startY + 4, 2, 2);
-          ctx.fillRect(10, startY + 4, 2, 2);
-        }
-      } else {
-        ctx.fillRect(4, startY + 3, 2, 2);
-        ctx.fillRect(8, startY + 4, 2, 2);
-      }
-
-      // Flower Blossom
-      if (currentMood === 'happy') {
-        const flowerY = startY - 3;
-
-        ctx.fillStyle = '#d15796';
-        ctx.fillRect(6, flowerY, 4, 4);
-
-        ctx.fillStyle = '#e86dae';
-        ctx.fillRect(7, flowerY - 1, 2, 1);
-        ctx.fillRect(7, flowerY + 4, 2, 1);
-        ctx.fillRect(5, flowerY + 1, 1, 2);
-        ctx.fillRect(10, flowerY + 1, 1, 2);
-
-        ctx.fillStyle = '#d9931e';
-        ctx.fillRect(7, flowerY + 1, 2, 2);
-
-      } else if (currentMood === 'calm') {
-        const budY = startY - 2;
-        ctx.fillStyle = '#448361';
-        ctx.fillRect(7, budY + 1, 2, 2);
-        ctx.fillStyle = '#9065b0';
-        ctx.fillRect(7, budY, 2, 1);
-      }
-    }
-
-    drawPixelPlant();
-    updateLanguage('en');
-  </script>
+  <audio id="audio-player" crossorigin="anonymous"></audio>
+  <script src="script.js"></script>
 </body>
 </html>
