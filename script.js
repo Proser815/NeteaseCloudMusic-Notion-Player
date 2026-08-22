@@ -1,5 +1,5 @@
-const PLAYLIST_ID = "18296112251";
-const API_BASE = `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${PLAYLIST_ID}`;
+let currentPlaylistID = "18296112251";
+let getApiBase = (id) => `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${id}`;
 
 let playlist = [];
 let currentIndex = 0;
@@ -51,6 +51,15 @@ const islandPlaylistDrawer = document.getElementById("island-playlist-drawer");
 const islandClosePlaylist = document.getElementById("island-close-playlist");
 const islandPlaylistUl = document.getElementById("island-playlist-ul");
 
+// Settings Drawer Elements
+const islandBtnSettings = document.getElementById("island-btn-settings");
+const islandSettingsDrawer = document.getElementById("island-settings-drawer");
+const islandCloseSettings = document.getElementById("island-close-settings");
+const btnInterfaceCompact = document.getElementById("btn-interface-compact");
+const btnInterfaceExtended = document.getElementById("btn-interface-extended");
+const islandPlaylistIdInput = document.getElementById("island-playlist-id-input");
+const btnImportPlaylist = document.getElementById("btn-import-playlist");
+
 // Top-Right Popover Elements
 const islandBtnVol = document.getElementById("island-btn-vol");
 const islandVolPopover = document.getElementById("island-vol-popover");
@@ -73,18 +82,19 @@ const islandProgressBarFill = document.getElementById("island-progress-bar-fill"
 function isAnyDrawerOrPopoverOpen() {
   return !islandSearchDrawer.classList.contains("collapsed") ||
          !islandPlaylistDrawer.classList.contains("collapsed") ||
+         !islandSettingsDrawer.classList.contains("collapsed") ||
          !islandVolPopover.classList.contains("collapsed") ||
          !islandOpacityPopover.classList.contains("collapsed");
 }
 
 function closeAllIslandPopoversAndDrawers() {
-  [islandSearchDrawer, islandPlaylistDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
+  [islandSearchDrawer, islandPlaylistDrawer, islandSettingsDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
     if (el) el.classList.add("collapsed");
   });
-  [islandBtnSearch, islandBtnPlaylist, islandBtnVol, islandBtnOpacity].forEach(b => {
+  [islandBtnSearch, islandBtnPlaylist, islandBtnSettings, islandBtnVol, islandBtnOpacity].forEach(b => {
     if (b) b.classList.remove("active");
   });
-  dynamicIsland.classList.remove("search-active", "playlist-active");
+  dynamicIsland.classList.remove("search-active", "playlist-active", "settings-active");
 }
 
 function togglePopover(popover, button) {
@@ -110,7 +120,9 @@ function toggleDrawer(drawer, button, activeClass) {
 dynamicIsland.addEventListener("mouseleave", () => {
   if (isAnyDrawerOrPopoverOpen()) {
     dynamicIsland.style.width = "275px";
-    dynamicIsland.style.height = dynamicIsland.classList.contains("search-active") || dynamicIsland.classList.contains("playlist-active") ? "135px" : "86px";
+    dynamicIsland.style.height = (dynamicIsland.classList.contains("search-active") || 
+                                  dynamicIsland.classList.contains("playlist-active") || 
+                                  dynamicIsland.classList.contains("settings-active")) ? "135px" : "86px";
   }
 });
 
@@ -155,20 +167,26 @@ function animateBars() {
   animationFrameId = requestAnimationFrame(animateBars);
 }
 
+async function fetchPlaylist(id) {
+  try {
+    const res = await fetch(getApiBase(id));
+    playlist = await res.json();
+    renderIslandPlaylist();
+    if (playlist.length > 0) {
+      loadTrack(0);
+      playTrack();
+    }
+  } catch (err) {
+    islandTitle.innerText = "Error Loading";
+  }
+}
+
 async function initPlayer() {
   dynamicIsland.classList.remove("hidden");
   handleVolumeChange(0.8, false);
   handleOpacityChange(0.85, false);
   syncPlayModeUI();
-
-  try {
-    const res = await fetch(API_BASE);
-    playlist = await res.json();
-    renderIslandPlaylist();
-    if (playlist.length > 0) loadTrack(0);
-  } catch (err) {
-    islandTitle.innerText = "Error Loading";
-  }
+  await fetchPlaylist(currentPlaylistID);
 }
 
 islandBtnSearch.addEventListener("click", (e) => { e.stopPropagation(); toggleDrawer(islandSearchDrawer, islandBtnSearch, "search-active"); });
@@ -180,6 +198,38 @@ islandBtnPlaylist.addEventListener("click", (e) => {
   toggleDrawer(islandPlaylistDrawer, islandBtnPlaylist, "playlist-active"); 
 });
 islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
+
+islandBtnSettings.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toggleDrawer(islandSettingsDrawer, islandBtnSettings, "settings-active");
+});
+islandCloseSettings.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
+
+// Compact / Extended Toggle Logic
+btnInterfaceCompact.addEventListener("click", (e) => {
+  e.stopPropagation();
+  btnInterfaceCompact.classList.add("active");
+  btnInterfaceExtended.classList.remove("active");
+  dynamicIsland.classList.remove("extended-mode");
+});
+
+btnInterfaceExtended.addEventListener("click", (e) => {
+  e.stopPropagation();
+  btnInterfaceExtended.classList.add("active");
+  btnInterfaceCompact.classList.remove("active");
+  dynamicIsland.classList.add("extended-mode");
+});
+
+// Playlist Import Logic
+btnImportPlaylist.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const id = islandPlaylistIdInput.value.trim();
+  if (id) {
+    currentPlaylistID = id;
+    fetchPlaylist(id);
+    islandPlaylistIdInput.value = "";
+  }
+});
 
 islandBtnVol.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandVolPopover, islandBtnVol); });
 islandBtnOpacity.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandOpacityPopover, islandBtnOpacity); });
@@ -282,19 +332,37 @@ islandBtnPlay.addEventListener("click", (e) => {
   if (audio.paused) playTrack(); else pauseTrack();
 });
 
+// Random/Shuffle Pick Function
+function getRandomIndex() {
+  if (playlist.length <= 1) return 0;
+  let rand;
+  do {
+    rand = Math.floor(Math.random() * playlist.length);
+  } while (rand === currentIndex);
+  return rand;
+}
+
 islandBtnPrev.addEventListener("click", (e) => {
   e.stopPropagation();
-  let prevIndex = currentIndex - 1;
-  if (prevIndex < 0) prevIndex = playlist.length - 1;
-  loadTrack(prevIndex);
+  if (playMode === 2) { // Shuffle Mode
+    loadTrack(getRandomIndex());
+  } else {
+    let prevIndex = currentIndex - 1;
+    if (prevIndex < 0) prevIndex = playlist.length - 1;
+    loadTrack(prevIndex);
+  }
   playTrack();
 });
 
 islandBtnNext.addEventListener("click", (e) => {
   e.stopPropagation();
-  let nextIndex = currentIndex + 1;
-  if (nextIndex >= playlist.length) nextIndex = 0;
-  loadTrack(nextIndex);
+  if (playMode === 2) { // Shuffle Mode
+    loadTrack(getRandomIndex());
+  } else {
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= playlist.length) nextIndex = 0;
+    loadTrack(nextIndex);
+  }
   playTrack();
 });
 
@@ -322,13 +390,12 @@ audio.addEventListener("timeupdate", () => {
 });
 
 audio.addEventListener("ended", () => {
-  if (playMode === 1) {
+  if (playMode === 1) { // Repeat One
     playTrack();
-  } else if (playMode === 2) {
-    let rand = Math.floor(Math.random() * playlist.length);
-    loadTrack(rand);
+  } else if (playMode === 2) { // Shuffle / Random Mode
+    loadTrack(getRandomIndex());
     playTrack();
-  } else {
+  } else { // Loop Playlist
     islandBtnNext.click();
   }
 });
@@ -505,7 +572,6 @@ islandSearchInput.addEventListener("input", (e) => {
 
             playlist.push(song);
             
-            // Switch plus icon to an iOS-style checkmark with animation
             addBtn.classList.add("added");
             addBtn.innerHTML = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#34c759" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
             

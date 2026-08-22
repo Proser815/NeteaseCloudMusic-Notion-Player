@@ -42,6 +42,9 @@
           <button id="island-btn-playlist" class="island-top-ctrl" title="Playlist">
             <svg viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg>
           </button>
+          <button id="island-btn-settings" class="island-top-ctrl" title="Advanced Settings">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          </button>
           <button id="island-btn-vol" class="island-top-ctrl" title="Volume Adjustment">
             <div class="vol-icon-wrapper">
               <svg id="island-vol-icon-svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
@@ -97,7 +100,7 @@
         <h3 style="font-size: 0.65rem; font-weight:600;">Search Track</h3>
         <button id="island-close-search" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
-      <input type="text" id="island-search-input" placeholder="Type artist or song..." autocomplete="off" style="width:100%; padding:2px 5px; border-radius:4px; border:1px solid rgba(0,0,0,0.15); background:rgba(0,0,0,0.03); color:inherit; font-size:0.6rem;">
+      <input type="text" id="island-search-input" placeholder="Type artist or song..." autocomplete="off">
       <div id="island-search-results" class="search-predictions hidden" style="position:relative; margin-top:2px; overflow-y:auto; max-height:130px;"><ul id="island-search-results-ul" style="list-style:none;"></ul></div>
     </div>
 
@@ -107,6 +110,42 @@
         <button id="island-close-playlist" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
       <ul id="island-playlist-ul" style="list-style:none; overflow-y:auto; flex:1;"></ul>
+    </div>
+
+    <div id="island-settings-drawer" class="playlist-drawer collapsed">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <h3 style="font-size: 0.65rem; font-weight:600;">Advanced Settings</h3>
+        <button id="island-close-settings" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      
+      <div class="settings-content" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:6px;">
+        <!-- Compact/Extended Interface Setting -->
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.55rem; font-weight:500;">Interface Mode</span>
+          <div class="segmented-control">
+            <button id="btn-interface-compact" class="segment-btn active">Compact</button>
+            <button id="btn-interface-extended" class="segment-btn">Extended</button>
+          </div>
+        </div>
+
+        <!-- Custom Playlist ID Setting -->
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <span style="font-size:0.55rem; font-weight:500;">Import Playlist ID</span>
+          <div style="display:flex; gap:4px;">
+            <input type="text" id="island-playlist-id-input" placeholder="Enter NetEase Playlist ID..." style="flex:1; height:20px; font-size:0.52rem; padding:0 4px; border-radius:4px; border:0.5px solid rgba(var(--text-rgb),0.2); background:rgba(var(--text-rgb),0.08); color:inherit; outline:none;">
+            <button id="btn-import-playlist" style="height:20px; padding:0 6px; font-size:0.52rem; font-weight:600; border-radius:4px; border:none; background:rgba(var(--text-rgb),0.18); color:inherit; cursor:pointer;">Import</button>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div style="font-size:0.48rem; opacity:0.75; line-height:1.2; background:rgba(var(--text-rgb),0.05); padding:4px; border-radius:4px;">
+          <strong>How to use:</strong><br>
+          • Hover over the island to expand controls.<br>
+          • Use Search or Playlist to manage tracks.<br>
+          • Click the Loop/Shuffle button to change playback mode.<br>
+          • Paste a valid playlist ID above to import custom tracks.
+        </div>
+      </div>
     </div>
 
     <div id="island-vol-popover" class="ios-popover collapsed">

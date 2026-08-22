@@ -72,8 +72,16 @@ body {
   border-radius: 16px;
 }
 
+/* Extended Interface Mode */
+.dynamic-island.extended-mode:hover {
+  width: 320px;
+  height: 105px;
+  border-radius: 20px;
+}
+
 .dynamic-island.search-active,
-.dynamic-island.playlist-active {
+.dynamic-island.playlist-active,
+.dynamic-island.settings-active {
   width: 275px;
   height: 135px;
   border-radius: 16px;
@@ -92,7 +100,8 @@ body {
 
 .dynamic-island:hover .island-collapsed-content,
 .dynamic-island.search-active .island-collapsed-content,
-.dynamic-island.playlist-active .island-collapsed-content {
+.dynamic-island.playlist-active .island-collapsed-content,
+.dynamic-island.settings-active .island-collapsed-content {
   opacity: 0;
   pointer-events: none;
   height: 0;
@@ -174,6 +183,11 @@ body {
   height: 20px;
   border-radius: 4px;
   object-fit: cover;
+}
+
+.dynamic-island.extended-mode #island-hover-cover {
+  width: 28px;
+  height: 28px;
 }
 
 .island-track-text {
@@ -304,6 +318,16 @@ body {
   transition: opacity 0.2s, transform 0.15s;
 }
 
+.dynamic-island.extended-mode .island-ctrl-btn {
+  width: 22px;
+  height: 22px;
+}
+
+.dynamic-island.extended-mode .island-ctrl-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
 .island-ctrl-btn:hover, .island-ctrl-btn.active {
   opacity: 1;
 }
@@ -346,7 +370,7 @@ body {
   margin-top: 1px;
 }
 
-/* iOS Search & Playlist Drawers */
+/* iOS Drawers */
 .playlist-drawer {
   position: absolute;
   top: 20px;
@@ -371,6 +395,32 @@ body {
   transform: scale(0.96) translateY(4px);
   opacity: 0;
   pointer-events: none;
+}
+
+/* Segmented Control UI for Settings */
+.segmented-control {
+  display: flex;
+  background: rgba(var(--text-rgb), 0.1);
+  padding: 1px;
+  border-radius: 4px;
+}
+
+.segment-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 0.48rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.segment-btn.active {
+  background: rgba(var(--accent-rgb), 1);
+  font-weight: 600;
+  opacity: 1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
 /* iOS Search Input Bar */
@@ -470,7 +520,6 @@ body {
   font-weight: 600;
 }
 
-/* Smooth iOS-style Checkmark Animation */
 @keyframes popCheck {
   0% { transform: scale(0.5); opacity: 0; }
   70% { transform: scale(1.2); }
