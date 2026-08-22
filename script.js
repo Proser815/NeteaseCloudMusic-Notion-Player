@@ -38,7 +38,7 @@ const islandPlayIcon = document.getElementById("island-play-icon");
 const islandPauseIcon = document.getElementById("island-pause-icon");
 const islandBtnNext = document.getElementById("island-btn-next");
 
-// Island Drawer Elements
+// Drawer Elements
 const islandBtnSearch = document.getElementById("island-btn-search");
 const islandSearchDrawer = document.getElementById("island-search-drawer");
 const islandCloseSearch = document.getElementById("island-close-search");
@@ -51,7 +51,6 @@ const islandPlaylistDrawer = document.getElementById("island-playlist-drawer");
 const islandClosePlaylist = document.getElementById("island-close-playlist");
 const islandPlaylistUl = document.getElementById("island-playlist-ul");
 
-// Settings Drawer Elements
 const islandBtnSettings = document.getElementById("island-btn-settings");
 const islandSettingsDrawer = document.getElementById("island-settings-drawer");
 const islandCloseSettings = document.getElementById("island-close-settings");
@@ -59,6 +58,10 @@ const btnInterfaceCompact = document.getElementById("btn-interface-compact");
 const btnInterfaceExtended = document.getElementById("btn-interface-extended");
 const islandPlaylistIdInput = document.getElementById("island-playlist-id-input");
 const btnImportPlaylist = document.getElementById("btn-import-playlist");
+
+const islandBtnInfo = document.getElementById("island-btn-info");
+const islandInfoDrawer = document.getElementById("island-info-drawer");
+const islandCloseInfo = document.getElementById("island-close-info");
 
 // Top-Right Popover Elements
 const islandBtnVol = document.getElementById("island-btn-vol");
@@ -83,18 +86,19 @@ function isAnyDrawerOrPopoverOpen() {
   return !islandSearchDrawer.classList.contains("collapsed") ||
          !islandPlaylistDrawer.classList.contains("collapsed") ||
          !islandSettingsDrawer.classList.contains("collapsed") ||
+         !islandInfoDrawer.classList.contains("collapsed") ||
          !islandVolPopover.classList.contains("collapsed") ||
          !islandOpacityPopover.classList.contains("collapsed");
 }
 
 function closeAllIslandPopoversAndDrawers() {
-  [islandSearchDrawer, islandPlaylistDrawer, islandSettingsDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
+  [islandSearchDrawer, islandPlaylistDrawer, islandSettingsDrawer, islandInfoDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
     if (el) el.classList.add("collapsed");
   });
-  [islandBtnSearch, islandBtnPlaylist, islandBtnSettings, islandBtnVol, islandBtnOpacity].forEach(b => {
+  [islandBtnSearch, islandBtnPlaylist, islandBtnSettings, islandBtnInfo, islandBtnVol, islandBtnOpacity].forEach(b => {
     if (b) b.classList.remove("active");
   });
-  dynamicIsland.classList.remove("search-active", "playlist-active", "settings-active");
+  dynamicIsland.classList.remove("search-active", "playlist-active", "settings-active", "info-active");
 }
 
 function togglePopover(popover, button) {
@@ -122,7 +126,8 @@ dynamicIsland.addEventListener("mouseleave", () => {
     dynamicIsland.style.width = "275px";
     dynamicIsland.style.height = (dynamicIsland.classList.contains("search-active") || 
                                   dynamicIsland.classList.contains("playlist-active") || 
-                                  dynamicIsland.classList.contains("settings-active")) ? "135px" : "86px";
+                                  dynamicIsland.classList.contains("settings-active") ||
+                                  dynamicIsland.classList.contains("info-active")) ? "135px" : "86px";
   }
 });
 
@@ -205,7 +210,12 @@ islandBtnSettings.addEventListener("click", (e) => {
 });
 islandCloseSettings.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
 
-// Compact / Extended Toggle Logic
+islandBtnInfo.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toggleDrawer(islandInfoDrawer, islandBtnInfo, "info-active");
+});
+islandCloseInfo.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
+
 btnInterfaceCompact.addEventListener("click", (e) => {
   e.stopPropagation();
   btnInterfaceCompact.classList.add("active");
@@ -220,7 +230,6 @@ btnInterfaceExtended.addEventListener("click", (e) => {
   dynamicIsland.classList.add("extended-mode");
 });
 
-// Playlist Import Logic
 btnImportPlaylist.addEventListener("click", (e) => {
   e.stopPropagation();
   const id = islandPlaylistIdInput.value.trim();
@@ -332,7 +341,6 @@ islandBtnPlay.addEventListener("click", (e) => {
   if (audio.paused) playTrack(); else pauseTrack();
 });
 
-// Random/Shuffle Pick Function
 function getRandomIndex() {
   if (playlist.length <= 1) return 0;
   let rand;
@@ -344,7 +352,7 @@ function getRandomIndex() {
 
 islandBtnPrev.addEventListener("click", (e) => {
   e.stopPropagation();
-  if (playMode === 2) { // Shuffle Mode
+  if (playMode === 2) {
     loadTrack(getRandomIndex());
   } else {
     let prevIndex = currentIndex - 1;
@@ -356,7 +364,7 @@ islandBtnPrev.addEventListener("click", (e) => {
 
 islandBtnNext.addEventListener("click", (e) => {
   e.stopPropagation();
-  if (playMode === 2) { // Shuffle Mode
+  if (playMode === 2) {
     loadTrack(getRandomIndex());
   } else {
     let nextIndex = currentIndex + 1;
@@ -390,12 +398,12 @@ audio.addEventListener("timeupdate", () => {
 });
 
 audio.addEventListener("ended", () => {
-  if (playMode === 1) { // Repeat One
+  if (playMode === 1) {
     playTrack();
-  } else if (playMode === 2) { // Shuffle / Random Mode
+  } else if (playMode === 2) {
     loadTrack(getRandomIndex());
     playTrack();
-  } else { // Loop Playlist
+  } else {
     islandBtnNext.click();
   }
 });
