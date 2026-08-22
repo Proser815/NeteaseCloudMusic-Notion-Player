@@ -1,13 +1,6 @@
+const API_BASE = "https://my-meting-api.vercel.app/api";
+
 let currentPlaylistID = "18296112251";
-
-// Array of public Meting API mirrors to ensure continuous uptime
-const API_MIRRORS = [
-  "https://api.i-meto.com/meting/api",
-  "https://meting.myservers.cc/api",
-  "https://api.injahow.cn/meting/"
-];
-let currentMirrorIndex = 0;
-
 let playlist = [];
 let currentIndex = 0;
 let lyrics = [];
@@ -184,21 +177,19 @@ function animateBars() {
   animationFrameId = requestAnimationFrame(animateBars);
 }
 
-// Fetch playlist with mirror failover
+// Fetch playlist directly from your Vercel API
 async function fetchPlaylist(id) {
-  for (let i = 0; i < API_MIRRORS.length; i++) {
-    const mirror = API_MIRRORS[(currentMirrorIndex + i) % API_MIRRORS.length];
-    try {
-      const res = await fetch(`${mirror}?server=netease&type=playlist&id=${id}`);
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        currentMirrorIndex = (currentMirrorIndex + i) % API_MIRRORS.length;
-        playlist = data;
-        renderIslandPlaylist();
-        loadTrack(0);
-        return;
-      }
-    } catch (err) {}
+  try {
+    const res = await fetch(`${API_BASE}?server=netease&type=playlist&id=${id}`);
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      playlist = data;
+      renderIslandPlaylist();
+      loadTrack(0);
+      return;
+    }
+  } catch (err) {
+    console.error("Playlist fetch failed:", err);
   }
   islandTitle.innerText = "Error Loading";
 }
@@ -320,22 +311,38 @@ function extractDominantColor(imgElement, callback) {
 
 function getAudioSources(song) {
   const sources = [];
+  const songId = song.id || song.song_id || song.url_id;
+
   if (song.url) sources.push(song.url);
 
-  const songId = song.id || song.song_id;
   if (songId) {
     sources.push(`https://music.163.com/song/media/outer/url?id=${songId}.mp3`);
-    sources.push(`https://api.injahow.cn/meting/?type=url&id=${songId}`);
   }
+
   return sources;
 }
 
-function loadTrack(index) {
+async function resolveAudioUrl(song) {
+  const songId = song.id || song.song_id || song.url_id;
+  if (!songId) return song.url || "";
+
+  try {
+    const res = await fetch(`${API_BASE}?server=netease&type=url&id=${songId}`);
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]?.url) return data[0].url;
+    if (data?.url) return data.url;
+  } catch (err) {}
+
+  return `https://music.163.com/song/media/outer/url?id=${songId}.mp3`;
+}
+
+async function loadTrack(index) {
   if (index < 0 || index >= playlist.length) return;
   currentIndex = index;
   const song = playlist[currentIndex];
 
-  currentAudioSources = getAudioSources(song);
+  const audioUrl = await resolveAudioUrl(song);
+  currentAudioSources = [audioUrl, `https://music.163.com/song/media/outer/url?id=${song.id || song.url_id}.mp3`].filter(Boolean);
   sourceIndex = 0;
 
   if (currentAudioSources.length > 0) {
@@ -343,12 +350,12 @@ function loadTrack(index) {
     audio.load();
   }
 
-  const picUrl = song.pic || song.cover || "";
+  const picUrl = song.pic || song.cover || song.pic_id || "";
   islandCover.src = picUrl;
   islandHoverCover.src = picUrl;
 
   const title = song.title || song.name || "Unknown Title";
-  const artist = song.author || song.artist || "Unknown Artist";
+  const artist = Array.isArray(song.artist) ? song.artist.join(", ") : (song.author || song.artist || "Unknown Artist");
 
   islandTitle.innerText = title;
   islandHoverTitle.innerText = title;
@@ -362,7 +369,7 @@ function loadTrack(index) {
         updateDynamicTheme(rgbString);
       });
     }
-    fetchLyricsFromApi(song.lrc);
+    fetchLyricsFromApi(song.id || song.lyric_id);
   }, 0);
 
   renderIslandPlaylist();
@@ -484,15 +491,16 @@ function formatTime(sec) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-async function fetchLyricsFromApi(lrcUrl) {
+async function fetchLyricsFromApi(songId) {
   lyrics = [];
   updateIslandLyric("No lyrics found");
-  if (!lrcUrl) return;
+  if (!songId) return;
 
   try {
-    const res = await fetch(lrcUrl);
-    const text = await res.text();
-    parseLrc(text);
+    const res = await fetch(`${API_BASE}?server=netease&type=lyric&id=${songId}`);
+    const data = await res.json();
+    const lrcText = data.lyric || data.lrc || (typeof data === "string" ? data : "");
+    if (lrcText) parseLrc(lrcText);
   } catch (err) {
     updateIslandLyric("Lyrics unavailable");
   }
@@ -573,7 +581,7 @@ function renderIslandPlaylist() {
     const li = document.createElement("li");
     li.className = `playlist-item-ios ${i === currentIndex ? "active" : ""}`;
     const songName = song.title || song.name || "Unknown";
-    const songArtist = song.author || song.artist || "Unknown";
+    const songArtist = Array.isArray(song.artist) ? song.artist.join(", ") : (song.author || song.artist || "Unknown");
 
     li.innerHTML = `
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 5px;">${songName} - ${songArtist}</span>
@@ -611,57 +619,53 @@ islandSearchInput.addEventListener("input", (e) => {
   }
 
   islandDebounce = setTimeout(async () => {
-    for (let i = 0; i < API_MIRRORS.length; i++) {
-      const mirror = API_MIRRORS[(currentMirrorIndex + i) % API_MIRRORS.length];
-      try {
-        const res = await fetch(`${mirror}?server=netease&type=search&id=${encodeURIComponent(q)}`);
-        const data = await res.json();
-        
-        if (Array.isArray(data)) {
-          islandSearchResultsUl.innerHTML = "";
-          data.slice(0, 15).forEach((song) => {
-            const li = document.createElement("li");
-            li.className = "playlist-item-ios";
-            const title = song.title || song.name || "Unknown";
-            const artist = song.author || song.artist || "Unknown";
+    try {
+      const res = await fetch(`${API_BASE}?server=netease&type=search&id=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      
+      if (Array.isArray(data)) {
+        islandSearchResultsUl.innerHTML = "";
+        data.slice(0, 15).forEach((song) => {
+          const li = document.createElement("li");
+          li.className = "playlist-item-ios";
+          const title = song.title || song.name || "Unknown";
+          const artist = Array.isArray(song.artist) ? song.artist.join(", ") : (song.author || song.artist || "Unknown");
 
-            li.innerHTML = `
-              <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; flex: 1;">
-                <img src="${song.pic || song.cover || ''}" style="width: 14px; height: 14px; border-radius: 2px; object-fit: cover;" alt="">
-                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  <span>${title} - ${artist}</span>
-                </div>
+          li.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; flex: 1;">
+              <img src="${song.pic || song.cover || ''}" style="width: 14px; height: 14px; border-radius: 2px; object-fit: cover;" alt="">
+              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span>${title} - ${artist}</span>
               </div>
-              <button class="btn-add-track" title="Add to Playlist" style="background:none;border:none;color:currentColor;cursor:pointer; display:flex; padding: 2px;">
-                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              </button>
-            `;
+            </div>
+            <button class="btn-add-track" title="Add to Playlist" style="background:none;border:none;color:currentColor;cursor:pointer; display:flex; padding: 2px;">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          `;
 
-            const addBtn = li.querySelector(".btn-add-track");
-            addBtn.addEventListener("click", (evt) => {
-              evt.stopPropagation();
-              if (addBtn.classList.contains("added")) return;
+          const addBtn = li.querySelector(".btn-add-track");
+          addBtn.addEventListener("click", (evt) => {
+            evt.stopPropagation();
+            if (addBtn.classList.contains("added")) return;
 
-              playlist.push(song);
-              addBtn.classList.add("added");
-              addBtn.innerHTML = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#34c759" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-              
-              renderIslandPlaylist();
-            });
-
-            li.addEventListener("click", () => {
-              playlist.push(song);
-              loadTrack(playlist.length - 1);
-              playTrack();
-            });
-
-            islandSearchResultsUl.appendChild(li);
+            playlist.push(song);
+            addBtn.classList.add("added");
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#34c759" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            
+            renderIslandPlaylist();
           });
-          islandSearchResults.classList.remove("hidden");
-          return;
-        }
-      } catch (err) {}
-    }
+
+          li.addEventListener("click", () => {
+            playlist.push(song);
+            loadTrack(playlist.length - 1);
+            playTrack();
+          });
+
+          islandSearchResultsUl.appendChild(li);
+        });
+        islandSearchResults.classList.remove("hidden");
+      }
+    } catch (err) {}
   }, 200);
 });
 
