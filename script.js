@@ -1,6 +1,6 @@
 let currentPlaylistID = "18296112251";
-// Swapped to a faster public Meting API endpoint mirror
-const getApiBase = (id) => `https://meting.eccy.es/api?server=netease&type=playlist&id=${id}`;
+// Restored original API endpoint
+const getApiBase = (id) => `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${id}`;
 
 let playlist = [];
 let currentIndex = 0;
@@ -18,7 +18,7 @@ const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="9" height="9" fill="none"
 
 // DOM Elements
 const audio = document.getElementById("audio-player");
-audio.preload = "auto"; // Optimize browser audio buffering
+audio.preload = "auto";
 
 const dynamicIsland = document.getElementById("dynamic-island");
 
@@ -295,7 +295,6 @@ function extractDominantColor(imgElement, callback) {
   };
 }
 
-// Pre-buffers the next track in memory for zero-delay track switching
 function preloadNextTrack() {
   if (playlist.length <= 1) return;
   const nextIdx = (currentIndex + 1) % playlist.length;
@@ -311,7 +310,6 @@ function loadTrack(index) {
   currentIndex = index;
   const song = playlist[currentIndex];
 
-  // Instantly assign source & start buffer loading
   audio.src = song.url;
   audio.load();
 
@@ -327,7 +325,6 @@ function loadTrack(index) {
   islandArtist.innerText = artist;
   islandHoverArtist.innerText = artist;
 
-  // Defer heavy non-critical operations so playback starts immediately
   setTimeout(() => {
     if (picUrl) {
       extractDominantColor(islandHoverCover, (rgbString) => {
@@ -572,7 +569,7 @@ islandSearchInput.addEventListener("input", (e) => {
 
   islandDebounce = setTimeout(async () => {
     try {
-      const res = await fetch(`https://meting.eccy.es/api?server=netease&type=search&id=${encodeURIComponent(q)}`);
+      const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(q)}`);
       const data = await res.json();
       
       if (Array.isArray(data)) {
