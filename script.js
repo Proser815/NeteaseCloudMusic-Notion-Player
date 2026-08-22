@@ -1,5 +1,5 @@
-let currentPlaylistID = "18296112251";
-let getApiBase = (id) => `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${id}`;
+const PLAYLIST_ID = "18296112251";
+const API_BASE = `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${PLAYLIST_ID}`;
 
 let playlist = [];
 let currentIndex = 0;
