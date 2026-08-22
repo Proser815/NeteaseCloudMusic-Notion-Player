@@ -1,5 +1,5 @@
 let currentPlaylistID = "18296112251";
-const API_BASE = "https://netease-cloud-music-api-ten-sepia.vercel.app";
+const API_BASE = "https://api.i-meto.com/meting/api";
 
 let playlist = [];
 let currentIndex = 0;
@@ -87,8 +87,8 @@ const islandProgressBarFill = document.getElementById("island-progress-bar-fill"
 function isAnyDrawerOrPopoverOpen() {
   return !islandSearchDrawer.classList.contains("collapsed") ||
          !islandPlaylistDrawer.classList.contains("collapsed") ||
-         !islandSettingsDrawer.classList.contains("collapsed") ||
-         !islandInfoDrawer.classList.contains("collapsed") ||
+         (islandSettingsDrawer && !islandSettingsDrawer.classList.contains("collapsed")) ||
+         (islandInfoDrawer && !islandInfoDrawer.classList.contains("collapsed")) ||
          !islandVolPopover.classList.contains("collapsed") ||
          !islandOpacityPopover.classList.contains("collapsed");
 }
@@ -176,12 +176,14 @@ function animateBars() {
 
 async function fetchPlaylist(id) {
   try {
-    const res = await fetch(`${API_BASE}/playlist/track/all?id=${id}&limit=50`);
+    const res = await fetch(`${API_BASE}?server=netease&type=playlist&id=${id}`);
     const data = await res.json();
-    if (data.songs && data.songs.length > 0) {
-      playlist = data.songs;
+    if (Array.isArray(data) && data.length > 0) {
+      playlist = data;
       renderIslandPlaylist();
       loadTrack(0);
+    } else {
+      islandTitle.innerText = "Error Loading";
     }
   } catch (err) {
     islandTitle.innerText = "Error Loading";
@@ -206,41 +208,51 @@ islandBtnPlaylist.addEventListener("click", (e) => {
 });
 islandClosePlaylist.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
 
-islandBtnSettings.addEventListener("click", (e) => {
-  e.stopPropagation();
-  toggleDrawer(islandSettingsDrawer, islandBtnSettings, "settings-active");
-});
-islandCloseSettings.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
+if (islandBtnSettings) {
+  islandBtnSettings.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleDrawer(islandSettingsDrawer, islandBtnSettings, "settings-active");
+  });
+}
+if (islandCloseSettings) islandCloseSettings.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
 
-islandBtnInfo.addEventListener("click", (e) => {
-  e.stopPropagation();
-  toggleDrawer(islandInfoDrawer, islandBtnInfo, "info-active");
-});
-islandCloseInfo.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
+if (islandBtnInfo) {
+  islandBtnInfo.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleDrawer(islandInfoDrawer, islandBtnInfo, "info-active");
+  });
+}
+if (islandCloseInfo) islandCloseInfo.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
 
-btnInterfaceCompact.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnInterfaceCompact.classList.add("active");
-  btnInterfaceExtended.classList.remove("active");
-  dynamicIsland.classList.remove("extended-mode");
-});
+if (btnInterfaceCompact) {
+  btnInterfaceCompact.addEventListener("click", (e) => {
+    e.stopPropagation();
+    btnInterfaceCompact.classList.add("active");
+    btnInterfaceExtended.classList.remove("active");
+    dynamicIsland.classList.remove("extended-mode");
+  });
+}
 
-btnInterfaceExtended.addEventListener("click", (e) => {
-  e.stopPropagation();
-  btnInterfaceExtended.classList.add("active");
-  btnInterfaceCompact.classList.remove("active");
-  dynamicIsland.classList.add("extended-mode");
-});
+if (btnInterfaceExtended) {
+  btnInterfaceExtended.addEventListener("click", (e) => {
+    e.stopPropagation();
+    btnInterfaceExtended.classList.add("active");
+    btnInterfaceCompact.classList.remove("active");
+    dynamicIsland.classList.add("extended-mode");
+  });
+}
 
-btnImportPlaylist.addEventListener("click", (e) => {
-  e.stopPropagation();
-  const id = islandPlaylistIdInput.value.trim();
-  if (id) {
-    currentPlaylistID = id;
-    fetchPlaylist(id);
-    islandPlaylistIdInput.value = "";
-  }
-});
+if (btnImportPlaylist) {
+  btnImportPlaylist.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const id = islandPlaylistIdInput.value.trim();
+    if (id) {
+      currentPlaylistID = id;
+      fetchPlaylist(id);
+      islandPlaylistIdInput.value = "";
+    }
+  });
+}
 
 islandBtnVol.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandVolPopover, islandBtnVol); });
 islandBtnOpacity.addEventListener("click", (e) => { e.stopPropagation(); togglePopover(islandOpacityPopover, islandBtnOpacity); });
@@ -295,30 +307,20 @@ function extractDominantColor(imgElement, callback) {
   };
 }
 
-function preloadNextTrack() {
-  if (playlist.length <= 1) return;
-  const nextIdx = (currentIndex + 1) % playlist.length;
-  if (playlist[nextIdx] && playlist[nextIdx].id) {
-    const tempAudio = new Audio();
-    tempAudio.src = `https://music.163.com/song/media/outer/url?id=${playlist[nextIdx].id}.mp3`;
-    tempAudio.preload = "auto";
-  }
-}
-
 function loadTrack(index) {
   if (index < 0 || index >= playlist.length) return;
   currentIndex = index;
   const song = playlist[currentIndex];
 
-  audio.src = `https://music.163.com/song/media/outer/url?id=${song.id}.mp3`;
+  audio.src = song.url;
   audio.load();
 
-  const picUrl = song.al ? song.al.picUrl : "";
+  const picUrl = song.pic || song.cover || "";
   islandCover.src = picUrl;
   islandHoverCover.src = picUrl;
 
-  const title = song.name || "Unknown Title";
-  const artist = (song.ar && song.ar.length > 0) ? song.ar.map(a => a.name).join(", ") : "Unknown Artist";
+  const title = song.title || song.name || "Unknown Title";
+  const artist = song.author || song.artist || "Unknown Artist";
 
   islandTitle.innerText = title;
   islandHoverTitle.innerText = title;
@@ -332,11 +334,10 @@ function loadTrack(index) {
         updateDynamicTheme(rgbString);
       });
     }
-    fetchLyricsFromApi(song.id);
+    fetchLyricsFromApi(song.lrc);
   }, 0);
 
   renderIslandPlaylist();
-  preloadNextTrack();
 }
 
 function playTrack() {
@@ -427,7 +428,6 @@ audio.addEventListener("ended", () => {
   }
 });
 
-// Auto-skip broken songs automatically
 audio.addEventListener("error", () => {
   if (playlist.length > 1) {
     let nextIndex = (currentIndex + 1) % playlist.length;
@@ -450,17 +450,15 @@ function formatTime(sec) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-async function fetchLyricsFromApi(songId) {
+async function fetchLyricsFromApi(lrcUrl) {
   lyrics = [];
   updateIslandLyric("No lyrics found");
-  if (!songId) return;
+  if (!lrcUrl) return;
 
   try {
-    const res = await fetch(`${API_BASE}/lyric?id=${songId}`);
-    const data = await res.json();
-    if (data.lrc && data.lrc.lyric) {
-      parseLrc(data.lrc.lyric);
-    }
+    const res = await fetch(lrcUrl);
+    const text = await res.text();
+    parseLrc(text);
   } catch (err) {
     updateIslandLyric("Lyrics unavailable");
   }
@@ -540,8 +538,8 @@ function renderIslandPlaylist() {
   playlist.forEach((song, i) => {
     const li = document.createElement("li");
     li.className = `playlist-item-ios ${i === currentIndex ? "active" : ""}`;
-    const songName = song.name || "Unknown";
-    const songArtist = (song.ar && song.ar.length > 0) ? song.ar.map(a => a.name).join(", ") : "Unknown";
+    const songName = song.title || song.name || "Unknown";
+    const songArtist = song.author || song.artist || "Unknown";
 
     li.innerHTML = `
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 5px;">${songName} - ${songArtist}</span>
@@ -580,19 +578,20 @@ islandSearchInput.addEventListener("input", (e) => {
 
   islandDebounce = setTimeout(async () => {
     try {
-      const res = await fetch(`${API_BASE}/search?keywords=${encodeURIComponent(q)}`);
+      const res = await fetch(`${API_BASE}?server=netease&type=search&id=${encodeURIComponent(q)}`);
       const data = await res.json();
       
-      if (data.result && data.result.songs) {
+      if (Array.isArray(data)) {
         islandSearchResultsUl.innerHTML = "";
-        data.result.songs.slice(0, 15).forEach((song) => {
+        data.slice(0, 15).forEach((song) => {
           const li = document.createElement("li");
           li.className = "playlist-item-ios";
-          const title = song.name || "Unknown";
-          const artist = (song.artists && song.artists.length > 0) ? song.artists.map(a => a.name).join(", ") : "Unknown";
+          const title = song.title || song.name || "Unknown";
+          const artist = song.author || song.artist || "Unknown";
 
           li.innerHTML = `
             <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; flex: 1;">
+              <img src="${song.pic || song.cover || ''}" style="width: 14px; height: 14px; border-radius: 2px; object-fit: cover;" alt="">
               <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <span>${title} - ${artist}</span>
               </div>
