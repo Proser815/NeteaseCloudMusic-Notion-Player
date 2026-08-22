@@ -1,5 +1,6 @@
 let currentPlaylistID = "18296112251";
-let getApiBase = `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${currentPlaylistID}`;
+// Fixed: converted getApiBase to a function returning the URL
+const getApiBase = (id) => `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${id}`;
 
 let playlist = [];
 let currentIndex = 0;
@@ -179,7 +180,6 @@ async function fetchPlaylist(id) {
     renderIslandPlaylist();
     if (playlist.length > 0) {
       loadTrack(0);
-      playTrack();
     }
   } catch (err) {
     islandTitle.innerText = "Error Loading";
