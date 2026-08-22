@@ -1,6 +1,6 @@
 let currentPlaylistID = "18296112251";
-// Fixed: converted getApiBase to a function returning the URL
-const getApiBase = (id) => `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${id}`;
+// Swapped to a faster public Meting API endpoint mirror
+const getApiBase = (id) => `https://meting.eccy.es/api?server=netease&type=playlist&id=${id}`;
 
 let playlist = [];
 let currentIndex = 0;
@@ -18,6 +18,8 @@ const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="9" height="9" fill="none"
 
 // DOM Elements
 const audio = document.getElementById("audio-player");
+audio.preload = "auto"; // Optimize browser audio buffering
+
 const dynamicIsland = document.getElementById("dynamic-island");
 
 const islandCover = document.getElementById("island-cover");
@@ -293,12 +295,26 @@ function extractDominantColor(imgElement, callback) {
   };
 }
 
+// Pre-buffers the next track in memory for zero-delay track switching
+function preloadNextTrack() {
+  if (playlist.length <= 1) return;
+  const nextIdx = (currentIndex + 1) % playlist.length;
+  if (playlist[nextIdx] && playlist[nextIdx].url) {
+    const tempAudio = new Audio();
+    tempAudio.src = playlist[nextIdx].url;
+    tempAudio.preload = "auto";
+  }
+}
+
 function loadTrack(index) {
   if (index < 0 || index >= playlist.length) return;
   currentIndex = index;
   const song = playlist[currentIndex];
 
+  // Instantly assign source & start buffer loading
   audio.src = song.url;
+  audio.load();
+
   const picUrl = song.pic || song.cover || "";
   islandCover.src = picUrl;
   islandHoverCover.src = picUrl;
@@ -311,19 +327,25 @@ function loadTrack(index) {
   islandArtist.innerText = artist;
   islandHoverArtist.innerText = artist;
 
-  extractDominantColor(islandHoverCover, (rgbString) => {
-    document.documentElement.style.setProperty("--accent-rgb", rgbString);
-    updateDynamicTheme(rgbString);
-  });
+  // Defer heavy non-critical operations so playback starts immediately
+  setTimeout(() => {
+    if (picUrl) {
+      extractDominantColor(islandHoverCover, (rgbString) => {
+        document.documentElement.style.setProperty("--accent-rgb", rgbString);
+        updateDynamicTheme(rgbString);
+      });
+    }
+    fetchLyrics(song.lrc);
+  }, 0);
 
-  fetchLyrics(song.lrc);
   renderIslandPlaylist();
+  preloadNextTrack();
 }
 
 function playTrack() {
   initAudioContext();
   if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
-  audio.play();
+  audio.play().catch(() => {});
   islandPlayIcon.classList.add("hidden");
   islandPauseIcon.classList.remove("hidden");
   animateBars();
@@ -550,7 +572,7 @@ islandSearchInput.addEventListener("input", (e) => {
 
   islandDebounce = setTimeout(async () => {
     try {
-      const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(q)}`);
+      const res = await fetch(`https://meting.eccy.es/api?server=netease&type=search&id=${encodeURIComponent(q)}`);
       const data = await res.json();
       
       if (Array.isArray(data)) {
