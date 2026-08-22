@@ -72,8 +72,16 @@ body {
   border-radius: 16px;
 }
 
+.dynamic-island.extended-mode:hover {
+  width: 320px;
+  height: 105px;
+  border-radius: 20px;
+}
+
 .dynamic-island.search-active,
-.dynamic-island.playlist-active {
+.dynamic-island.playlist-active,
+.dynamic-island.settings-active,
+.dynamic-island.info-active {
   width: 275px;
   height: 135px;
   border-radius: 16px;
@@ -92,7 +100,9 @@ body {
 
 .dynamic-island:hover .island-collapsed-content,
 .dynamic-island.search-active .island-collapsed-content,
-.dynamic-island.playlist-active .island-collapsed-content {
+.dynamic-island.playlist-active .island-collapsed-content,
+.dynamic-island.settings-active .island-collapsed-content,
+.dynamic-island.info-active .island-collapsed-content {
   opacity: 0;
   pointer-events: none;
   height: 0;
@@ -174,6 +184,11 @@ body {
   height: 20px;
   border-radius: 4px;
   object-fit: cover;
+}
+
+.dynamic-island.extended-mode #island-hover-cover {
+  width: 28px;
+  height: 28px;
 }
 
 .island-track-text {
@@ -304,6 +319,16 @@ body {
   transition: opacity 0.2s, transform 0.15s;
 }
 
+.dynamic-island.extended-mode .island-ctrl-btn {
+  width: 22px;
+  height: 22px;
+}
+
+.dynamic-island.extended-mode .island-ctrl-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
 .island-ctrl-btn:hover, .island-ctrl-btn.active {
   opacity: 1;
 }
@@ -346,7 +371,7 @@ body {
   margin-top: 1px;
 }
 
-/* iOS Search & Playlist Drawers */
+/* iOS Drawers */
 .playlist-drawer {
   position: absolute;
   top: 20px;
@@ -373,11 +398,156 @@ body {
   pointer-events: none;
 }
 
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.drawer-header h3 {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Native iOS Inset Group Container Styling */
+.ios-group-container {
+  background: rgba(var(--text-rgb), 0.05);
+  border-radius: 8px;
+  border: 0.5px solid rgba(var(--text-rgb), 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ios-group-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 6px;
+  border-bottom: 0.5px solid rgba(var(--text-rgb), 0.08);
+}
+
+.ios-group-row:last-child {
+  border-bottom: none;
+}
+
+.ios-group-row.vertical {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.ios-row-label {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.ios-input-group {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+.ios-input-group input {
+  flex: 1;
+  height: 20px;
+  font-size: 0.5rem;
+  padding: 0 6px;
+  border-radius: 5px;
+  border: 0.5px solid rgba(var(--text-rgb), 0.15);
+  background: rgba(var(--text-rgb), 0.06);
+  color: inherit;
+  outline: none;
+}
+
+.ios-action-btn {
+  height: 20px;
+  padding: 0 8px;
+  font-size: 0.5rem;
+  font-weight: 600;
+  border-radius: 5px;
+  border: none;
+  background: #007aff;
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.ios-action-btn:active {
+  opacity: 0.8;
+}
+
+/* iOS Segmented Control UI */
+.segmented-control {
+  display: flex;
+  background: rgba(var(--text-rgb), 0.08);
+  padding: 1.5px;
+  border-radius: 6px;
+}
+
+.segment-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 0.46rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.segment-btn.active {
+  background: rgba(var(--accent-rgb), 1);
+  font-weight: 600;
+  opacity: 1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+/* iOS Info List */
+.ios-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.48rem;
+  padding: 3px 4px;
+  background: rgba(var(--text-rgb), 0.04);
+  border-radius: 5px;
+}
+
+.info-icon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--text-rgb), 0.1);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.info-icon svg {
+  width: 9px;
+  height: 9px;
+  fill: currentColor;
+}
+
 /* iOS Search Input Bar */
 #island-search-input {
   width: 100%;
   height: 24px;
-  padding: 0 6px 0 22px;
+  padding: 0 6px 0 8px;
   border-radius: 6px;
   border: 0.5px solid rgba(var(--text-rgb), 0.2);
   background-color: rgba(var(--text-rgb), 0.08);
@@ -398,7 +568,6 @@ body {
   border-color: rgba(var(--text-rgb), 0.4);
 }
 
-/* Search Prediction Results List */
 .search-predictions {
   margin-top: 3px;
   border-radius: 6px;
@@ -470,7 +639,6 @@ body {
   font-weight: 600;
 }
 
-/* Smooth iOS-style Checkmark Animation */
 @keyframes popCheck {
   0% { transform: scale(0.5); opacity: 0; }
   70% { transform: scale(1.2); }
