@@ -1,6 +1,5 @@
 let currentPlaylistID = "18296112251";
-// Restored original API endpoint
-const getApiBase = (id) => `https://api.i-meto.com/meting/api?server=netease&type=playlist&id=${id}`;
+const API_BASE = "https://netease-cloud-music-api-ten-sepia.vercel.app";
 
 let playlist = [];
 let currentIndex = 0;
@@ -177,10 +176,11 @@ function animateBars() {
 
 async function fetchPlaylist(id) {
   try {
-    const res = await fetch(getApiBase(id));
-    playlist = await res.json();
-    renderIslandPlaylist();
-    if (playlist.length > 0) {
+    const res = await fetch(`${API_BASE}/playlist/track/all?id=${id}&limit=50`);
+    const data = await res.json();
+    if (data.songs && data.songs.length > 0) {
+      playlist = data.songs;
+      renderIslandPlaylist();
       loadTrack(0);
     }
   } catch (err) {
@@ -298,9 +298,9 @@ function extractDominantColor(imgElement, callback) {
 function preloadNextTrack() {
   if (playlist.length <= 1) return;
   const nextIdx = (currentIndex + 1) % playlist.length;
-  if (playlist[nextIdx] && playlist[nextIdx].url) {
+  if (playlist[nextIdx] && playlist[nextIdx].id) {
     const tempAudio = new Audio();
-    tempAudio.src = playlist[nextIdx].url;
+    tempAudio.src = `https://music.163.com/song/media/outer/url?id=${playlist[nextIdx].id}.mp3`;
     tempAudio.preload = "auto";
   }
 }
@@ -310,15 +310,15 @@ function loadTrack(index) {
   currentIndex = index;
   const song = playlist[currentIndex];
 
-  audio.src = song.url;
+  audio.src = `https://music.163.com/song/media/outer/url?id=${song.id}.mp3`;
   audio.load();
 
-  const picUrl = song.pic || song.cover || "";
+  const picUrl = song.al ? song.al.picUrl : "";
   islandCover.src = picUrl;
   islandHoverCover.src = picUrl;
 
-  const title = song.title || song.name || "Unknown Title";
-  const artist = song.author || song.artist || "Unknown Artist";
+  const title = song.name || "Unknown Title";
+  const artist = (song.ar && song.ar.length > 0) ? song.ar.map(a => a.name).join(", ") : "Unknown Artist";
 
   islandTitle.innerText = title;
   islandHoverTitle.innerText = title;
@@ -332,7 +332,7 @@ function loadTrack(index) {
         updateDynamicTheme(rgbString);
       });
     }
-    fetchLyrics(song.lrc);
+    fetchLyricsFromApi(song.id);
   }, 0);
 
   renderIslandPlaylist();
@@ -427,6 +427,15 @@ audio.addEventListener("ended", () => {
   }
 });
 
+// Auto-skip broken songs automatically
+audio.addEventListener("error", () => {
+  if (playlist.length > 1) {
+    let nextIndex = (currentIndex + 1) % playlist.length;
+    loadTrack(nextIndex);
+    playTrack();
+  }
+});
+
 islandProgressBarBg.addEventListener("click", (e) => {
   e.stopPropagation();
   const rect = islandProgressBarBg.getBoundingClientRect();
@@ -441,15 +450,17 @@ function formatTime(sec) {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-async function fetchLyrics(lrcUrl) {
+async function fetchLyricsFromApi(songId) {
   lyrics = [];
   updateIslandLyric("No lyrics found");
-  if (!lrcUrl) return;
+  if (!songId) return;
 
   try {
-    const res = await fetch(lrcUrl);
-    const text = await res.text();
-    parseLrc(text);
+    const res = await fetch(`${API_BASE}/lyric?id=${songId}`);
+    const data = await res.json();
+    if (data.lrc && data.lrc.lyric) {
+      parseLrc(data.lrc.lyric);
+    }
   } catch (err) {
     updateIslandLyric("Lyrics unavailable");
   }
@@ -529,8 +540,8 @@ function renderIslandPlaylist() {
   playlist.forEach((song, i) => {
     const li = document.createElement("li");
     li.className = `playlist-item-ios ${i === currentIndex ? "active" : ""}`;
-    const songName = song.title || song.name || "Unknown";
-    const songArtist = song.author || song.artist || "Unknown";
+    const songName = song.name || "Unknown";
+    const songArtist = (song.ar && song.ar.length > 0) ? song.ar.map(a => a.name).join(", ") : "Unknown";
 
     li.innerHTML = `
       <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 5px;">${songName} - ${songArtist}</span>
@@ -569,20 +580,19 @@ islandSearchInput.addEventListener("input", (e) => {
 
   islandDebounce = setTimeout(async () => {
     try {
-      const res = await fetch(`https://api.i-meto.com/meting/api?server=netease&type=search&id=${encodeURIComponent(q)}`);
+      const res = await fetch(`${API_BASE}/search?keywords=${encodeURIComponent(q)}`);
       const data = await res.json();
       
-      if (Array.isArray(data)) {
+      if (data.result && data.result.songs) {
         islandSearchResultsUl.innerHTML = "";
-        data.slice(0, 15).forEach((song) => {
+        data.result.songs.slice(0, 15).forEach((song) => {
           const li = document.createElement("li");
           li.className = "playlist-item-ios";
-          const title = song.title || song.name || "Unknown";
-          const artist = song.author || song.artist || "Unknown";
+          const title = song.name || "Unknown";
+          const artist = (song.artists && song.artists.length > 0) ? song.artists.map(a => a.name).join(", ") : "Unknown";
 
           li.innerHTML = `
             <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; flex: 1;">
-              <img src="${song.pic || song.cover || ''}" style="width: 14px; height: 14px; border-radius: 2px; object-fit: cover;" alt="">
               <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <span>${title} - ${artist}</span>
               </div>
