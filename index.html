@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notion Glass Music Player - Pocket Edition</title>
+  <title>Notion Glass Music Player - iOS Edition</title>
   <style>
     :root {
       --accent-rgb: 245, 245, 247;
@@ -36,7 +36,7 @@
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-      width: 2.5px;
+      width: 3px;
     }
 
     ::-webkit-scrollbar-track {
@@ -44,28 +44,29 @@
     }
 
     ::-webkit-scrollbar-thumb {
-      background: rgba(var(--text-rgb), 0.25);
+      background: rgba(var(--text-rgb), 0.2);
       border-radius: 10px;
     }
 
-    /* Pocket-Sized Ultra Condensed Live Activity Styling */
+    /* iOS Dynamic Island Styling */
     .dynamic-island {
       position: absolute;
-      top: 20px;
-      width: 34px;
-      height: 56px;
+      top: 24px;
+      width: 150px;
+      height: 48px;
       background: rgba(var(--accent-rgb), var(--glass-tint-opacity));
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
-      border-radius: 14px;
+      border-radius: 24px;
       border: 0.5px solid rgba(var(--text-rgb), 0.2);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
       z-index: 1000;
-      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
-                  height 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
-                  border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                  height 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1),
                   background 0.4s ease,
-                  color 0.4s ease;
+                  color 0.4s ease,
+                  transform 0.15s ease;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -73,45 +74,74 @@
       color: var(--text-color);
     }
 
-    /* Hover States - Extremely compact pocket size */
+    /* Ambient Glow */
+    .dynamic-island::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      background: rgba(var(--accent-rgb), 0.4);
+      filter: blur(20px);
+      z-index: -1;
+      border-radius: inherit;
+      opacity: 0.75;
+      transition: background 0.4s ease;
+    }
+
+    .dynamic-island:active {
+      transform: scale(0.97);
+    }
+
     .dynamic-island:hover {
-      width: 175px;
-      height: 76px;
-      border-radius: 12px;
+      width: 210px;
+      height: 88px;
+      border-radius: 16px;
     }
 
+    /* True Expanded Mode Dimensions */
     .dynamic-island.extended-mode:hover {
-      width: 188px;
-      height: 80px;
-      border-radius: 12px;
+      width: 290px;
+      height: 125px;
+      border-radius: 22px;
     }
 
-    /* Drawer Active State */
     .dynamic-island.playlist-active,
     .dynamic-island.settings-active,
-    .dynamic-island.info-active {
-      width: 175px !important;
-      height: 140px !important;
-      border-radius: 12px;
+    .dynamic-island.info-active,
+    .dynamic-island.lyrics-active,
+    .dynamic-island.ai-active {
+      width: 210px !important;
+      height: 175px !important;
+      border-radius: 16px;
+    }
+
+    .dynamic-island.extended-mode.playlist-active,
+    .dynamic-island.extended-mode.settings-active,
+    .dynamic-island.extended-mode.info-active,
+    .dynamic-island.extended-mode.lyrics-active,
+    .dynamic-island.extended-mode.ai-active {
+      width: 290px !important;
+      height: 220px !important;
+      border-radius: 20px;
     }
 
     .island-collapsed-content {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       width: 100%;
       height: 100%;
-      padding: 3px 2px;
-      gap: 3px;
+      padding: 0 10px;
+      gap: 8px;
       opacity: 1;
-      transition: opacity 0.15s ease-in-out;
+      transition: opacity 0.2s ease-in-out;
     }
 
     .dynamic-island:hover .island-collapsed-content,
     .dynamic-island.playlist-active .island-collapsed-content,
     .dynamic-island.settings-active .island-collapsed-content,
-    .dynamic-island.info-active .island-collapsed-content {
+    .dynamic-island.info-active .island-collapsed-content,
+    .dynamic-island.lyrics-active .island-collapsed-content,
+    .dynamic-island.ai-active .island-collapsed-content {
       opacity: 0;
       pointer-events: none;
       height: 0;
@@ -120,24 +150,67 @@
     }
 
     #island-cover {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
       object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .island-collapsed-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #island-collapsed-title {
+      font-size: 0.48rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      width: 100%;
+      display: inline-block;
+    }
+
+    #island-collapsed-title.animate {
+      overflow: visible;
+      text-overflow: clip;
+      animation: appleMarquee 7s linear infinite;
+    }
+
+    @keyframes appleMarquee {
+      0%, 15% { transform: translateX(0); }
+      85%, 100% { transform: translateX(calc(-100% + 40px)); }
+    }
+
+    #island-collapsed-artist {
+      font-size: 0.38rem;
+      opacity: 0.65;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      width: 100%;
     }
 
     .eq-bars {
       display: flex;
       align-items: flex-end;
-      gap: 1px;
-      height: 6px;
+      gap: 1.5px;
+      height: 10px;
+      flex-shrink: 0;
     }
 
     .eq-bars span {
-      width: 1px;
+      width: 1.5px;
       background: currentColor;
       border-radius: 1px;
-      height: 2px;
+      height: 3px;
       transition: height 0.1s ease;
     }
 
@@ -147,7 +220,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      padding: 4px 6px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -170,56 +243,67 @@
     .island-track-meta-compact {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 6px;
       flex: 1;
       min-width: 0;
-      margin-right: 3px;
+      margin-right: 4px;
     }
 
     #island-hover-cover {
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
       object-fit: cover;
       flex-shrink: 0;
     }
 
     .dynamic-island.extended-mode #island-hover-cover {
-      width: 21px;
-      height: 21px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
     }
 
     .island-track-text {
       display: flex;
       flex-direction: column;
-      font-size: 0.44rem;
       overflow: hidden;
       flex: 1;
       min-width: 0;
+      position: relative;
     }
 
     #island-hover-title {
+      font-size: 0.48rem;
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      line-height: 1.05;
+      line-height: 1.15;
       width: 100%;
+      display: inline-block;
+    }
+
+    .dynamic-island.extended-mode #island-hover-title {
+      font-size: 0.58rem;
     }
 
     #island-hover-artist {
-      opacity: 0.7;
-      font-size: 0.34rem;
+      opacity: 0.65;
+      font-size: 0.38rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      line-height: 1.05;
+      line-height: 1.15;
       width: 100%;
+    }
+
+    .dynamic-island.extended-mode #island-hover-artist {
+      font-size: 0.46rem;
     }
 
     .island-top-right-group {
       display: flex;
-      gap: 1px;
+      gap: 2px;
       align-items: center;
       flex-shrink: 0;
     }
@@ -233,31 +317,50 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 13px;
-      height: 13px;
+      width: 15px;
+      height: 15px;
       border-radius: 50%;
-      transition: opacity 0.2s, background 0.2s;
+      transition: opacity 0.2s, background 0.2s, transform 0.1s;
       position: relative;
+    }
+
+    .dynamic-island.extended-mode .island-top-ctrl {
+      width: 20px;
+      height: 20px;
+    }
+
+    .island-top-ctrl:active, .btn-exit-drawer:active {
+      transform: scale(0.9);
     }
 
     .island-top-ctrl:hover, .btn-exit-drawer:hover {
       opacity: 1;
-      background: rgba(var(--text-rgb), 0.12);
+      background: rgba(var(--text-rgb), 0.1);
     }
 
     .island-top-ctrl svg {
-      width: 6.5px;
-      height: 6.5px;
+      width: 7.5px;
+      height: 7.5px;
       fill: currentColor;
+    }
+
+    .dynamic-island.extended-mode .island-top-ctrl svg {
+      width: 10px;
+      height: 10px;
     }
 
     .vol-icon-wrapper {
       position: relative;
-      width: 6.5px;
-      height: 6.5px;
+      width: 7.5px;
+      height: 7.5px;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .dynamic-island.extended-mode .vol-icon-wrapper {
+      width: 10px;
+      height: 10px;
     }
 
     .vol-icon-wrapper svg {
@@ -270,7 +373,7 @@
       top: 50%;
       left: -15%;
       width: 130%;
-      height: 1px;
+      height: 1.2px;
       background-color: currentColor;
       transform: translateY(-50%) rotate(45deg);
       pointer-events: none;
@@ -283,14 +386,22 @@
     .island-marquee-container {
       overflow: hidden;
       width: 100%;
-      font-size: 0.36rem;
-      opacity: 0.88;
+      font-size: 0.38rem;
+      opacity: 0.85;
       white-space: nowrap;
       text-overflow: ellipsis;
-      max-height: 8px;
-      margin: 0;
-      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
-              opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 10px;
+      margin: 2px 0;
+      cursor: pointer;
+    }
+
+    .dynamic-island.extended-mode .island-marquee-container {
+      font-size: 0.46rem;
+      max-height: 14px;
+    }
+
+    .island-marquee-container:hover {
+      text-decoration: underline;
     }
 
     .island-marquee-container.collapsed-lyric {
@@ -304,7 +415,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 1px;
+      padding: 0 4px;
     }
 
     .island-ctrl-btn {
@@ -312,23 +423,18 @@
       border: none;
       color: currentColor;
       cursor: pointer;
-      width: 14px;
-      height: 14px;
+      width: 18px;
+      height: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.8;
+      opacity: 0.75;
       transition: opacity 0.2s, transform 0.15s;
     }
 
     .dynamic-island.extended-mode .island-ctrl-btn {
-      width: 16px;
-      height: 16px;
-    }
-
-    .dynamic-island.extended-mode .island-ctrl-btn svg {
-      width: 8px;
-      height: 8px;
+      width: 24px;
+      height: 24px;
     }
 
     .island-ctrl-btn:hover, .island-ctrl-btn.active {
@@ -336,27 +442,37 @@
     }
 
     .island-ctrl-btn:active {
-      transform: scale(0.9);
+      transform: scale(0.85);
     }
 
     .island-ctrl-btn svg {
-      width: 7px;
-      height: 7px;
+      width: 9px;
+      height: 9px;
       fill: currentColor;
+    }
+
+    .dynamic-island.extended-mode .island-ctrl-btn svg {
+      width: 13px;
+      height: 13px;
     }
 
     .island-progress-section {
       width: 100%;
+      margin: 2px 0;
     }
 
     .progress-bar-bg {
       width: 100%;
-      height: 1.2px;
-      background: rgba(var(--text-rgb), 0.25);
+      height: 2px;
+      background: rgba(var(--text-rgb), 0.2);
       border-radius: 2px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
+    }
+
+    .dynamic-island.extended-mode .progress-bar-bg {
+      height: 3.5px;
     }
 
     .progress-bar-fill {
@@ -368,35 +484,39 @@
     .time-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.3rem;
-      opacity: 0.65;
-      margin-top: 0.5px;
+      font-size: 0.32rem;
+      opacity: 0.6;
+      margin-top: 1px;
+    }
+
+    .dynamic-island.extended-mode .time-row {
+      font-size: 0.4rem;
     }
 
     /* iOS Drawers */
     .playlist-drawer {
       position: absolute;
-      top: 3px;
-      left: 3px;
-      right: 3px;
-      bottom: 3px;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
       background: rgba(var(--accent-rgb), var(--glass-tint-opacity));
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
       border: 0.5px solid rgba(var(--text-rgb), 0.2);
-      border-radius: 10px;
-      padding: 3px 5px;
+      border-radius: 12px;
+      padding: 6px 8px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       z-index: 10;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease;
       color: var(--text-color);
     }
 
     .playlist-drawer.collapsed {
-      transform: scale(0.96) translateY(4px);
+      transform: scale(0.96) translateY(6px);
       opacity: 0;
       pointer-events: none;
     }
@@ -405,7 +525,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
     .drawer-header h3 {
@@ -414,72 +534,79 @@
       letter-spacing: -0.01em;
     }
 
+    .dynamic-island.extended-mode .drawer-header h3 {
+      font-size: 0.54rem;
+    }
+
     .ios-group-container {
-      background: rgba(var(--text-rgb), 0.05);
-      border-radius: 4px;
+      background: rgba(var(--text-rgb), 0.03);
+      border-radius: 6px;
       border: 0.5px solid rgba(var(--text-rgb), 0.08);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      margin-bottom: 4px;
+      padding: 4px 6px;
+      gap: 3px;
     }
 
     .ios-group-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 2px 4px;
-      border-bottom: 0.5px solid rgba(var(--text-rgb), 0.08);
-    }
-
-    .ios-group-row:last-child {
-      border-bottom: none;
-    }
-
-    .ios-group-row.vertical {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1.5px;
+      padding: 1px 0;
     }
 
     .ios-row-label {
-      font-size: 0.4rem;
+      font-size: 0.36rem;
       font-weight: 500;
-      letter-spacing: -0.01em;
+      opacity: 0.8;
     }
 
-    .ios-input-group {
-      display: flex;
-      gap: 2px;
+    .dynamic-island.extended-mode .ios-row-label {
+      font-size: 0.43rem;
+    }
+
+    .ios-input-field {
       width: 100%;
-    }
-
-    .ios-input-group input {
-      flex: 1;
-      height: 14px;
-      font-size: 0.38rem;
-      padding: 0 3px;
+      height: 18px;
+      font-size: 0.36rem;
+      padding: 0 5px;
       border-radius: 3px;
       border: 0.5px solid rgba(var(--text-rgb), 0.15);
-      background: rgba(var(--text-rgb), 0.06);
+      background: rgba(var(--text-rgb), 0.05);
       color: inherit;
       outline: none;
     }
 
-    .ios-action-btn {
-      height: 14px;
-      padding: 0 4px;
-      font-size: 0.38rem;
+    .dynamic-island.extended-mode .ios-input-field {
+      height: 22px;
+      font-size: 0.43rem;
+    }
+
+    .inputs-grid-row {
+      display: flex;
+      gap: 3px;
+      width: 100%;
+      align-items: center;
+    }
+
+    .ios-action-btn-small {
+      height: 18px;
+      padding: 0 8px;
+      font-size: 0.35rem;
       font-weight: 600;
       border-radius: 3px;
       border: none;
       background: #007aff;
       color: #ffffff;
       cursor: pointer;
-      transition: opacity 0.15s;
+      flex-shrink: 0;
     }
 
-    .ios-action-btn:active {
-      opacity: 0.8;
+    .dynamic-island.extended-mode .ios-action-btn-small {
+      height: 22px;
+      font-size: 0.43rem;
     }
 
     .segmented-control {
@@ -493,25 +620,29 @@
       background: none;
       border: none;
       color: inherit;
-      font-size: 0.38rem;
-      padding: 1px 4px;
+      font-size: 0.35rem;
+      padding: 1px 6px;
       border-radius: 2px;
       cursor: pointer;
       opacity: 0.7;
-      transition: all 0.2s ease;
+    }
+
+    .dynamic-island.extended-mode .segment-btn {
+      font-size: 0.43rem;
+      padding: 2px 8px;
     }
 
     .segment-btn.active {
       background: rgba(var(--accent-rgb), 1);
       font-weight: 600;
       opacity: 1;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     .ios-info-list {
       display: flex;
       flex-direction: column;
-      gap: 1.5px;
+      gap: 3px;
       overflow-y: auto;
       flex: 1;
     }
@@ -519,92 +650,192 @@
     .info-item {
       display: flex;
       align-items: center;
-      gap: 3px;
-      font-size: 0.38rem;
-      padding: 1.5px 3px;
+      gap: 5px;
+      font-size: 0.4rem;
+      padding: 4px 6px;
       background: rgba(var(--text-rgb), 0.04);
-      border-radius: 3px;
+      border-radius: 5px;
     }
 
     .info-icon {
-      width: 8px;
-      height: 8px;
+      width: 14px;
+      height: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(var(--text-rgb), 0.1);
-      border-radius: 2px;
+      background: rgba(var(--text-rgb), 0.08);
+      border-radius: 3px;
       flex-shrink: 0;
     }
 
     .info-icon svg {
-      width: 4.5px;
-      height: 4.5px;
+      width: 8px;
+      height: 8px;
       fill: currentColor;
     }
 
+    /* Compact & Authentic iOS Control Center Popover Sliders */
     .ios-popover {
       position: absolute;
-      top: 3px;
-      right: 3px;
-      width: 90px;
-      background: rgba(var(--accent-rgb), var(--glass-tint-opacity));
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      top: 6px;
+      right: 6px;
+      width: 130px;
+      background: rgba(var(--accent-rgb), 0.88);
+      backdrop-filter: blur(35px);
+      -webkit-backdrop-filter: blur(35px);
       border: 0.5px solid rgba(var(--text-rgb), 0.2);
-      border-radius: 6px;
-      padding: 3px 5px;
+      border-radius: 12px;
+      padding: 6px 8px;
       z-index: 20;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
       color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transform-origin: top right;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
     }
 
     .ios-popover.collapsed {
-      transform: scale(0.9) translateY(-6px);
+      transform: scale(0.85) translateY(-6px);
       opacity: 0;
       pointer-events: none;
+    }
+
+    .ios-control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.35rem;
+      font-weight: 600;
+      opacity: 0.85;
+      padding: 0 1px;
+    }
+
+    .ios-slider-track {
+      position: relative;
+      width: 100%;
+      height: 16px;
+      background: rgba(var(--text-rgb), 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 0 2px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
     }
 
     .ios-range {
       -webkit-appearance: none;
       width: 100%;
-      height: 1.5px;
-      background: rgba(var(--text-rgb), 0.25);
-      border-radius: 2px;
+      height: 100%;
+      background: transparent;
       outline: none;
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
     }
 
     .ios-range::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 6px;
-      height: 6px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
-      background: currentColor;
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
       cursor: pointer;
-      box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+      transition: transform 0.1s ease;
+    }
+
+    .ios-range::-webkit-slider-thumb:active {
+      transform: scale(1.08);
     }
 
     .playlist-item-ios {
-      padding: 2.5px 4px;
-      border-radius: 3px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 0.4rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: currentColor;
+    }
+
+    .playlist-item-ios:active {
+      background: rgba(var(--text-rgb), 0.08);
+    }
+
+    .playlist-item-ios.active {
+      background: rgba(0, 122, 255, 0.15);
+      font-weight: 600;
+    }
+
+    .vault-item-ios {
+      padding: 4px 6px;
+      border-radius: 4px;
       font-size: 0.38rem;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: background 0.1s;
-      color: currentColor;
+      background: rgba(var(--text-rgb), 0.04);
+      margin-bottom: 2px;
     }
 
-    .playlist-item-ios:active {
-      background: rgba(var(--text-rgb), 0.1);
+    .vault-item-ios:hover {
+      background: rgba(0, 122, 255, 0.12);
     }
 
-    .playlist-item-ios.active {
-      background: rgba(0, 122, 255, 0.2);
-      color: currentColor;
-      font-weight: 600;
+    .lyrics-sheet-item {
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 0.4rem;
+      cursor: pointer;
+      text-align: center;
+      opacity: 0.55;
+      transition: all 0.2s;
+    }
+
+    .lyrics-sheet-item.active {
+      opacity: 1;
+      font-weight: 700;
+    }
+
+    /* Minimalist AI Assistant Styles */
+    .ai-minimal-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+      gap: 3px;
+      padding: 1px 2px;
+    }
+
+    .ai-msg {
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 0.35rem;
+      max-width: 90%;
+      line-height: 1.25;
+    }
+
+    .ai-msg.bot {
+      background: rgba(var(--text-rgb), 0.05);
+      align-self: flex-start;
+      border-left: 1px solid #007aff;
+    }
+
+    .ai-msg.user {
+      background: #007aff;
+      color: #ffffff;
+      align-self: flex-end;
+    }
+
+    .ai-minimal-input-row {
+      display: flex;
+      gap: 3px;
+      margin-top: 2px;
     }
   </style>
 </head>
@@ -614,6 +845,10 @@
     
     <div id="island-collapsed-content" class="island-collapsed-content">
       <img id="island-cover" src="" alt="Island Cover">
+      <div class="island-collapsed-info">
+        <span id="island-collapsed-title">Loading...</span>
+        <span id="island-collapsed-artist">...</span>
+      </div>
       <div id="island-eq" class="eq-bars">
         <span></span><span></span><span></span>
       </div>
@@ -631,10 +866,14 @@
         </div>
 
         <div class="island-top-right-group">
-          <button id="island-btn-playlist" class="island-top-ctrl" title="Playlist">
+          <!-- Sparkles / AI Intelligence Icon -->
+          <button id="island-btn-ai" class="island-top-ctrl" title="Pocket AI Assistant">
+            <svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"/></svg>
+          </button>
+          <button id="island-btn-playlist" class="island-top-ctrl" title="Playlist Queue">
             <svg viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg>
           </button>
-          <button id="island-btn-settings" class="island-top-ctrl" title="Advanced Settings">
+          <button id="island-btn-settings" class="island-top-ctrl" title="Playlist Vault & Settings">
             <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
           </button>
           <button id="island-btn-info" class="island-top-ctrl" title="Player Guide">
@@ -652,7 +891,7 @@
         </div>
       </div>
 
-      <div id="island-marquee-container" class="island-marquee-container">
+      <div id="island-marquee-container" class="island-marquee-container" title="Click for Full Lyrics">
         <div id="island-marquee-inner" class="island-marquee-inner">
           <span id="island-lyric-text">♫ Enjoy the music</span>
         </div>
@@ -690,18 +929,44 @@
       </div>
     </div>
 
+    <!-- Minimalist Context-Aware AI Assistant Drawer -->
+    <div id="island-ai-drawer" class="playlist-drawer collapsed">
+      <div class="drawer-header">
+        <h3>AI Assistant ✨</h3>
+        <button id="island-close-ai" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div id="ai-chat-box" class="ai-minimal-container">
+        <div class="ai-msg bot">Hi! Ask me anything about what's playing or your playlist.</div>
+      </div>
+      <div class="ai-minimal-input-row">
+        <input type="text" id="ai-input" class="ios-input-field" placeholder="Ask AI about this song...">
+        <button id="ai-send-btn" class="ios-action-btn-small">Send</button>
+      </div>
+    </div>
+
+    <!-- Active Playlist Drawer -->
     <div id="island-playlist-drawer" class="playlist-drawer collapsed">
       <div class="drawer-header">
-        <h3>Playlist</h3>
-        <button id="island-close-playlist" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="6.5" height="6.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        <h3>Playlist Queue</h3>
+        <button id="island-close-playlist" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
       <ul id="island-playlist-ul" style="list-style:none; overflow-y:auto; flex:1;"></ul>
     </div>
 
+    <!-- Full-Screen Interactive Lyrics Sheet Drawer -->
+    <div id="island-lyrics-drawer" class="playlist-drawer collapsed">
+      <div class="drawer-header">
+        <h3>Lyrics Sheet</h3>
+        <button id="island-close-lyrics-drawer" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <ul id="island-lyrics-sheet-ul" style="list-style:none; overflow-y:auto; flex:1;"></ul>
+    </div>
+
+    <!-- Settings & Playlist Vault Drawer -->
     <div id="island-settings-drawer" class="playlist-drawer collapsed">
       <div class="drawer-header">
-        <h3>Advanced Settings</h3>
-        <button id="island-close-settings" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="6.5" height="6.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        <h3>Playlist Vault & Settings</h3>
+        <button id="island-close-settings" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
       
       <div class="ios-group-container">
@@ -713,62 +978,70 @@
           </div>
         </div>
 
-        <div class="ios-group-row vertical">
-          <span class="ios-row-label">Custom Playlist ID</span>
-          <div class="ios-input-group">
-            <input type="text" id="island-playlist-id-input" placeholder="Paste NetEase ID...">
-            <button id="btn-import-playlist" class="ios-action-btn">Import</button>
+        <div style="display:flex; flex-direction:column; gap:3px; width:100%; margin-top:2px;">
+          <span class="ios-row-label">Playlist ID (Manual Input & Paste)</span>
+          <div style="position:relative; display:flex; align-items:center;">
+            <input type="text" id="island-playlist-id-input" class="ios-input-field" placeholder="Enter playlist ID..." style="padding-right: 20px;">
+            <button id="btn-paste-clipboard" title="Paste from Clipboard" style="position:absolute; right:3px; background:none; border:none; cursor:pointer; opacity:0.7; display:flex; align-items:center;" class="island-top-ctrl">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            </button>
+          </div>
+
+          <span class="ios-row-label" style="margin-top:2px;">Custom Name & Load</span>
+          <div class="inputs-grid-row">
+            <input type="text" id="island-playlist-name-input" class="ios-input-field" placeholder="Custom Name (Optional)...">
+            <button id="btn-import-playlist" class="ios-action-btn-small">Load</button>
           </div>
         </div>
       </div>
+
+      <div style="font-size:0.4rem; font-weight:600; margin: 2px 0 2px 2px;">Saved Playlists</div>
+      <ul id="island-vault-ul" style="list-style:none; overflow-y:auto; flex:1;"></ul>
     </div>
 
+    <!-- Player Guide Drawer -->
     <div id="island-info-drawer" class="playlist-drawer collapsed">
       <div class="drawer-header">
         <h3>Player Guide</h3>
-        <button id="island-close-info" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="6.5" height="6.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        <button id="island-close-info" class="btn-exit-drawer"><svg viewBox="0 0 24 24" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
 
       <div class="ios-info-list">
         <div class="info-item">
+          <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"/></svg></div>
+          <div><strong>AI Assistant:</strong> Knows your current track, lyrics, and playlists via Pollinations.ai.</div>
+        </div>
+        <div class="info-item">
           <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg></div>
-          <div><strong>Playlist:</strong> View and remove queued tracks.</div>
+          <div><strong>Playlist Queue:</strong> View queued tracks, jump between songs, or remove items.</div>
         </div>
         <div class="info-item">
-          <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></div>
-          <div><strong>Settings:</strong> Interface sizing & custom ID imports.</div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></div>
-          <div><strong>Volume:</strong> Adjust gain output levels.</div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-1.09 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
-          <div><strong>Glass Opacity:</strong> Change island transparency.</div>
-        </div>
-        <div class="info-item">
-          <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></div>
-          <div><strong>Modes:</strong> Toggle Loop, Repeat 1, or Random Mode.</div>
+          <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>
+          <div><strong>Lyrics Sheet:</strong> Tap the marquee text to open full lyrics and seek playback.</div>
         </div>
       </div>
     </div>
 
-    <!-- Volume Popover with Close Cross -->
+    <!-- Volume Control Center Popover -->
     <div id="island-vol-popover" class="ios-popover collapsed">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5px; font-size:0.38rem;">
-        <span style="font-weight:600;">Volume</span>
+      <div class="ios-control-header">
+        <span>Volume <span id="vol-percentage" style="font-weight:400; opacity:0.6;">80%</span></span>
         <button id="island-close-vol" class="btn-exit-drawer" style="width:10px; height:10px;"><svg viewBox="0 0 24 24" width="6" height="6" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
-      <input type="range" id="island-settings-vol" class="ios-range" min="0" max="1" step="0.01" value="0.8">
+      <div class="ios-slider-track">
+        <input type="range" id="island-settings-vol" class="ios-range" min="0" max="1" step="0.01" value="0.8">
+      </div>
     </div>
 
-    <!-- Opacity Popover with Close Cross -->
+    <!-- Opacity Control Center Popover -->
     <div id="island-opacity-popover" class="ios-popover collapsed">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5px; font-size:0.38rem;">
-        <span style="font-weight:600;">Glass Opacity</span>
+      <div class="ios-control-header">
+        <span>Opacity <span id="opacity-percentage" style="font-weight:400; opacity:0.6;">85%</span></span>
         <button id="island-close-opacity" class="btn-exit-drawer" style="width:10px; height:10px;"><svg viewBox="0 0 24 24" width="6" height="6" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
-      <input type="range" id="island-settings-opacity" class="ios-range" min="0" max="1" step="0.01" value="0.85">
+      <div class="ios-slider-track">
+        <input type="range" id="island-settings-opacity" class="ios-range" min="0" max="1" step="0.01" value="0.85">
+      </div>
     </div>
 
   </div>
@@ -776,9 +1049,11 @@
   <audio id="audio-player" crossorigin="anonymous"></audio>
 
   <script>
-    const API_BASE = "https://api.injahow.cn/meting/";
+    const NETEASE_API_BASE = "https://api.injahow.cn/meting/";
+    const POLLINATIONS_API_BASE = "https://text.pollinations.ai/";
 
-    let currentPlaylistID = "18296112251";
+    let playlistVault = [];
+    let currentPlaylistID = "";
     let playlist = [];
     let currentIndex = 0;
     let lyrics = [];
@@ -787,13 +1062,16 @@
     let currentAudioSources = [];
     let sourceIndex = 0;
 
+    let userIsScrollingLyrics = false;
+    let lyricsUserScrollTimeout = null;
+
     let audioCtx;
     let analyser;
     let source;
     let dataArray;
     let animationFrameId;
 
-    const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="6.5" height="6.5" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    const TRASH_BIN_SVG = `<svg viewBox="0 0 24 24" width="7" height="7" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
 
     // DOM Elements
     const audio = document.getElementById("audio-player");
@@ -802,6 +1080,9 @@
     const dynamicIsland = document.getElementById("dynamic-island");
 
     const islandCover = document.getElementById("island-cover");
+    const islandCollapsedTitle = document.getElementById("island-collapsed-title");
+    const islandCollapsedArtist = document.getElementById("island-collapsed-artist");
+
     const islandHoverCover = document.getElementById("island-hover-cover");
     const islandHoverTitle = document.getElementById("island-hover-title");
     const islandHoverArtist = document.getElementById("island-hover-artist");
@@ -818,19 +1099,33 @@
     const islandPauseIcon = document.getElementById("island-pause-icon");
     const islandBtnNext = document.getElementById("island-btn-next");
 
-    // Drawer & Popover Elements
+    const islandBtnAi = document.getElementById("island-btn-ai");
+    const islandAiDrawer = document.getElementById("island-ai-drawer");
+    const islandCloseAi = document.getElementById("island-close-ai");
+    const aiChatBox = document.getElementById("ai-chat-box");
+    const aiInput = document.getElementById("ai-input");
+    const aiSendBtn = document.getElementById("ai-send-btn");
+
     const islandBtnPlaylist = document.getElementById("island-btn-playlist");
     const islandPlaylistDrawer = document.getElementById("island-playlist-drawer");
     const islandClosePlaylist = document.getElementById("island-close-playlist");
     const islandPlaylistUl = document.getElementById("island-playlist-ul");
+
+    const islandLyricsDrawer = document.getElementById("island-lyrics-drawer");
+    const islandCloseLyricsDrawer = document.getElementById("island-close-lyrics-drawer");
+    const islandLyricsSheetUl = document.getElementById("island-lyrics-sheet-ul");
 
     const islandBtnSettings = document.getElementById("island-btn-settings");
     const islandSettingsDrawer = document.getElementById("island-settings-drawer");
     const islandCloseSettings = document.getElementById("island-close-settings");
     const btnInterfaceCompact = document.getElementById("btn-interface-compact");
     const btnInterfaceExtended = document.getElementById("btn-interface-extended");
+
     const islandPlaylistIdInput = document.getElementById("island-playlist-id-input");
+    const islandPlaylistNameInput = document.getElementById("island-playlist-name-input");
+    const btnPasteClipboard = document.getElementById("btn-paste-clipboard");
     const btnImportPlaylist = document.getElementById("btn-import-playlist");
+    const islandVaultUl = document.getElementById("island-vault-ul");
 
     const islandBtnInfo = document.getElementById("island-btn-info");
     const islandInfoDrawer = document.getElementById("island-info-drawer");
@@ -840,15 +1135,15 @@
     const islandVolPopover = document.getElementById("island-vol-popover");
     const islandCloseVol = document.getElementById("island-close-vol");
     const islandSettingsVol = document.getElementById("island-settings-vol");
-    const islandVolVal = document.getElementById("island-vol-val");
     const islandVolIconSvg = document.getElementById("island-vol-icon-svg");
     const volCrossStrike = document.getElementById("vol-cross-strike");
+    const volPercentageEl = document.getElementById("vol-percentage");
 
     const islandBtnOpacity = document.getElementById("island-btn-opacity");
     const islandOpacityPopover = document.getElementById("island-opacity-popover");
     const islandCloseOpacity = document.getElementById("island-close-opacity");
     const islandSettingsOpacity = document.getElementById("island-settings-opacity");
-    const islandOpacityVal = document.getElementById("island-opacity-val");
+    const opacityPercentageEl = document.getElementById("opacity-percentage");
 
     const islandBtnLyricsToggle = document.getElementById("island-btn-lyrics");
     const islandCurrentTimeEl = document.getElementById("island-current-time");
@@ -856,8 +1151,20 @@
     const islandProgressBarBg = document.getElementById("island-progress-bar-bg");
     const islandProgressBarFill = document.getElementById("island-progress-bar-fill");
 
+    function checkTitleMarquee() {
+      [islandCollapsedTitle, islandHoverTitle].forEach(el => {
+        if (!el) return;
+        el.classList.remove("animate");
+        if (el.scrollWidth > el.parentElement.clientWidth) {
+          el.classList.add("animate");
+        }
+      });
+    }
+
     function isAnyDrawerOrPopoverOpen() {
       return !islandPlaylistDrawer.classList.contains("collapsed") ||
+             !islandLyricsDrawer.classList.contains("collapsed") ||
+             !islandAiDrawer.classList.contains("collapsed") ||
              (islandSettingsDrawer && !islandSettingsDrawer.classList.contains("collapsed")) ||
              (islandInfoDrawer && !islandInfoDrawer.classList.contains("collapsed")) ||
              !islandVolPopover.classList.contains("collapsed") ||
@@ -865,13 +1172,13 @@
     }
 
     function closeAllIslandPopoversAndDrawers() {
-      [islandPlaylistDrawer, islandSettingsDrawer, islandInfoDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
+      [islandPlaylistDrawer, islandLyricsDrawer, islandAiDrawer, islandSettingsDrawer, islandInfoDrawer, islandVolPopover, islandOpacityPopover].forEach(el => {
         if (el) el.classList.add("collapsed");
       });
-      [islandBtnPlaylist, islandBtnSettings, islandBtnInfo, islandBtnVol, islandBtnOpacity].forEach(b => {
+      [islandBtnPlaylist, islandBtnSettings, islandBtnAi, islandBtnInfo, islandBtnVol, islandBtnOpacity].forEach(b => {
         if (b) b.classList.remove("active");
       });
-      dynamicIsland.classList.remove("playlist-active", "settings-active", "info-active");
+      dynamicIsland.classList.remove("playlist-active", "settings-active", "ai-active", "info-active", "lyrics-active");
     }
 
     document.addEventListener("click", (e) => {
@@ -894,24 +1201,107 @@
       closeAllIslandPopoversAndDrawers();
       if (isCollapsed) {
         drawer.classList.remove("collapsed");
-        button.classList.add("active");
+        if (button) button.classList.add("active");
         dynamicIsland.classList.add(activeClass);
+        setTimeout(checkTitleMarquee, 50);
       }
     }
 
     dynamicIsland.addEventListener("mouseleave", () => {
       if (isAnyDrawerOrPopoverOpen()) {
-        dynamicIsland.style.width = "175px";
-        dynamicIsland.style.height = (islandPlaylistDrawer.classList.contains("playlist-active") || 
-                                      islandSettingsDrawer.classList.contains("settings-active") ||
-                                      islandInfoDrawer.classList.contains("info-active")) ? "140px" : "76px";
+        const isExtended = dynamicIsland.classList.contains("extended-mode");
+        dynamicIsland.style.width = isExtended ? "290px" : "210px";
+        dynamicIsland.style.height = isExtended ? "220px" : "175px";
       }
+      setTimeout(checkTitleMarquee, 50);
     });
 
     dynamicIsland.addEventListener("mouseenter", () => {
       dynamicIsland.style.width = "";
       dynamicIsland.style.height = "";
+      setTimeout(checkTitleMarquee, 50);
     });
+
+    // Fast Context-Aware AI Assistant Logic via Pollinations.ai
+    islandBtnAi.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleDrawer(islandAiDrawer, islandBtnAi, "ai-active");
+    });
+    islandCloseAi.addEventListener("click", (e) => { e.stopPropagation(); closeAllIslandPopoversAndDrawers(); });
+
+    function appendAiMessage(sender, text) {
+      const bubble = document.createElement("div");
+      bubble.className = `ai-msg ${sender}`;
+      bubble.innerText = text;
+      aiChatBox.appendChild(bubble);
+      aiChatBox.scrollTop = aiChatBox.scrollHeight;
+    }
+
+    aiSendBtn.addEventListener("click", handleAiSend);
+    aiInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleAiSend(); });
+
+    async function handleAiSend() {
+      const text = aiInput.value.trim();
+      if (!text) return;
+      appendAiMessage("user", text);
+      aiInput.value = "";
+
+      const loadingId = "loading-" + Date.now();
+      const loadingBubble = document.createElement("div");
+      loadingBubble.id = loadingId;
+      loadingBubble.className = "ai-msg bot";
+      loadingBubble.innerText = "...";
+      aiChatBox.appendChild(loadingBubble);
+      aiChatBox.scrollTop = aiChatBox.scrollHeight;
+
+      const currentTitle = islandHoverTitle.innerText || "Unknown Title";
+      const currentArtist = islandHoverArtist.innerText || "Unknown Artist";
+      const activeLyric = islandLyricText.innerText || "None";
+      const activePlaylistId = currentPlaylistID || "None";
+
+      const contextualPrompt = `[Context: Currently playing song "${currentTitle}" by artist "${currentArtist}". Current active lyric line: "${activeLyric}". Active NetEase Playlist ID: ${activePlaylistId}. Total tracks in queue: ${playlist.length}]. User question: ${text}`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const res = await fetch(`${POLLINATIONS_API_BASE}${encodeURIComponent(contextualPrompt)}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        const reply = res.ok ? await res.text() : "Here! Enjoy the music ✨";
+        document.getElementById(loadingId)?.remove();
+        appendAiMessage("bot", reply);
+      } catch (err) {
+        document.getElementById(loadingId)?.remove();
+        appendAiMessage("bot", `You're listening to "${currentTitle}" by ${currentArtist}! 🎵`);
+      }
+    }
+
+    islandMarqueeContainer.addEventListener("click", (e) => {
+      e.stopPropagation();
+      renderLyricsSheet();
+      toggleDrawer(islandLyricsDrawer, null, "lyrics-active");
+    });
+
+    islandCloseLyricsDrawer.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeAllIslandPopoversAndDrawers();
+    });
+
+    if (islandLyricsSheetUl) {
+      islandLyricsSheetUl.addEventListener("wheel", markUserScrollingLyrics);
+      islandLyricsSheetUl.addEventListener("touchmove", markUserScrollingLyrics);
+    }
+
+    function markUserScrollingLyrics() {
+      userIsScrollingLyrics = true;
+      if (lyricsUserScrollTimeout) clearTimeout(lyricsUserScrollTimeout);
+      lyricsUserScrollTimeout = setTimeout(() => {
+        userIsScrollingLyrics = false;
+      }, 4000);
+    }
 
     islandBtnLyricsToggle.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -942,26 +1332,27 @@
       const high = dataArray[15] || 0;
 
       const allBars = document.querySelectorAll(".eq-bars span");
-      if (allBars[0]) allBars[0].style.height = `${Math.max(2, (low / 255) * 6)}px`;
-      if (allBars[1]) allBars[1].style.height = `${Math.max(2, (mid / 255) * 6)}px`;
-      if (allBars[2]) allBars[2].style.height = `${Math.max(2, (high / 255) * 6)}px`;
+      if (allBars[0]) allBars[0].style.height = `${Math.max(3, (low / 255) * 9)}px`;
+      if (allBars[1]) allBars[1].style.height = `${Math.max(3, (mid / 255) * 9)}px`;
+      if (allBars[2]) allBars[2].style.height = `${Math.max(3, (high / 255) * 9)}px`;
 
       animationFrameId = requestAnimationFrame(animateBars);
     }
 
     async function fetchPlaylist(id) {
       try {
-        const res = await fetch(`${API_BASE}?server=netease&type=playlist&id=${id}`);
+        const res = await fetch(`${NETEASE_API_BASE}?server=netease&type=playlist&id=${id}`);
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
           playlist = data;
           renderIslandPlaylist();
           await loadTrack(0);
-          return;
+          return true;
         }
       } catch (err) {
         console.error("Playlist fetch failed:", err);
       }
+      return false;
     }
 
     async function initPlayer() {
@@ -969,7 +1360,7 @@
       handleVolumeChange(0.8, false);
       handleOpacityChange(0.85, false);
       syncPlayModeUI();
-      await fetchPlaylist(currentPlaylistID);
+      renderVault();
     }
 
     islandBtnPlaylist.addEventListener("click", (e) => { 
@@ -982,6 +1373,7 @@
     if (islandBtnSettings) {
       islandBtnSettings.addEventListener("click", (e) => {
         e.stopPropagation();
+        renderVault();
         toggleDrawer(islandSettingsDrawer, islandBtnSettings, "settings-active");
       });
     }
@@ -1001,6 +1393,7 @@
         btnInterfaceCompact.classList.add("active");
         btnInterfaceExtended.classList.remove("active");
         dynamicIsland.classList.remove("extended-mode");
+        setTimeout(checkTitleMarquee, 50);
       });
     }
 
@@ -1010,18 +1403,70 @@
         btnInterfaceExtended.classList.add("active");
         btnInterfaceCompact.classList.remove("active");
         dynamicIsland.classList.add("extended-mode");
+        setTimeout(checkTitleMarquee, 50);
+      });
+    }
+
+    if (btnPasteClipboard) {
+      btnPasteClipboard.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            islandPlaylistIdInput.value = text.trim();
+          }
+        } catch (err) {
+          console.error("Failed to read clipboard:", err);
+        }
       });
     }
 
     if (btnImportPlaylist) {
-      btnImportPlaylist.addEventListener("click", (e) => {
+      btnImportPlaylist.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = islandPlaylistIdInput.value.trim();
+        let customName = islandPlaylistNameInput.value.trim();
         if (id) {
-          currentPlaylistID = id;
-          fetchPlaylist(id);
-          islandPlaylistIdInput.value = "";
+          const success = await fetchPlaylist(id);
+          if (success) {
+            currentPlaylistID = id;
+            if (!customName) {
+              customName = `Playlist #${id.slice(-4)}`;
+            }
+            if (!playlistVault.some(p => p.id === id)) {
+              playlistVault.push({ name: customName, id: id });
+            }
+            playTrack();
+            renderVault();
+            islandPlaylistIdInput.value = "";
+            islandPlaylistNameInput.value = "";
+          }
         }
+      });
+    }
+
+    function renderVault() {
+      if (!islandVaultUl) return;
+      islandVaultUl.innerHTML = "";
+      if (playlistVault.length === 0) {
+        islandVaultUl.innerHTML = `<li style="text-align:center; opacity:0.6; font-size:0.38rem; padding:6px;">No saved playlists yet.</li>`;
+        return;
+      }
+      playlistVault.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = `vault-item-ios ${item.id === currentPlaylistID ? "active" : ""}`;
+        li.innerHTML = `
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; padding-right:4px;">${item.name} <span style="opacity:0.5; font-size:0.33rem;">(${item.id})</span></span>
+          <span style="font-size:0.33rem; color:#007aff; font-weight:600;">Switch</span>
+        `;
+        li.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          currentPlaylistID = item.id;
+          await fetchPlaylist(item.id);
+          playTrack();
+          renderVault();
+        });
+        islandVaultUl.appendChild(li);
       });
     }
 
@@ -1088,7 +1533,7 @@
       if (!songId) return song.url || "";
 
       try {
-        const res = await fetch(`${API_BASE}?server=netease&type=url&id=${songId}`);
+        const res = await fetch(`${NETEASE_API_BASE}?server=netease&type=url&id=${songId}`);
         const data = await res.json();
         if (Array.isArray(data) && data[0]?.url) return data[0].url;
         if (data?.url) return data.url;
@@ -1118,8 +1563,12 @@
       const title = song.title || song.name || "Unknown Title";
       const artist = Array.isArray(song.artist) ? song.artist.join(", ") : (song.author || song.artist || "Unknown Artist");
 
+      islandCollapsedTitle.innerText = title;
+      islandCollapsedArtist.innerText = artist;
       islandHoverTitle.innerText = title;
       islandHoverArtist.innerText = artist;
+
+      setTimeout(checkTitleMarquee, 50);
 
       setTimeout(() => {
         if (picUrl) {
@@ -1262,7 +1711,7 @@
 
       try {
         if (songId) {
-          const res = await fetch(`${API_BASE}?server=netease&type=lyric&id=${songId}`);
+          const res = await fetch(`${NETEASE_API_BASE}?server=netease&type=lyric&id=${songId}`);
           const data = await res.json();
           const lrcText = data.lyric || data.lrc || data.data?.lyric || "";
           if (lrcText && lrcText.trim() !== "") {
@@ -1313,28 +1762,72 @@
       if (lyrics.length === 0) {
         updateIslandLyric("No lyrics found");
       }
+      renderLyricsSheet();
     }
 
     function updateCurrentLyric(currentTime) {
       if (!lyrics.length) return;
-      let activeLyric = "";
+      let activeIndex = -1;
       for (let i = 0; i < lyrics.length; i++) {
-        if (currentTime >= lyrics[i].time) activeLyric = lyrics[i].text;
+        if (currentTime >= lyrics[i].time) activeIndex = i;
         else break;
       }
-      if (activeLyric) updateIslandLyric(activeLyric);
+      if (activeIndex !== -1) {
+        updateIslandLyric(lyrics[activeIndex].text);
+        highlightLyricSheetLine(activeIndex);
+      }
     }
 
     function updateIslandLyric(text) {
       if (islandLyricText) islandLyricText.innerText = text;
     }
 
+    function renderLyricsSheet() {
+      if (!islandLyricsSheetUl) return;
+      islandLyricsSheetUl.innerHTML = "";
+      if (lyrics.length === 0) {
+        islandLyricsSheetUl.innerHTML = `<li style="text-align:center; opacity:0.6; font-size:0.4rem; padding:12px;">No synced lyrics available</li>`;
+        return;
+      }
+      lyrics.forEach((item, idx) => {
+        const li = document.createElement("li");
+        li.className = `lyrics-sheet-item`;
+        li.dataset.index = idx;
+        li.innerText = item.text;
+        li.addEventListener("click", (e) => {
+          e.stopPropagation();
+          audio.currentTime = item.time;
+          playTrack();
+        });
+        islandLyricsSheetUl.appendChild(li);
+      });
+    }
+
+    function highlightLyricSheetLine(index) {
+      if (!islandLyricsSheetUl) return;
+      const items = islandLyricsSheetUl.querySelectorAll(".lyrics-sheet-item");
+      items.forEach((el, idx) => {
+        if (idx === index) {
+          el.classList.add("active");
+          if (!userIsScrollingLyrics) {
+            const container = islandLyricsSheetUl;
+            const targetScrollTop = el.offsetTop - container.offsetTop - (container.clientHeight / 2) + (el.clientHeight / 2);
+            container.scrollTo({
+              top: targetScrollTop,
+              behavior: "smooth"
+            });
+          }
+        } else {
+          el.classList.remove("active");
+        }
+      });
+    }
+
     function handleVolumeChange(val, updateDisplay = true) {
       audio.volume = parseFloat(val);
-      if (updateDisplay) {
-        islandVolVal.innerText = `${Math.round(val * 100)}%`;
+      if (volPercentageEl) {
+        volPercentageEl.innerText = `${Math.round(val * 100)}%`;
       }
-      
       if (val == 0) {
         islandVolIconSvg.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3z"/>`;
         volCrossStrike.classList.remove("hidden");
@@ -1354,8 +1847,8 @@
 
     function handleOpacityChange(val, updateDisplay = true) {
       document.documentElement.style.setProperty("--glass-tint-opacity", val);
-      if (updateDisplay) {
-        islandOpacityVal.innerText = `${Math.round(val * 100)}%`;
+      if (opacityPercentageEl) {
+        opacityPercentageEl.innerText = `${Math.round(val * 100)}%`;
       }
     }
 
@@ -1374,7 +1867,7 @@
         const songArtist = Array.isArray(song.artist) ? song.artist.join(", ") : (song.author || song.artist || "Unknown");
 
         li.innerHTML = `
-          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 3px;">${songName} - ${songArtist}</span>
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 4px;">${songName} - ${songArtist}</span>
           <button class="btn-remove" title="Remove" style="background:none;border:none;color:#ff3b30;cursor:pointer; display:flex;">${TRASH_BIN_SVG}</button>
         `;
 
